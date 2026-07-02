@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/GolangEVN.iml" filepath="$PROJECT_DIR$/.idea/GolangEVN.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/GolangEvn.iml" filepath="$PROJECT_DIR$/.idea/GolangEvn.iml" />
     </modules>
   </component>
 </project>
