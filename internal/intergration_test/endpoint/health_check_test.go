@@ -46,7 +46,7 @@ func TestHealthCheck_Integration(t *testing.T) {
 		{
 			name: "Wrong health endpoint",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := httptest.NewRequest(http.MethodGet, "/ping_wrong", nil)
+				req := httptest.NewRequest(http.MethodGet, "/ping_not_found", nil)
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
 				return respRec
