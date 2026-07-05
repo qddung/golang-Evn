@@ -2,6 +2,7 @@ package endpoint // Để _test để đảm bảo tính đóng gói độc lậ
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,7 +15,6 @@ import (
 
 func TestHealthCheck_Integration(t *testing.T) {
 	t.Parallel()
-
 	testCases := []struct {
 		name string
 
@@ -59,18 +59,24 @@ func TestHealthCheck_Integration(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
+
 		t.Run(tc.name, func(testItem *testing.T) {
-			cfg := &config.Config{
-				ServiceName: "app_service",
-				InstanceID:  "instance_01",
+			testItem.Parallel()
+
+			cfg, err := config.LoadConfig()
+			if err != nil {
+				panic(err)
 			}
+			fmt.Printf("Loaded config: %+v\n", cfg)
 			apiEngine := api.NewEngine(cfg)
 
 			rec := tc.setupTestHTTP(apiEngine)
 
+			// Check the status code of the response
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
+			// Check the response body content
 			assert.Equal(testItem, tc.getExpectedResponseContain(), rec.Body.String(), "Expected response body does not match actual response body")
+
 		})
 	}
 }
