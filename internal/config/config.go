@@ -23,5 +23,9 @@ func LoadConfig() (*Config, error) {
 		cfg.InstanceID = uuid.String()
 	}
 
+	if cfg.ServiceName == "" {
+		cfg.ServiceName = "default_service"
+	}
+
 	return cfg, nil
 }
