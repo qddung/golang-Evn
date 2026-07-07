@@ -23,6 +23,7 @@ func TestHealthCheck_Integration(t *testing.T) {
 
 		expectedStatusCode         int
 		getExpectedResponseContain func() string
+		configTest                 *config.Config
 	}{
 		{
 			name: "Health check successfully",
@@ -42,6 +43,11 @@ func TestHealthCheck_Integration(t *testing.T) {
 				})
 				return string(resp)
 			},
+			configTest: &config.Config{
+				AppPort:     "8080",
+				ServiceName: "app_service",
+				InstanceID:  "instance_01",
+			},
 		},
 		{
 			name: "Wrong health endpoint",
@@ -55,6 +61,11 @@ func TestHealthCheck_Integration(t *testing.T) {
 			getExpectedResponseContain: func() string {
 				return "404 page not found"
 			},
+			configTest: &config.Config{
+				AppPort:     "8080",
+				ServiceName: "app_service",
+				InstanceID:  "instance_01",
+			},
 		},
 	}
 
@@ -63,12 +74,8 @@ func TestHealthCheck_Integration(t *testing.T) {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
 
-			cfg, err := config.LoadConfig()
-			if err != nil {
-				panic(err)
-			}
-			fmt.Printf("Loaded config: %+v\n", cfg)
-			apiEngine := api.NewEngine(cfg)
+			fmt.Printf("Loaded config: %+v\n", tc.configTest)
+			apiEngine := api.NewEngine(tc.configTest)
 
 			rec := tc.setupTestHTTP(apiEngine)
 
