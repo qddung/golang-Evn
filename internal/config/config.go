@@ -1,62 +1,30 @@
 package config
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
+	"log"
 
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
+	"github.com/kelseyhightower/envconfig"
 )
 
 // Config struct for app config
 type Config struct {
-	AppPort     string
-	ServiceName string
-	InstanceID  string
+	AppPort     string `envconfig:"APP_PORT" default:"8080"`
+	ServiceName string `envconfig:"SERVICE_NAME" default:"book"`
+	InstanceID  string `envconfig:"INSTANCE_ID"`
 }
 
 func LoadConfig() (*Config, error) {
-	envPath, err := findEnvFile()
+	var cfg Config
+
+	err := envconfig.Process("", &cfg)
 	if err != nil {
-		return nil, err
-	}
-	if envPath != "" {
-		if err := godotenv.Load(envPath); err != nil {
-			return nil, fmt.Errorf("load .env from %s: %w", envPath, err)
-		}
+		log.Fatal(err.Error())
 	}
 
-	instanceID := os.Getenv("INSTANCE_ID")
-	serviceName := os.Getenv("SERVICE_NAME")
-	appPort := os.Getenv("APP_PORT")
-	if instanceID == "" {
-		instanceID = uuid.New().String()
-	}
-	cfg := &Config{
-		AppPort:     appPort,
-		ServiceName: serviceName,
-		InstanceID:  instanceID,
-	}
-	return cfg, nil
-}
-
-func findEnvFile() (string, error) {
-	wd, err := os.Getwd()
-	if err != nil {
-		return "", err
+	if cfg.InstanceID == "" {
+		cfg.InstanceID = uuid.NewString()
 	}
 
-	for dir := wd; ; dir = filepath.Dir(dir) {
-		candidate := filepath.Join(dir, ".env")
-		if _, err := os.Stat(candidate); err == nil {
-			return candidate, nil
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-	}
-
-	return "", nil
+	return &cfg, nil
 }
