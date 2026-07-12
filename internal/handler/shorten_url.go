@@ -1,12 +1,12 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/homework/lab/internal/service"
 	"github.com/homework/lab/pkg/response"
-	log "github.com/rs/zerolog/log"
 )
 
 type ShorternUrl interface {
@@ -40,7 +40,7 @@ func (s *shorternURL) ShortenUrl(c *gin.Context) {
 	}
 	code, err := s.svc.ShortenUrlShortenUrl(c, request.Url, request.Exp)
 	if err != nil {
-		log.Error().Err(err).Str("url", request.Url).Int64("exp", request.Exp).Msg("Generate shorten url err")
+		log.Fatal(err.Error())
 		c.JSON(http.StatusInternalServerError, response.InternalErrResponse)
 		return
 	}
