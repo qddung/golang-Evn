@@ -1,6 +1,7 @@
 package endpoint // Để _test để đảm bảo tính đóng gói độc lập
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,7 +10,7 @@ import (
 
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
-	"github.com/homework/lab/internal/handler"
+	redisPkg "github.com/homework/lab/pkg/redis"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,22 +27,22 @@ func TestShorten_Integration(t *testing.T) {
 		configTest                 *config.Config
 	}{
 		{
-			name: "Health check successfully",
+			name: "Create shorten link successfully",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := httptest.NewRequest(http.MethodGet, "/ping", nil)
+				reqBody := map[string]interface{}{
+					"url": "https://www.google.com",
+					"exp": 3600,
+				}
+				bodyBytes, _ := json.Marshal(reqBody)
+				req := httptest.NewRequest(http.MethodPost, "/api/v1/shorten", bytes.NewBuffer(bodyBytes))
+				req.Header.Set("Content-Type", "application/json")
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
 				return respRec
 			},
 			expectedStatusCode: http.StatusOK,
 			getExpectedResponseContain: func() string {
-				// Serialize the expected response to JSON format for comparison
-				resp, _ := json.Marshal(handler.HealthResponse{
-					Message:     "OK",
-					InstanceID:  "instance_01",
-					ServiceName: "app_service",
-				})
-				return string(resp)
+				return "Shorten URL generated successfully!"
 			},
 			configTest: &config.Config{
 				AppPort:     "8080",
@@ -50,9 +51,105 @@ func TestShorten_Integration(t *testing.T) {
 			},
 		},
 		{
-			name: "Wrong health endpoint",
+			name: "Create shorten link fail - invalid url format",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := httptest.NewRequest(http.MethodGet, "/ping_not_found", nil)
+				reqBody := map[string]interface{}{
+					"url": "invalid-url-not-a-link",
+					"exp": 3600,
+				}
+				bodyBytes, _ := json.Marshal(reqBody)
+				req := httptest.NewRequest(http.MethodPost, "/api/v1/shorten", bytes.NewBuffer(bodyBytes))
+				req.Header.Set("Content-Type", "application/json")
+				respRec := httptest.NewRecorder()
+				router.ServeHTTP(respRec, req)
+				return respRec
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			getExpectedResponseContain: func() string {
+				return "Field validation for 'Url' failed on the 'url' tag"
+			},
+			configTest: &config.Config{
+				AppPort:     "8080",
+				ServiceName: "app_service",
+				InstanceID:  "instance_01",
+			},
+		},
+		{
+			name: "Create shorten link fail - missing required exp",
+			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
+				reqBody := map[string]interface{}{
+					"url": "https://www.google.com",
+				}
+				bodyBytes, _ := json.Marshal(reqBody)
+				req := httptest.NewRequest(http.MethodPost, "/api/v1/shorten", bytes.NewBuffer(bodyBytes))
+				req.Header.Set("Content-Type", "application/json")
+				respRec := httptest.NewRecorder()
+				router.ServeHTTP(respRec, req)
+				return respRec
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			getExpectedResponseContain: func() string {
+				return "Field validation for 'Exp' failed on the 'required' tag"
+			},
+			configTest: &config.Config{
+				AppPort:     "8080",
+				ServiceName: "app_service",
+				InstanceID:  "instance_01",
+			},
+		},
+		{
+			name: "Create shorten link fail - exp exceed maximum limit (604800)",
+			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
+				reqBody := map[string]interface{}{
+					"url": "https://www.google.com",
+					"exp": 999999,
+				}
+				bodyBytes, _ := json.Marshal(reqBody)
+				req := httptest.NewRequest(http.MethodPost, "/api/v1/shorten", bytes.NewBuffer(bodyBytes))
+				req.Header.Set("Content-Type", "application/json")
+				respRec := httptest.NewRecorder()
+				router.ServeHTTP(respRec, req)
+				return respRec
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			getExpectedResponseContain: func() string {
+				return "Field validation for 'Exp' failed on the 'lte' tag"
+			},
+			configTest: &config.Config{
+				AppPort:     "8080",
+				ServiceName: "app_service",
+				InstanceID:  "instance_01",
+			},
+		},
+		{
+			name: "Create shorten link fail - invalid json body",
+			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
+				req := httptest.NewRequest(http.MethodPost, "/api/v1/shorten", bytes.NewBufferString("{invalid-json}"))
+				req.Header.Set("Content-Type", "application/json")
+				respRec := httptest.NewRecorder()
+				router.ServeHTTP(respRec, req)
+				return respRec
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			getExpectedResponseContain: func() string {
+				return "invalid character"
+			},
+			configTest: &config.Config{
+				AppPort:     "8080",
+				ServiceName: "app_service",
+				InstanceID:  "instance_01",
+			},
+		},
+		{
+			name: "Wrong shorten endpoint",
+			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
+				reqBody := map[string]interface{}{
+					"url": "https://www.google.com",
+					"exp": 3600,
+				}
+				bodyBytes, _ := json.Marshal(reqBody)
+				req := httptest.NewRequest(http.MethodPost, "/api/v1/shorten_not_found", bytes.NewBuffer(bodyBytes))
+				req.Header.Set("Content-Type", "application/json")
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
 				return respRec
@@ -75,14 +172,15 @@ func TestShorten_Integration(t *testing.T) {
 			testItem.Parallel()
 
 			fmt.Printf("Loaded config: %+v\n", tc.configTest)
-			apiEngine := api.NewEngine(tc.configTest)
+			redisMock := redisPkg.InitMockRedis(testItem)
+			apiEngine := api.NewEngine(tc.configTest, redisMock)
 
 			rec := tc.setupTestHTTP(apiEngine)
 
 			// Check the status code of the response
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
 			// Check the response body content
-			assert.Equal(testItem, tc.getExpectedResponseContain(), rec.Body.String(), "Expected response body does not match actual response body")
+			assert.Contains(testItem, rec.Body.String(), tc.getExpectedResponseContain(), "Expected response body does not match actual response body")
 
 		})
 	}

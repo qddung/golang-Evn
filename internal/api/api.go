@@ -31,10 +31,20 @@ type engine struct {
 }
 
 // NewEngine creates a new engine instance
-func NewEngine(cfg *config.Config) Engine {
+func NewEngine(cfg *config.Config, redisClient ...*redis.Client) Engine {
+	var rClient *redis.Client
+	if len(redisClient) > 0 && redisClient[0] != nil {
+		rClient = redisClient[0]
+	} else {
+		rClient = redis.NewClient(&redis.Options{
+			Addr: "localhost:6379",
+		})
+	}
+
 	api := &engine{
-		app: gin.New(),
-		cfg: cfg,
+		app:   gin.New(),
+		cfg:   cfg,
+		redis: rClient,
 	}
 
 	api.initRoutes(cfg)

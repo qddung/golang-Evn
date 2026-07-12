@@ -10,6 +10,7 @@ import (
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/handler"
+	redisPkg "github.com/homework/lab/pkg/redis"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -75,7 +76,8 @@ func TestHealthCheck_Integration(t *testing.T) {
 			testItem.Parallel()
 
 			fmt.Printf("Loaded config: %+v\n", tc.configTest)
-			apiEngine := api.NewEngine(tc.configTest)
+			redisMock := redisPkg.InitMockRedis(testItem)
+			apiEngine := api.NewEngine(tc.configTest, redisMock)
 
 			rec := tc.setupTestHTTP(apiEngine)
 
