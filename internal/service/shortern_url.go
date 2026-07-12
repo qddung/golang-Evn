@@ -11,6 +11,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+//go:generate mockery --name=ShorternUrl --filename=shorten_url.go --outpkg=mocks
 type ShorternUrl interface {
 	ShortenUrlShortenUrl(ctx context.Context, url string, exp int64) (string, error)
 }

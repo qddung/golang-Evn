@@ -63,7 +63,7 @@ func TestHealthCheck_Ping(t *testing.T) {
 
 			// Configure the mock behavior
 			// When the handler calls mockSvc.Ping(), the mock returns the data for the current test case
-			mockSvc.On("Ping").Return(service.HealthStatusResult{
+			mockSvc.On("Ping", c).Return(service.HealthStatusResult{
 				Message:     tc.expectedResult.Message,
 				ServiceName: tc.mockEnvName,
 				InstanceID:  tc.mockEnvID,

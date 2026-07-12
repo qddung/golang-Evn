@@ -40,7 +40,7 @@ func (s *shorternURL) ShortenUrl(c *gin.Context) {
 	}
 	code, err := s.svc.ShortenUrlShortenUrl(c, request.Url, request.Exp)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, response.InternalErrResponse)
 		return
 	}
