@@ -130,3 +130,57 @@ func TestService_CreateShortenLink(t *testing.T) {
 	}
 
 }
+
+func TestService_GetLinkFromCode(t *testing.T) {
+	testCases := []struct {
+		name string
+
+		setupRepo func(ctx context.Context) *mocks.URLStorage
+
+		expectedResult string
+		expectedErr    error
+	}{
+		{
+			name: "normal case",
+
+			setupRepo: func(ctx context.Context) *mocks.URLStorage {
+				mock := mocks.NewURLStorage(t)
+				mock.On("GetURL", ctx, "1234567").Return("https://google.com", nil)
+
+				return mock
+			},
+
+			expectedResult: "https://google.com",
+			expectedErr:    nil,
+		},
+		{
+			name: "err case - can't get key",
+
+			setupRepo: func(ctx context.Context) *mocks.URLStorage {
+				mock := mocks.NewURLStorage(t)
+				mock.On("GetURL", ctx, "1234567").Return("", testErr)
+
+				return mock
+			},
+
+			expectedResult: "",
+			expectedErr:    testErr,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			ctx := context.Background()
+
+			mockRepo := tc.setupRepo(ctx)
+
+			testService := NewShorternUrl(mockRepo, nil)
+
+			result, err := testService.GetLinkFromCode(ctx, "1234567")
+			assert.Equal(t, result, tc.expectedResult)
+			assert.ErrorIs(t, err, tc.expectedErr)
+		})
+	}
+
+}
