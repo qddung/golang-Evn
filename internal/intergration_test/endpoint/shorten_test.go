@@ -34,7 +34,7 @@ func TestShorten_Integration(t *testing.T) {
 					"exp": 3600,
 				}
 				bodyBytes, _ := json.Marshal(reqBody)
-				req := httptest.NewRequest(http.MethodPost, "/api/v1/shorten", bytes.NewBuffer(bodyBytes))
+				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", bytes.NewBuffer(bodyBytes))
 				req.Header.Set("Content-Type", "application/json")
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
@@ -58,7 +58,7 @@ func TestShorten_Integration(t *testing.T) {
 					"exp": 3600,
 				}
 				bodyBytes, _ := json.Marshal(reqBody)
-				req := httptest.NewRequest(http.MethodPost, "/api/v1/shorten", bytes.NewBuffer(bodyBytes))
+				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", bytes.NewBuffer(bodyBytes))
 				req.Header.Set("Content-Type", "application/json")
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
@@ -81,7 +81,7 @@ func TestShorten_Integration(t *testing.T) {
 					"url": "https://www.google.com",
 				}
 				bodyBytes, _ := json.Marshal(reqBody)
-				req := httptest.NewRequest(http.MethodPost, "/api/v1/shorten", bytes.NewBuffer(bodyBytes))
+				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", bytes.NewBuffer(bodyBytes))
 				req.Header.Set("Content-Type", "application/json")
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
@@ -105,7 +105,7 @@ func TestShorten_Integration(t *testing.T) {
 					"exp": 999999,
 				}
 				bodyBytes, _ := json.Marshal(reqBody)
-				req := httptest.NewRequest(http.MethodPost, "/api/v1/shorten", bytes.NewBuffer(bodyBytes))
+				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", bytes.NewBuffer(bodyBytes))
 				req.Header.Set("Content-Type", "application/json")
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
@@ -124,7 +124,7 @@ func TestShorten_Integration(t *testing.T) {
 		{
 			name: "Create shorten link fail - invalid json body",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := httptest.NewRequest(http.MethodPost, "/api/v1/shorten", bytes.NewBufferString("{invalid-json}"))
+				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", bytes.NewBufferString("{invalid-json}"))
 				req.Header.Set("Content-Type", "application/json")
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
@@ -148,7 +148,7 @@ func TestShorten_Integration(t *testing.T) {
 					"exp": 3600,
 				}
 				bodyBytes, _ := json.Marshal(reqBody)
-				req := httptest.NewRequest(http.MethodPost, "/api/v1/shorten_not_found", bytes.NewBuffer(bodyBytes))
+				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten_not_found", bytes.NewBuffer(bodyBytes))
 				req.Header.Set("Content-Type", "application/json")
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)

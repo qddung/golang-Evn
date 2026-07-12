@@ -88,8 +88,8 @@ func (e *engine) initRoutes(cfg *config.Config) {
 	e.app.GET("/ping", allHandlers.healthCheck.Ping)
 	e.app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	v1Routes := e.app.Group("/api/v1")
+	v1Routes := e.app.Group("/v1")
 	{
-		v1Routes.POST("/shorten", allHandlers.shorten.ShortenUrl)
+		v1Routes.POST("/links/shorten", allHandlers.shorten.ShortenUrl)
 	}
 }
