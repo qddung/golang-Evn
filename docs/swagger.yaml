@@ -1,0 +1,31 @@
+basePath: /
+definitions:
+  handler.HealthResponse:
+    properties:
+      instance_id:
+        type: string
+      message:
+        type: string
+      service_name:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is a book API
+  title: Book API
+  version: "1.0"
+paths:
+  /ping:
+    get:
+      description: Check the health of the API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.HealthResponse'
+      summary: Health check endpoint
+      tags:
+      - health_check
+swagger: "2.0"
