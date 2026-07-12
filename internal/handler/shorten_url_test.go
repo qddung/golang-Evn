@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -47,8 +48,8 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 				"url": "invalid-url",
 				"exp": 3600,
 			},
-			setupMock:          func(mockSvc *mocks.ShorternUrl) {},
-			expectedStatusCode: http.StatusBadRequest,
+			setupMock:             func(mockSvc *mocks.ShorternUrl) {},
+			expectedStatusCode:    http.StatusBadRequest,
 			expectedErrorContains: "Field validation for 'Url' failed on the 'url' tag",
 		},
 		{
@@ -56,8 +57,8 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 			inputBody: map[string]interface{}{
 				"url": "https://www.google.com",
 			},
-			setupMock:          func(mockSvc *mocks.ShorternUrl) {},
-			expectedStatusCode: http.StatusBadRequest,
+			setupMock:             func(mockSvc *mocks.ShorternUrl) {},
+			expectedStatusCode:    http.StatusBadRequest,
 			expectedErrorContains: "Field validation for 'Exp' failed on the 'required' tag",
 		},
 		{
@@ -66,8 +67,8 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 				"url": "https://www.google.com",
 				"exp": 999999,
 			},
-			setupMock:          func(mockSvc *mocks.ShorternUrl) {},
-			expectedStatusCode: http.StatusBadRequest,
+			setupMock:             func(mockSvc *mocks.ShorternUrl) {},
+			expectedStatusCode:    http.StatusBadRequest,
 			expectedErrorContains: "Field validation for 'Exp' failed on the 'lte' tag",
 		},
 		{
@@ -142,6 +143,89 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 			} else {
 				assert.Contains(testItem, rec.Body.String(), tc.expectedErrorContains)
 			}
+		})
+	}
+}
+
+func TestShortenURL_Redirect(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+
+		setupRequest     func(ctx *gin.Context)
+		setupMockService func(ctx context.Context) *mocks.ShorternUrl
+
+		expectedStatus int
+	}{
+		{
+			name: "normal case - success",
+
+			setupRequest: func(ctx *gin.Context) {
+				ctx.Request = httptest.NewRequest(
+					http.MethodGet,
+					"/link/redirect/1234567",
+					nil,
+				)
+				ctx.Params = gin.Params{{Key: "code", Value: "1234567"}}
+			},
+			setupMockService: func(ctx context.Context) *mocks.ShorternUrl {
+				serviceMock := mocks.NewShorternUrl(t)
+				serviceMock.On("GetLinkFromCode", ctx, "1234567").Return("https://google.com", nil)
+				return serviceMock
+			},
+
+			expectedStatus: http.StatusFound,
+		},
+		{
+			name: "err case - wrong code",
+
+			setupRequest: func(ctx *gin.Context) {
+				ctx.Request = httptest.NewRequest(
+					http.MethodGet,
+					"/link/redirect",
+					nil,
+				)
+			},
+			setupMockService: func(ctx context.Context) *mocks.ShorternUrl {
+				serviceMock := mocks.NewShorternUrl(t)
+				return serviceMock
+			},
+
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name: "err case - service err",
+
+			setupRequest: func(ctx *gin.Context) {
+				ctx.Request = httptest.NewRequest(
+					http.MethodGet,
+					"/link/redirect/1234567",
+					nil,
+				)
+				ctx.Params = gin.Params{{Key: "code", Value: "1234567"}}
+			},
+			setupMockService: func(ctx context.Context) *mocks.ShorternUrl {
+				serviceMock := mocks.NewShorternUrl(t)
+				serviceMock.On("GetLinkFromCode", ctx, "1234567").Return("", errors.New("test err"))
+				return serviceMock
+			},
+
+			expectedStatus: http.StatusInternalServerError,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			gc, _ := gin.CreateTestContext(rec)
+			tc.setupRequest(gc)
+			mockService := tc.setupMockService(gc)
+			handler := NewShortenURL(mockService)
+			handler.Redirect(gc)
+			assert.Equal(t, tc.expectedStatus, rec.Code)
+			mockService.AssertExpectations(t)
 		})
 	}
 }
