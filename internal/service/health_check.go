@@ -12,7 +12,7 @@ var (
 	errRedisNotAvailable = errors.New("redis not available")
 )
 
-//go:generate mockery --name=HealthCheck --filename=health_check.go --outpkg=mocks_health_check
+//go:generate mockery --name=HealthCheck --filename=health_check.go --outpkg=mocks
 type HealthStatusResult struct {
 	Message     string
 	ServiceName string
