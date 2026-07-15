@@ -31,16 +31,7 @@ type engine struct {
 }
 
 // NewEngine creates a new engine instance
-func NewEngine(cfg *config.Config, redisClient ...*redis.Client) Engine {
-	var rClient *redis.Client
-	if len(redisClient) > 0 && redisClient[0] != nil {
-		rClient = redisClient[0]
-	} else {
-		rClient = redis.NewClient(&redis.Options{
-			Addr: "localhost:6379",
-		})
-	}
-
+func NewEngine(cfg *config.Config, rClient *redis.Client) Engine {
 	api := &engine{
 		app:   gin.New(),
 		cfg:   cfg,
@@ -85,7 +76,7 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 func (e *engine) initRoutes(cfg *config.Config) {
 	allHandlers := e.InitHandlers(cfg)
 
-	e.app.GET("/ping", allHandlers.healthCheck.Ping)
+	e.app.GET("/health-check", allHandlers.healthCheck.Ping)
 	e.app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	v1Routes := e.app.Group("/v1")

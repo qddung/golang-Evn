@@ -13,7 +13,6 @@ import (
 	"github.com/homework/lab/internal/service/mocks"
 	"github.com/homework/lab/pkg/response"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestShortenURL_ShortenUrl(t *testing.T) {
@@ -22,7 +21,7 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 	testCases := []struct {
 		name                  string
 		inputBody             interface{}
-		setupMock             func(mockSvc *mocks.ShorternUrl)
+		setupMock             func(mockSvc *mocks.ShorternUrl, ctx *gin.Context)
 		expectedStatusCode    int
 		expectedResult        interface{}
 		expectedErrorContains string
@@ -33,8 +32,8 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 				"url": "https://www.google.com",
 				"exp": 3600,
 			},
-			setupMock: func(mockSvc *mocks.ShorternUrl) {
-				mockSvc.On("ShortenUrlShortenUrl", mock.Anything, "https://www.google.com", int64(3600)).Return("abcde1", nil)
+			setupMock: func(mockSvc *mocks.ShorternUrl, ctx *gin.Context) {
+				mockSvc.On("ShortenUrlShortenUrl", ctx, "https://www.google.com", int64(3600)).Return("abcde1", nil)
 			},
 			expectedStatusCode: http.StatusOK,
 			expectedResult: shortenResMessage{
@@ -48,7 +47,7 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 				"url": "invalid-url",
 				"exp": 3600,
 			},
-			setupMock:             func(mockSvc *mocks.ShorternUrl) {},
+			setupMock:             func(mockSvc *mocks.ShorternUrl, ctx *gin.Context) {},
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedErrorContains: "Field validation for 'Url' failed on the 'url' tag",
 		},
@@ -57,7 +56,7 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 			inputBody: map[string]interface{}{
 				"url": "https://www.google.com",
 			},
-			setupMock:             func(mockSvc *mocks.ShorternUrl) {},
+			setupMock:             func(mockSvc *mocks.ShorternUrl, ctx *gin.Context) {},
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedErrorContains: "Field validation for 'Exp' failed on the 'required' tag",
 		},
@@ -67,14 +66,14 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 				"url": "https://www.google.com",
 				"exp": 999999,
 			},
-			setupMock:             func(mockSvc *mocks.ShorternUrl) {},
+			setupMock:             func(mockSvc *mocks.ShorternUrl, ctx *gin.Context) {},
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedErrorContains: "Field validation for 'Exp' failed on the 'lte' tag",
 		},
 		{
 			name:                  "Case 5: Lỗi validation - JSON body sai định dạng (400 Bad Request)",
 			inputBody:             "{invalid-json}",
-			setupMock:             func(mockSvc *mocks.ShorternUrl) {},
+			setupMock:             func(mockSvc *mocks.ShorternUrl, ctx *gin.Context) {},
 			expectedStatusCode:    http.StatusBadRequest,
 			expectedErrorContains: "invalid character",
 		},
@@ -84,8 +83,8 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 				"url": "https://www.google.com",
 				"exp": 3600,
 			},
-			setupMock: func(mockSvc *mocks.ShorternUrl) {
-				mockSvc.On("ShortenUrlShortenUrl", mock.Anything, "https://www.google.com", int64(3600)).Return("", errors.New("redis internal error"))
+			setupMock: func(mockSvc *mocks.ShorternUrl, ctx *gin.Context) {
+				mockSvc.On("ShortenUrlShortenUrl", ctx, "https://www.google.com", int64(3600)).Return("", errors.New("redis internal error"))
 			},
 			expectedStatusCode: http.StatusInternalServerError,
 			expectedResult:     response.InternalErrResponse,
@@ -117,7 +116,8 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 
 			// Configure the mock behavior
 			if tc.setupMock != nil {
-				tc.setupMock(mockSvc)
+
+				tc.setupMock(mockSvc, c)
 			}
 
 			// Initialize the handler and inject the mock service (DI)

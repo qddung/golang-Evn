@@ -11,8 +11,11 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// ShorternUrl is an interface for shorten url
+//
 //go:generate mockery --name=ShorternUrl --filename=shorten_url.go --outpkg=mocks
 type ShorternUrl interface {
+	// ShortenUrlShortenUrl method for shorten url
 	ShortenUrlShortenUrl(ctx context.Context, url string, exp int64) (string, error)
 	GetLinkFromCode(ctx context.Context, code string) (string, error)
 }

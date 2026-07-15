@@ -7,6 +7,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// InitMockRedis creates a new redis client
 func InitMockRedis(t *testing.T) *redis.Client {
 	mock := miniredis.RunT(t)
 	return redis.NewClient(&redis.Options{

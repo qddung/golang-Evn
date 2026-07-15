@@ -21,6 +21,7 @@ type healthCheck struct {
 	svc service.HealthCheck
 }
 
+// NewHealthCheck Handler Initializer
 func NewHealthCheck(svc service.HealthCheck) HealthCheck {
 	return &healthCheck{
 		svc: svc,
@@ -32,7 +33,7 @@ func NewHealthCheck(svc service.HealthCheck) HealthCheck {
 // @Tags health_check
 // @Produce json
 // @Success 200 {object} HealthResponse
-// @Router /ping [get]
+// @Router /health-check [get]
 func (h *healthCheck) Ping(c *gin.Context) {
 	result, _ := h.svc.Ping(c)
 	handlerResponse := HealthResponse{

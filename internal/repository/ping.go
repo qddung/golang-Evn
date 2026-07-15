@@ -15,12 +15,14 @@ type ping struct {
 	c *redis.Client
 }
 
+// NewPing creates a new Ping
 func NewPing(c *redis.Client) Ping {
 	return &ping{
 		c: c,
 	}
 }
 
+// Ping pings redis
 func (c *ping) Ping(ctx context.Context) error {
 	return c.c.Ping(ctx).Err()
 }

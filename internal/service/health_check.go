@@ -19,7 +19,9 @@ type HealthStatusResult struct {
 	InstanceID  string
 }
 
+// HealthCheck interface
 type HealthCheck interface {
+	// Kiem tra tinh trang hoat dong cua dich vu
 	Ping(ctx context.Context) (HealthStatusResult, error)
 }
 
@@ -38,6 +40,7 @@ func NewHealthCheck(serviceName string, instanceID string, pingRepository reposi
 	}
 }
 
+// Kiem tra tinh trang hoat dong cua dich vu
 func (h *healthCheck) Ping(ctx context.Context) (HealthStatusResult, error) {
 	// Hàm này giờ đây cực kỳ "sạch", không phụ thuộc vào file .env nào cả
 	pingErr := h.pingRepository.Ping(ctx)
