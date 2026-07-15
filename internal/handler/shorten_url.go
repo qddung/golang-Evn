@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +15,7 @@ type shorternURL struct {
 	svc service.ShorternUrl
 }
 
+// NewShortenURL Handler Initializer
 func NewShortenURL(svc service.ShorternUrl) ShorternUrl {
 	return &shorternURL{svc}
 }
@@ -35,12 +35,11 @@ func (s *shorternURL) ShortenUrl(c *gin.Context) {
 	request := &shortenInputBody{}
 	// serialize request
 	if err := c.ShouldBindJSON(request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": response.InternalErrResponse})
 		return
 	}
 	code, err := s.svc.ShortenUrlShortenUrl(c, request.Url, request.Exp)
 	if err != nil {
-		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, response.InternalErrResponse)
 		return
 	}

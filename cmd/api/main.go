@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
+	redisPkg "github.com/homework/lab/pkg/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 // @title Book API
@@ -17,9 +19,20 @@ func main() {
 		panic("Failed to load config: " + err.Error())
 	}
 
-	apiEngine := api.NewEngine(cfg)
+	// create redis client
+	rdClient := createRedisClient()
+
+	apiEngine := api.NewEngine(cfg, rdClient)
 	err = apiEngine.Run()
 	if err != nil {
 		panic(err)
 	}
+}
+
+func createRedisClient() *redis.Client {
+	rdClient, err := redisPkg.NewRedisClient()
+	if err != nil {
+		panic(err)
+	}
+	return rdClient
 }

@@ -11,8 +11,11 @@ const charset = "abcdefghijklmnopqrstuvwxyz" +
 
 // KeyGenerator represents the interface to generate random string keys
 //
+// KeyGenerator is an interface to generate random string keys
+//
 //go:generate mockery --name KeyGenerator --filename string.go
 type KeyGenerator interface {
+	// GenerateRandomCode generates a random string
 	GenerateRandomCode(length int) string
 }
 
@@ -32,7 +35,8 @@ func (r *randomCodeGenerator) GenerateRandomCode(length int) string {
 	return randomCode(r.rng, length)
 }
 
-func GenerateRandomCode(length int) string {
+// GenerateRandomCodeUnique generates a unique random string
+func GenerateRandomCodeUnique(length int) string {
 	// Seed the random number generator
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 

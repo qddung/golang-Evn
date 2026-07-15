@@ -15,8 +15,8 @@ func TestRandomCodeGenerator_GenerateRandomCode(t *testing.T) {
 	}
 }
 
-func TestGenerateRandomCode(t *testing.T) {
-	res := GenerateRandomCode(7)
+func TestGenerateRandomCodeUnique(t *testing.T) {
+	res := GenerateRandomCodeUnique(7)
 	assert.Len(t, res, 7)
 	for _, c := range res {
 		assert.Contains(t, charset, string(c))
