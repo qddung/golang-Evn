@@ -21,13 +21,21 @@ type healthCheck struct {
 	svc service.HealthCheck
 }
 
+// NewHealthCheck Handler Initializer
 func NewHealthCheck(svc service.HealthCheck) HealthCheck {
 	return &healthCheck{
 		svc: svc,
 	}
 }
+
+// @Summary Health check endpoint
+// @Description Check the health of the API
+// @Tags health_check
+// @Produce json
+// @Success 200 {object} HealthResponse
+// @Router /health-check [get]
 func (h *healthCheck) Ping(c *gin.Context) {
-	result, _ := h.svc.Ping()
+	result, _ := h.svc.Ping(c)
 	handlerResponse := HealthResponse{
 		Message:     result.Message,
 		ServiceName: result.ServiceName,

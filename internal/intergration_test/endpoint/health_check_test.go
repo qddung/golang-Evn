@@ -10,6 +10,7 @@ import (
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/handler"
+	redisPkg "github.com/homework/lab/pkg/redis"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,7 +29,7 @@ func TestHealthCheck_Integration(t *testing.T) {
 		{
 			name: "Health check successfully",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := httptest.NewRequest(http.MethodGet, "/ping", nil)
+				req := httptest.NewRequest(http.MethodGet, "/health-check", nil)
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
 				return respRec
@@ -52,7 +53,7 @@ func TestHealthCheck_Integration(t *testing.T) {
 		{
 			name: "Wrong health endpoint",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := httptest.NewRequest(http.MethodGet, "/ping_not_found", nil)
+				req := httptest.NewRequest(http.MethodGet, "/health-check_not_found", nil)
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
 				return respRec
@@ -75,7 +76,8 @@ func TestHealthCheck_Integration(t *testing.T) {
 			testItem.Parallel()
 
 			fmt.Printf("Loaded config: %+v\n", tc.configTest)
-			apiEngine := api.NewEngine(tc.configTest)
+			redisMock := redisPkg.InitMockRedis(testItem)
+			apiEngine := api.NewEngine(tc.configTest, redisMock)
 
 			rec := tc.setupTestHTTP(apiEngine)
 
