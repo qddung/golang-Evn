@@ -38,7 +38,7 @@ func (s *shorternURL) ShortenUrl(c *gin.Context) {
 	request := &shortenInputBody{}
 	// serialize request
 	if err := c.ShouldBindJSON(request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": response.InternalErrResponse})
+		c.JSON(http.StatusBadRequest, gin.H{"error": response.InputFieldError(err)})
 		return
 	}
 	code, err := s.svc.ShortenUrlShortenUrl(c, request.Url, request.Exp)
