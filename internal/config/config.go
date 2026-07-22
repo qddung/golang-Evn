@@ -12,6 +12,7 @@ type Config struct {
 	AppPort     string `envconfig:"APP_PORT" default:"8080"`
 	ServiceName string `envconfig:"SERVICE_NAME" default:"book"`
 	InstanceID  string `envconfig:"INSTANCE_ID"`
+	BasePath    string `envconfig:"BASE_PATH" default:"/"`
 }
 
 func LoadConfig() (*Config, error) {

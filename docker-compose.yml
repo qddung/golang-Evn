@@ -9,7 +9,7 @@ services:
     ports:
       - 6379:6379
   bookmark_service: 
-    image: bookmark_service:latest
+    image: dungi3/golang-learn-bookmark_service:latest
     build: .
     container_name: bookmark_service
     depends_on:
