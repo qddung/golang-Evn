@@ -4,7 +4,7 @@ RUN mkdir -p /opt/app
 
 WORKDIR /opt/app
 
-COPY .. .
+COPY . .
 
 RUN apk add build-base
 

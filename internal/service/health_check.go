@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 
 	"github.com/homework/lab/internal/repository"
 )
@@ -44,6 +45,7 @@ func NewHealthCheck(serviceName string, instanceID string, pingRepository reposi
 func (h *healthCheck) Ping(ctx context.Context) (HealthStatusResult, error) {
 	// Hàm này giờ đây cực kỳ "sạch", không phụ thuộc vào file .env nào cả
 	pingErr := h.pingRepository.Ping(ctx)
+	log.Error().Err(pingErr)
 	if pingErr != nil {
 		return HealthStatusResult{
 			Message:     "Error",
