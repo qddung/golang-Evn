@@ -13,6 +13,9 @@ run-app:
 COVERAGE_EXCLUDE=mocks|main.go|test
 COVERAGE_THRESHOLD = 80
 
+IMG_NAME=dungi3/golang-learn-bookmark_service
+IMG_TAG := latest
+
 test:
 	go test ./... -coverprofile=./test/coverage_tmp -covermode=atomic -coverpkg=./... -p 1
 	grep -vE "$(COVERAGE_EXCLUDE)" ./test/coverage_tmp > ./test/coverage_out
@@ -25,3 +28,10 @@ test:
 		echo "✅ Coverage ($$total%) meets threshold ($(COVERAGE_THRESHOLD)%)"; \
 	fi
 
+
+
+docker-build:
+	docker build -t $(IMG_NAME):$(IMG_TAG) .
+
+docker-release:
+	docker push $(IMG_NAME):$(IMG_TAG)

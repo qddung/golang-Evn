@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 
+	"github.com/homework/lab/docs"
 	_ "github.com/homework/lab/docs"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/handler"
@@ -55,6 +56,7 @@ func (e *engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 type handlers struct {
 	healthCheck handler.HealthCheck
 	shorten     handler.ShorternUrl
+	config      *config.Config
 }
 
 func (e *engine) InitHandlers(cfg *config.Config) handlers {
@@ -69,7 +71,7 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	urlStorage := repository.NewURLStorage(e.redis)
 	shortenService := service.NewShorternUrl(urlStorage, helpers.NewKeyGenerator())
 	shortenURLHandler := handler.NewShortenURL(shortenService)
-	return handlers{healthCheckHandler, shortenURLHandler}
+	return handlers{healthCheckHandler, shortenURLHandler, cfg}
 }
 
 // initRoutes initializes the routes for the app engine
@@ -77,6 +79,8 @@ func (e *engine) initRoutes(cfg *config.Config) {
 	allHandlers := e.InitHandlers(cfg)
 
 	e.app.GET("/health-check", allHandlers.healthCheck.Ping)
+
+	docs.SwaggerInfo.BasePath = allHandlers.config.BasePath
 	e.app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	v1Routes := e.app.Group("/v1")
