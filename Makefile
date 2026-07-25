@@ -28,7 +28,8 @@ test:
 		echo "✅ Coverage ($$total%) meets threshold ($(COVERAGE_THRESHOLD)%)"; \
 	fi
 
-
+docker-up:
+	docker compose -f deployment/docker-compose.yml up -d 
 
 docker-build:
 	docker build -f deployment/Dockerfile -t $(IMG_NAME):$(IMG_TAG) .
