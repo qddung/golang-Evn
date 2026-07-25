@@ -7,7 +7,6 @@ WORKDIR /opt/app
 COPY . .
 
 RUN apk add build-base
-
 RUN go mod download && \
 GOOS=linux go build -tags musl -ldflags "-w -s" -o bookmark_service cmd/api/main.go
 

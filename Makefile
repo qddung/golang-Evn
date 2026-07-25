@@ -31,7 +31,7 @@ test:
 
 
 docker-build:
-	docker build -t $(IMG_NAME):$(IMG_TAG) .
+	docker build -f deployment/Dockerfile -t $(IMG_NAME):$(IMG_TAG) .
 
 docker-release:
 	docker push $(IMG_NAME):$(IMG_TAG)
