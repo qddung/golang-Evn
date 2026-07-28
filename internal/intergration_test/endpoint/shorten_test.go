@@ -66,7 +66,7 @@ func TestShorten_Integration(t *testing.T) {
 			},
 			expectedStatusCode: http.StatusBadRequest,
 			getExpectedResponseContain: func() string {
-				return "Field validation for 'Url' failed on the 'url' tag"
+				return "Url is invalid (url)"
 			},
 			configTest: &config.Config{
 				AppPort:     "8080",
@@ -89,7 +89,7 @@ func TestShorten_Integration(t *testing.T) {
 			},
 			expectedStatusCode: http.StatusBadRequest,
 			getExpectedResponseContain: func() string {
-				return "Field validation for 'Exp' failed on the 'required' tag"
+				return "Exp is invalid (required)"
 			},
 			configTest: &config.Config{
 				AppPort:     "8080",
@@ -113,7 +113,7 @@ func TestShorten_Integration(t *testing.T) {
 			},
 			expectedStatusCode: http.StatusBadRequest,
 			getExpectedResponseContain: func() string {
-				return "Field validation for 'Exp' failed on the 'lte' tag"
+				return "Exp is invalid (lte)"
 			},
 			configTest: &config.Config{
 				AppPort:     "8080",
@@ -132,7 +132,7 @@ func TestShorten_Integration(t *testing.T) {
 			},
 			expectedStatusCode: http.StatusBadRequest,
 			getExpectedResponseContain: func() string {
-				return "invalid character"
+				return "Input error"
 			},
 			configTest: &config.Config{
 				AppPort:     "8080",
@@ -276,4 +276,3 @@ func TestRedirect_Integration(t *testing.T) {
 		})
 	}
 }
-
