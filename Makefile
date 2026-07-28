@@ -17,10 +17,6 @@ COVERAGE_THRESHOLD = 80
 
 IMG_NAME=dungi3/golang-learn-bookmark_service
 IMG_TAG := latest
-GIT_TAG := $(shell git describe --tags --exact-match --abbrev=0 2>/dev/null)
-ifneq ($(GIT_TAG),)
-	IMG_TAG := $(GIT_TAG)
-endif
 
 testdir := ./test
 
