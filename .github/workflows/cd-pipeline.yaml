@@ -1,36 +1,36 @@
 name: cd-pipeline
 on:
     workflow_run:
-        workflows: ["ci_pipeline"]
+        workflows: ["ci-pipeline"]
         types:
             - completed
 jobs:
     cd_pipeline_bookmark_service:
         if: |
             github.event.workflow_run.event == 'push' &&
-            github.event.workflow_run.conclusion == 'success' &&
-            github.event.workflow_run.head_branch == 'test'
+            github.event.workflow_run.conclusion == 'success'
         runs-on: ubuntu-latest
         steps:
             - name: Run native SSH with sshpass
               run: |
                   sudo apt-get update && sudo apt-get install -y sshpass
                   sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "echo 'Connected via sshpass'"
-              # Check in to the code directory
-            - name: Check in to code directory
-              run: cd /app/golang-deployment/deployment/
-              # git pull
-            - name: git pull
+
+            - name: Pull latest deployment files
+              working-directory: /app/golang-deployment/deployment
               run: git pull
-              # handown bookmark_service
-            - name: handown bookmark_service
+
+            - name: Remove old bookmark_service container
+              working-directory: /app/golang-deployment/deployment
               run: docker ps -f "name=bookmark_service" --format '{{.Names}}' | grep -q bookmark_service && docker rm -f bookmark_service
-              # pull bookmark_service
-            - name: pull bookmark_service
+
+            - name: Pull bookmark_service image
+              working-directory: /app/golang-deployment/deployment
               run: docker compose pull bookmark_service
-              # run docker compose
-            - name: run docker compose
+
+            - name: Run docker compose
+              working-directory: /app/golang-deployment/deployment
               run: docker compose up -d
-              #system prune
-            - name: system prune
+
+            - name: System prune
               run: docker system prune -f
