@@ -16,7 +16,16 @@ COVERAGE_THRESHOLD = 80
 IMG_NAME=dungi3/golang-learn-bookmark_service
 IMG_TAG := latest
 
-test:
+testdir := ./test
+
+testdir-check:
+	@if [ ! -d "$(testdir)" ]; then \
+		echo "Directory does not exist. Creating..."; \
+		mkdir -p "$(testdir)"; \
+	fi
+
+test: testdir-check
+	# Run your tests here
 	go test ./... -coverprofile=./test/coverage_tmp -covermode=atomic -coverpkg=./... -p 1
 	grep -vE "$(COVERAGE_EXCLUDE)" ./test/coverage_tmp > ./test/coverage_out
 	go tool cover -html=./test/coverage_out -o coverage.html

@@ -49,7 +49,7 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 			},
 			setupMock:             func(mockSvc *mocks.ShorternUrl, ctx *gin.Context) {},
 			expectedStatusCode:    http.StatusBadRequest,
-			expectedErrorContains: "Field validation for 'Url' failed on the 'url' tag",
+			expectedErrorContains: "Url is invalid (url)",
 		},
 		{
 			name: "Case 3: Lỗi validation - Thiếu tham số exp (400 Bad Request)",
@@ -58,7 +58,7 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 			},
 			setupMock:             func(mockSvc *mocks.ShorternUrl, ctx *gin.Context) {},
 			expectedStatusCode:    http.StatusBadRequest,
-			expectedErrorContains: "Field validation for 'Exp' failed on the 'required' tag",
+			expectedErrorContains: "Exp is invalid",
 		},
 		{
 			name: "Case 4: Lỗi validation - exp vượt quá giới hạn 604800 (400 Bad Request)",
@@ -68,14 +68,14 @@ func TestShortenURL_ShortenUrl(t *testing.T) {
 			},
 			setupMock:             func(mockSvc *mocks.ShorternUrl, ctx *gin.Context) {},
 			expectedStatusCode:    http.StatusBadRequest,
-			expectedErrorContains: "Field validation for 'Exp' failed on the 'lte' tag",
+			expectedErrorContains: "Exp is invalid (lte)",
 		},
 		{
 			name:                  "Case 5: Lỗi validation - JSON body sai định dạng (400 Bad Request)",
 			inputBody:             "{invalid-json}",
 			setupMock:             func(mockSvc *mocks.ShorternUrl, ctx *gin.Context) {},
 			expectedStatusCode:    http.StatusBadRequest,
-			expectedErrorContains: "invalid character",
+			expectedErrorContains: "Input error",
 		},
 		{
 			name: "Case 6: Lỗi từ tầng Service (500 Internal Server Error)",
@@ -164,14 +164,14 @@ func TestShortenURL_Redirect(t *testing.T) {
 			setupRequest: func(ctx *gin.Context) {
 				ctx.Request = httptest.NewRequest(
 					http.MethodGet,
-					"/link/redirect/1234567",
+					"/link/redirect/123456",
 					nil,
 				)
-				ctx.Params = gin.Params{{Key: "code", Value: "1234567"}}
+				ctx.Params = gin.Params{{Key: "code", Value: "123456"}}
 			},
 			setupMockService: func(ctx context.Context) *mocks.ShorternUrl {
 				serviceMock := mocks.NewShorternUrl(t)
-				serviceMock.On("GetLinkFromCode", ctx, "1234567").Return("https://google.com", nil)
+				serviceMock.On("GetLinkFromCode", ctx, "123456").Return("https://google.com", nil)
 				return serviceMock
 			},
 
@@ -200,14 +200,14 @@ func TestShortenURL_Redirect(t *testing.T) {
 			setupRequest: func(ctx *gin.Context) {
 				ctx.Request = httptest.NewRequest(
 					http.MethodGet,
-					"/link/redirect/1234567",
+					"/link/redirect/123456",
 					nil,
 				)
-				ctx.Params = gin.Params{{Key: "code", Value: "1234567"}}
+				ctx.Params = gin.Params{{Key: "code", Value: "123456"}}
 			},
 			setupMockService: func(ctx context.Context) *mocks.ShorternUrl {
 				serviceMock := mocks.NewShorternUrl(t)
-				serviceMock.On("GetLinkFromCode", ctx, "1234567").Return("", errors.New("test err"))
+				serviceMock.On("GetLinkFromCode", ctx, "123456").Return("", errors.New("test err"))
 				return serviceMock
 			},
 

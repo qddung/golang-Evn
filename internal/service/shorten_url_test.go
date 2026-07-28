@@ -16,7 +16,7 @@ import (
 var testErr = errors.New("test error")
 
 const testExpTime = 60 * time.Second
-const linkKeyLength = 7
+const linkKeyLength = 6
 
 func TestService_CreateShortenLink(t *testing.T) {
 	testCases := []struct {
@@ -34,19 +34,19 @@ func TestService_CreateShortenLink(t *testing.T) {
 
 			setupRepo: func(ctx context.Context) *mocks.URLStorage {
 				mock := mocks.NewURLStorage(t)
-				mock.On("GetURL", ctx, "1234567").Return("", redis.Nil)
-				mock.On("StoreURL", ctx, "1234567", "https://google.com", testExpTime).Return(nil)
+				mock.On("GetURL", ctx, "123456").Return("", redis.Nil)
+				mock.On("StoreURL", ctx, "123456", "https://google.com", testExpTime).Return(nil)
 
 				return mock
 			},
 			setupKeyGen: func() *mocksGenerateHelper.KeyGenerator {
 				mockKeyGen := mocksGenerateHelper.NewKeyGenerator(t)
-				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("1234567")
+				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("123456")
 
 				return mockKeyGen
 			},
 
-			expectedResult: "1234567",
+			expectedResult: "123456",
 			expectedErr:    nil,
 		},
 		{
@@ -54,21 +54,21 @@ func TestService_CreateShortenLink(t *testing.T) {
 
 			setupRepo: func(ctx context.Context) *mocks.URLStorage {
 				mock := mocks.NewURLStorage(t)
-				mock.On("GetURL", ctx, "1234567").Return("https://example.com", nil)
-				mock.On("GetURL", ctx, "2345678").Return("", redis.Nil)
-				mock.On("StoreURL", ctx, "2345678", "https://google.com", testExpTime).Return(nil)
+				mock.On("GetURL", ctx, "123456").Return("https://example.com", nil)
+				mock.On("GetURL", ctx, "234567").Return("", redis.Nil)
+				mock.On("StoreURL", ctx, "234567", "https://google.com", testExpTime).Return(nil)
 
 				return mock
 			},
 			setupKeyGen: func() *mocksGenerateHelper.KeyGenerator {
 				mockKeyGen := mocksGenerateHelper.NewKeyGenerator(t)
-				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("1234567").Once()
-				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("2345678").Once()
+				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("123456").Once()
+				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("234567").Once()
 
 				return mockKeyGen
 			},
 
-			expectedResult: "2345678",
+			expectedResult: "234567",
 			expectedErr:    nil,
 		},
 		{
@@ -76,14 +76,14 @@ func TestService_CreateShortenLink(t *testing.T) {
 
 			setupRepo: func(ctx context.Context) *mocks.URLStorage {
 				mock := mocks.NewURLStorage(t)
-				mock.On("GetURL", ctx, "1234567").Return("", redis.Nil)
-				mock.On("StoreURL", ctx, "1234567", "https://google.com", testExpTime).Return(testErr)
+				mock.On("GetURL", ctx, "123456").Return("", redis.Nil)
+				mock.On("StoreURL", ctx, "123456", "https://google.com", testExpTime).Return(testErr)
 
 				return mock
 			},
 			setupKeyGen: func() *mocksGenerateHelper.KeyGenerator {
 				mockKeyGen := mocksGenerateHelper.NewKeyGenerator(t)
-				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("1234567")
+				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("123456")
 
 				return mockKeyGen
 			},
@@ -96,13 +96,13 @@ func TestService_CreateShortenLink(t *testing.T) {
 
 			setupRepo: func(ctx context.Context) *mocks.URLStorage {
 				mock := mocks.NewURLStorage(t)
-				mock.On("GetURL", ctx, "1234567").Return("", testErr)
+				mock.On("GetURL", ctx, "123456").Return("", testErr)
 
 				return mock
 			},
 			setupKeyGen: func() *mocksGenerateHelper.KeyGenerator {
 				mockKeyGen := mocksGenerateHelper.NewKeyGenerator(t)
-				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("1234567")
+				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("123456")
 
 				return mockKeyGen
 			},
@@ -145,7 +145,7 @@ func TestService_GetLinkFromCode(t *testing.T) {
 
 			setupRepo: func(ctx context.Context) *mocks.URLStorage {
 				mock := mocks.NewURLStorage(t)
-				mock.On("GetURL", ctx, "1234567").Return("https://google.com", nil)
+				mock.On("GetURL", ctx, "123456").Return("https://google.com", nil)
 
 				return mock
 			},
@@ -158,7 +158,7 @@ func TestService_GetLinkFromCode(t *testing.T) {
 
 			setupRepo: func(ctx context.Context) *mocks.URLStorage {
 				mock := mocks.NewURLStorage(t)
-				mock.On("GetURL", ctx, "1234567").Return("", testErr)
+				mock.On("GetURL", ctx, "123456").Return("", testErr)
 
 				return mock
 			},
@@ -177,7 +177,7 @@ func TestService_GetLinkFromCode(t *testing.T) {
 
 			testService := NewShorternUrl(mockRepo, nil)
 
-			result, err := testService.GetLinkFromCode(ctx, "1234567")
+			result, err := testService.GetLinkFromCode(ctx, "123456")
 			assert.Equal(t, result, tc.expectedResult)
 			assert.ErrorIs(t, err, tc.expectedErr)
 		})
