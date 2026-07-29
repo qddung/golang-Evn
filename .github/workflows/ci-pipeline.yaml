@@ -43,4 +43,3 @@ jobs:
         # success login and event github is push to main
         if: ${{ success() && github.event_name == 'push' }}
         run: make docker-release
-

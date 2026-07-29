@@ -151,16 +151,13 @@ func TestShortenURL_Redirect(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		name string
-
+		name             string
 		setupRequest     func(ctx *gin.Context)
 		setupMockService func(ctx context.Context) *mocks.ShorternUrl
-
-		expectedStatus int
+		expectedStatus   int
 	}{
 		{
 			name: "normal case - success",
-
 			setupRequest: func(ctx *gin.Context) {
 				ctx.Request = httptest.NewRequest(
 					http.MethodGet,
@@ -179,7 +176,6 @@ func TestShortenURL_Redirect(t *testing.T) {
 		},
 		{
 			name: "err case - wrong code",
-
 			setupRequest: func(ctx *gin.Context) {
 				ctx.Request = httptest.NewRequest(
 					http.MethodGet,
@@ -191,12 +187,10 @@ func TestShortenURL_Redirect(t *testing.T) {
 				serviceMock := mocks.NewShorternUrl(t)
 				return serviceMock
 			},
-
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
 			name: "err case - service err",
-
 			setupRequest: func(ctx *gin.Context) {
 				ctx.Request = httptest.NewRequest(
 					http.MethodGet,
@@ -210,7 +204,6 @@ func TestShortenURL_Redirect(t *testing.T) {
 				serviceMock.On("GetLinkFromCode", ctx, "123456").Return("", errors.New("test err"))
 				return serviceMock
 			},
-
 			expectedStatus: http.StatusInternalServerError,
 		},
 	}

@@ -18,10 +18,8 @@ func TestHealthCheck_Integration(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
 		name string
-
 		// setupTestHTTP là một hàm để thiết lập và gửi yêu cầu HTTP đến API Engine, trả về ResponseRecorder để kiểm tra kết quả
-		setupTestHTTP func(router api.Engine) *httptest.ResponseRecorder
-
+		setupTestHTTP              func(router api.Engine) *httptest.ResponseRecorder
 		expectedStatusCode         int
 		getExpectedResponseContain func() string
 		configTest                 *config.Config

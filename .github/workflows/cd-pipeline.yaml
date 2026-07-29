@@ -35,4 +35,3 @@ jobs:
               # Ép đóng phiên SSH trên server để trả quyền điều khiển về cho GitHub Runner
               exit 0
           EOF
-
