@@ -14,7 +14,6 @@ import (
 
 func TestHealthCheck_Ping(t *testing.T) {
 	t.Parallel()
-
 	testCases := []struct {
 		name               string
 		mockEnvName        string
@@ -45,22 +44,17 @@ func TestHealthCheck_Ping(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tc := range testCases {
 		// Preserve the test context for the parallel loop
 		tc := tc
-
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-
 			// Initialize a mocked Gin HTTP context
 			rec := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(rec)
 			c.Request = httptest.NewRequest(http.MethodGet, "/health_check", nil)
-
 			// Create a mock service
 			mockSvc := mocks_health_check.NewHealthCheck(testItem) // Use testItem for the correct context
-
 			// Configure the mock behavior
 			// When the handler calls mockSvc.Ping(), the mock returns the data for the current test case
 			mockSvc.On("Ping", c).Return(service.HealthStatusResult{
@@ -68,13 +62,10 @@ func TestHealthCheck_Ping(t *testing.T) {
 				ServiceName: tc.mockEnvName,
 				InstanceID:  tc.mockEnvID,
 			}, nil)
-
 			// Initialize the handler and inject the mock service (DI)
 			healthCheckHandler := NewHealthCheck(mockSvc)
-
 			// Execute the function under test
 			healthCheckHandler.Ping(c)
-
 			// Compare the returned JSON response accurately
 			var actualResponse HealthResponse
 			// Decode the JSON response body into actualResponse

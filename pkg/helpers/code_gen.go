@@ -7,7 +7,7 @@ import (
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyz" +
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZ012345689"
 
 // KeyGenerator represents the interface to generate random string keys
 //
@@ -39,7 +39,6 @@ func (r *randomCodeGenerator) GenerateRandomCode(length int) string {
 func GenerateRandomCodeUnique(length int) string {
 	// Seed the random number generator
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-
 	return randomCode(rng, length)
 }
 
@@ -48,6 +47,5 @@ func randomCode(rng *rand.Rand, length int) string {
 	for i := 0; i < length; i++ {
 		strBuilder.WriteByte(charset[rng.Intn(len(charset))])
 	}
-
 	return strBuilder.String()
 }

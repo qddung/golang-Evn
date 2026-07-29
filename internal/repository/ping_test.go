@@ -4,39 +4,32 @@ import (
 	"context"
 	"testing"
 
+	redisPkg "github.com/homework/lab/pkg/redis"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
-
-	redisPkg "github.com/homework/lab/pkg/redis"
 )
 
 func TestPing_Ping(t *testing.T) {
 	testCases := []struct {
-		name string
-
-		setupMock func(ctx context.Context) *redis.Client
-
+		name        string
+		setupMock   func(ctx context.Context) *redis.Client
 		expectedErr error
 	}{
 		{
 			name: "normal case",
-
 			setupMock: func(ctx context.Context) *redis.Client {
 				mock := redisPkg.InitMockRedis(t)
 				return mock
 			},
-
 			expectedErr: nil,
 		},
 		{
 			name: "err case - redis connection err",
-
 			setupMock: func(ctx context.Context) *redis.Client {
 				mock := redisPkg.InitMockRedis(t)
 				_ = mock.Close()
 				return mock
 			},
-
 			expectedErr: redis.ErrClosed,
 		},
 	}
