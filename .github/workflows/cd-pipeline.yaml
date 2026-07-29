@@ -4,6 +4,7 @@ on:
     workflows: ["ci-pipeline"]
     types:
       - completed
+
 jobs:
   cd_pipeline_bookmark_service:
     if: |
@@ -34,3 +35,4 @@ jobs:
               # Ép đóng phiên SSH trên server để trả quyền điều khiển về cho GitHub Runner
               exit 0
           EOF
+
