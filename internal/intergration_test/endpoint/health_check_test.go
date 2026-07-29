@@ -14,6 +14,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func newHealthCheckIntegrationConfig() *config.Config {
+	return &config.Config{
+		AppPort:     "8080",
+		ServiceName: "app_service",
+		InstanceID:  "instance_01",
+	}
+}
+
 func TestHealthCheck_Integration(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {

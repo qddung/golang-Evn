@@ -1,4 +1,5 @@
 package endpoint // Để _test để đảm bảo tính đóng gói độc lập
+
 import (
 	"bytes"
 	"encoding/json"
@@ -13,6 +14,30 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func newIntegrationConfig() *config.Config {
+	return &config.Config{
+		AppPort:     "8080",
+		ServiceName: "app_service",
+		InstanceID:  "instance_01",
+	}
+}
+
+func makeJSONRequest(method, target string, body interface{}) *http.Request {
+	var bodyBytes []byte
+	switch typedBody := body.(type) {
+	case nil:
+		bodyBytes = nil
+	case string:
+		bodyBytes = []byte(typedBody)
+	default:
+		bodyBytes, _ = json.Marshal(typedBody)
+	}
+
+	req := httptest.NewRequest(method, target, bytes.NewBuffer(bodyBytes))
+	req.Header.Set("Content-Type", "application/json")
+	return req
+}
+
 func TestShorten_Integration(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
@@ -26,13 +51,10 @@ func TestShorten_Integration(t *testing.T) {
 		{
 			name: "Create shorten link successfully",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				reqBody := map[string]interface{}{
+				req := makeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
 					"url": "https://www.google.com",
 					"exp": 3600,
-				}
-				bodyBytes, _ := json.Marshal(reqBody)
-				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", bytes.NewBuffer(bodyBytes))
-				req.Header.Set("Content-Type", "application/json")
+				})
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
 				return respRec
@@ -41,22 +63,15 @@ func TestShorten_Integration(t *testing.T) {
 			getExpectedResponseContain: func() string {
 				return "Shorten URL generated successfully!"
 			},
-			configTest: &config.Config{
-				AppPort:     "8080",
-				ServiceName: "app_service",
-				InstanceID:  "instance_01",
-			},
+			configTest: newIntegrationConfig(),
 		},
 		{
 			name: "Create shorten link fail - invalid url format",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				reqBody := map[string]interface{}{
+				req := makeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
 					"url": "invalid-url-not-a-link",
 					"exp": 3600,
-				}
-				bodyBytes, _ := json.Marshal(reqBody)
-				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", bytes.NewBuffer(bodyBytes))
-				req.Header.Set("Content-Type", "application/json")
+				})
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
 				return respRec
@@ -65,21 +80,14 @@ func TestShorten_Integration(t *testing.T) {
 			getExpectedResponseContain: func() string {
 				return "Url is invalid (url)"
 			},
-			configTest: &config.Config{
-				AppPort:     "8080",
-				ServiceName: "app_service",
-				InstanceID:  "instance_01",
-			},
+			configTest: newIntegrationConfig(),
 		},
 		{
 			name: "Create shorten link fail - missing required exp",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				reqBody := map[string]interface{}{
+				req := makeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
 					"url": "https://www.google.com",
-				}
-				bodyBytes, _ := json.Marshal(reqBody)
-				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", bytes.NewBuffer(bodyBytes))
-				req.Header.Set("Content-Type", "application/json")
+				})
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
 				return respRec
@@ -88,22 +96,15 @@ func TestShorten_Integration(t *testing.T) {
 			getExpectedResponseContain: func() string {
 				return "Exp is invalid (required)"
 			},
-			configTest: &config.Config{
-				AppPort:     "8080",
-				ServiceName: "app_service",
-				InstanceID:  "instance_01",
-			},
+			configTest: newIntegrationConfig(),
 		},
 		{
 			name: "Create shorten link fail - exp exceed maximum limit (604800)",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				reqBody := map[string]interface{}{
+				req := makeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
 					"url": "https://www.google.com",
 					"exp": 999999,
-				}
-				bodyBytes, _ := json.Marshal(reqBody)
-				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", bytes.NewBuffer(bodyBytes))
-				req.Header.Set("Content-Type", "application/json")
+				})
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
 				return respRec
@@ -112,17 +113,12 @@ func TestShorten_Integration(t *testing.T) {
 			getExpectedResponseContain: func() string {
 				return "Exp is invalid (lte)"
 			},
-			configTest: &config.Config{
-				AppPort:     "8080",
-				ServiceName: "app_service",
-				InstanceID:  "instance_01",
-			},
+			configTest: newIntegrationConfig(),
 		},
 		{
 			name: "Create shorten link fail - invalid json body",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", bytes.NewBufferString("{invalid-json}"))
-				req.Header.Set("Content-Type", "application/json")
+				req := makeJSONRequest(http.MethodPost, "/v1/links/shorten", "{invalid-json}")
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
 				return respRec
@@ -131,22 +127,15 @@ func TestShorten_Integration(t *testing.T) {
 			getExpectedResponseContain: func() string {
 				return "Input error"
 			},
-			configTest: &config.Config{
-				AppPort:     "8080",
-				ServiceName: "app_service",
-				InstanceID:  "instance_01",
-			},
+			configTest: newIntegrationConfig(),
 		},
 		{
 			name: "Wrong shorten endpoint",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				reqBody := map[string]interface{}{
+				req := makeJSONRequest(http.MethodPost, "/v1/links/shorten_not_found", map[string]interface{}{
 					"url": "https://www.google.com",
 					"exp": 3600,
-				}
-				bodyBytes, _ := json.Marshal(reqBody)
-				req := httptest.NewRequest(http.MethodPost, "/v1/links/shorten_not_found", bytes.NewBuffer(bodyBytes))
-				req.Header.Set("Content-Type", "application/json")
+				})
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
 				return respRec
@@ -155,11 +144,7 @@ func TestShorten_Integration(t *testing.T) {
 			getExpectedResponseContain: func() string {
 				return "404 page not found"
 			},
-			configTest: &config.Config{
-				AppPort:     "8080",
-				ServiceName: "app_service",
-				InstanceID:  "instance_01",
-			},
+			configTest: newIntegrationConfig(),
 		},
 	}
 	for _, tc := range testCases {
@@ -189,13 +174,10 @@ func TestRedirect_Integration(t *testing.T) {
 			name: "Redirect successfully to original url",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
 				// Bước 1: Tạo shorten link qua POST /v1/links/shorten để có mã code hợp lệ trong Redis mock
-				reqBody := map[string]interface{}{
+				reqPost := makeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
 					"url": "https://www.google.com",
 					"exp": 3600,
-				}
-				bodyBytes, _ := json.Marshal(reqBody)
-				reqPost := httptest.NewRequest(http.MethodPost, "/v1/links/shorten", bytes.NewBuffer(bodyBytes))
-				reqPost.Header.Set("Content-Type", "application/json")
+				})
 				respPost := httptest.NewRecorder()
 				router.ServeHTTP(respPost, reqPost)
 				// Phân tích response để lấy mã rút gọn (code)
@@ -239,7 +221,6 @@ func TestRedirect_Integration(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
 			fmt.Printf("Loaded config: %+v\n", tc.configTest)
