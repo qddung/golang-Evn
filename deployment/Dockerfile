@@ -10,7 +10,7 @@ RUN apk add build-base
 RUN go mod download && \
 GOOS=linux go build -tags musl -ldflags "-w -s" -o bookmark_service cmd/api/main.go
 
-FROM alpine
+FROM alpine:latest
 
 ARG app_name=app
 ENV TZ=Asia/Ho_Chi_Minh
