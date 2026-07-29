@@ -36,7 +36,7 @@ jobs:
         if: ${{ success() && github.event_name == 'push' }}
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       # Push image
       - name: Push image to Docker Hub
