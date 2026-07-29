@@ -163,23 +163,17 @@ func TestShorten_Integration(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tc := range testCases {
-
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-
 			fmt.Printf("Loaded config: %+v\n", tc.configTest)
 			redisMock := redisPkg.InitMockRedis(testItem)
 			apiEngine := api.NewEngine(tc.configTest, redisMock)
-
 			rec := tc.setupTestHTTP(apiEngine)
-
 			// Check the status code of the response
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
 			// Check the response body content
 			assert.Contains(testItem, rec.Body.String(), tc.getExpectedResponseContain(), "Expected response body does not match actual response body")
-
 		})
 	}
 }
@@ -187,10 +181,8 @@ func TestShorten_Integration(t *testing.T) {
 func TestRedirect_Integration(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
-		name string
-
-		setupTestHTTP func(router api.Engine) *httptest.ResponseRecorder
-
+		name                       string
+		setupTestHTTP              func(router api.Engine) *httptest.ResponseRecorder
 		expectedStatusCode         int
 		getExpectedResponseContain func() string
 		configTest                 *config.Config
@@ -208,13 +200,11 @@ func TestRedirect_Integration(t *testing.T) {
 				reqPost.Header.Set("Content-Type", "application/json")
 				respPost := httptest.NewRecorder()
 				router.ServeHTTP(respPost, reqPost)
-
 				// Phân tích response để lấy mã rút gọn (code)
 				var shortenResp struct {
 					Code string `json:"code"`
 				}
 				_ = json.Unmarshal(respPost.Body.Bytes(), &shortenResp)
-
 				// Bước 2: Gọi GET /v1/links/redirect/{code}
 				reqGet := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v1/links/redirect/%s", shortenResp.Code), nil)
 				respGet := httptest.NewRecorder()
@@ -250,7 +240,6 @@ func TestRedirect_Integration(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(testItem *testing.T) {
@@ -259,9 +248,7 @@ func TestRedirect_Integration(t *testing.T) {
 			fmt.Printf("Loaded config: %+v\n", tc.configTest)
 			redisMock := redisPkg.InitMockRedis(testItem)
 			apiEngine := api.NewEngine(tc.configTest, redisMock)
-
 			rec := tc.setupTestHTTP(apiEngine)
-
 			// Check status code
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
 
