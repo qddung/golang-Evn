@@ -16,7 +16,11 @@ COVERAGE_EXCLUDE=mocks|main.go|test
 COVERAGE_THRESHOLD = 80
 
 IMG_NAME=dungi3/golang-learn-bookmark_service
+GIT_TAG := $(shell git describe --tags --exact-match --abbrev=0 2>/dev/null)
 IMG_TAG := latest
+ifneq ($(GIT_TAG),)
+	IMG_TAG := $(GIT_TAG)
+endif
 
 testdir := ./test
 
