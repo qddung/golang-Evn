@@ -1,5 +1,4 @@
 package endpoint // Để _test để đảm bảo tính đóng gói độc lập
-
 import (
 	"bytes"
 	"encoding/json"
@@ -177,7 +176,6 @@ func TestShorten_Integration(t *testing.T) {
 		})
 	}
 }
-
 func TestRedirect_Integration(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
@@ -244,14 +242,12 @@ func TestRedirect_Integration(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-
 			fmt.Printf("Loaded config: %+v\n", tc.configTest)
 			redisMock := redisPkg.InitMockRedis(testItem)
 			apiEngine := api.NewEngine(tc.configTest, redisMock)
 			rec := tc.setupTestHTTP(apiEngine)
 			// Check status code
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
-
 			// Check response content or location header
 			if tc.expectedStatusCode == http.StatusFound {
 				assert.Equal(testItem, tc.getExpectedResponseContain(), rec.Header().Get("Location"), "Expected redirect location header does not match")
