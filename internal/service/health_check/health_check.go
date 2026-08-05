@@ -1,4 +1,4 @@
-package service
+package health_check
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/homework/lab/internal/repository"
+	health_check_repository "github.com/homework/lab/internal/repository/health_check"
 )
 
 var (
@@ -29,11 +29,11 @@ type HealthCheck interface {
 type healthCheck struct {
 	serviceName    string
 	instanceID     string
-	pingRepository repository.Ping
+	pingRepository health_check_repository.Ping
 }
 
 // Nhận cấu hình từ ngoài truyền vào (Dependency Injection)
-func NewHealthCheck(serviceName string, instanceID string, pingRepository repository.Ping) HealthCheck {
+func NewHealthCheck(serviceName string, instanceID string, pingRepository health_check_repository.Ping) HealthCheck {
 	return &healthCheck{
 		serviceName:    serviceName,
 		instanceID:     instanceID,

@@ -1,0 +1,29 @@
+package entity
+
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+type User struct {
+	Id          string    `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	DisplayName string    `json:"display_name"`
+	Email       string    `json:"email" gorm:"type:text;not null"`
+	Password    string    `json:"password" gorm:"type:text;not null"`
+	UserName    string    `json:"user_name" gorm:"type:text;unique"`
+	CreateAt    time.Time `json:"created_at"`
+}
+
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+
+	if u.Id == "" {
+		u.Id = uuid.NewString()
+	}
+	return
+}
+
+func (u *User) AfterCreate(tx *gorm.DB) (err error) {
+	return
+}

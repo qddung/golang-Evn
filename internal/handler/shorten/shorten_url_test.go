@@ -1,4 +1,4 @@
-package handler
+package shorten
 
 import (
 	"bytes"
@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/homework/lab/internal/service/mocks"
+	"github.com/homework/lab/internal/service/shorten/mocks"
 	"github.com/homework/lab/pkg/response"
 	"github.com/stretchr/testify/assert"
 )

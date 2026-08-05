@@ -9,8 +9,8 @@ import (
 
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
-	"github.com/homework/lab/internal/handler"
-	redisPkg "github.com/homework/lab/pkg/redis"
+	"github.com/homework/lab/internal/connection"
+	"github.com/homework/lab/internal/handler/health_check"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -43,7 +43,7 @@ func TestHealthCheck_Integration(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 			getExpectedResponseContain: func() string {
 				// Serialize the expected response to JSON format for comparison
-				resp, _ := json.Marshal(handler.HealthResponse{
+				resp, _ := json.Marshal(health_check.HealthResponse{
 					Message:     "OK",
 					InstanceID:  "instance_01",
 					ServiceName: "app_service",
@@ -82,8 +82,8 @@ func TestHealthCheck_Integration(t *testing.T) {
 			testItem.Parallel()
 
 			fmt.Printf("Loaded config: %+v\n", tc.configTest)
-			redisMock := redisPkg.InitMockRedis(testItem)
-			apiEngine := api.NewEngine(tc.configTest, redisMock)
+			connectorMock := connection.InitDBConnectorMock(testItem)
+			apiEngine := api.NewEngine(tc.configTest, connectorMock)
 
 			rec := tc.setupTestHTTP(apiEngine)
 

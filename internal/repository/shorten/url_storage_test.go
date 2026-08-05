@@ -1,8 +1,7 @@
-package repository
+package url_repository
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/redis/go-redis/v9"
@@ -10,8 +9,6 @@ import (
 
 	redisPkg "github.com/homework/lab/pkg/redis"
 )
-
-var testErr = errors.New("test error")
 
 func TestUrlStorage_GetURL(t *testing.T) {
 	testCases := []struct {

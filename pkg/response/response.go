@@ -2,8 +2,10 @@ package response
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/homework/lab/internal/models/dto/api"
 )
 
 // Message represents the structure of a response message
@@ -40,5 +42,21 @@ func InputFieldError(err error) Message {
 	return Message{
 		Message: "Input error",
 		Details: errs,
+	}
+}
+
+// ToDataResponse converts a Message struct to a Response struct.
+// error only related to input validation, so the data field is set to nil.
+func ToDataResponse[T any](err error) api.Response[T] {
+	m := InputFieldError(err)
+	errs := m.Details.([]string)
+	defaultMessage := m.Message
+	message := strings.Join(errs, "; ")
+	if message == "" {
+		message = defaultMessage
+	}
+	return api.Response[T]{
+		Message: message,
+		Data:    nil,
 	}
 }

@@ -1,10 +1,10 @@
-package service
+package health_check
 
 import (
 	"context"
 	"testing"
 
-	"github.com/homework/lab/internal/repository/mocks"
+	"github.com/homework/lab/internal/repository/health_check/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

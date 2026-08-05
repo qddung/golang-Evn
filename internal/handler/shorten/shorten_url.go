@@ -1,11 +1,12 @@
-package handler
+package shorten
 
 import (
 	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/homework/lab/internal/service"
+
+	shorten_service "github.com/homework/lab/internal/service/shorten"
 	"github.com/homework/lab/pkg/response"
 	"github.com/rs/zerolog/log"
 )
@@ -15,11 +16,11 @@ type ShorternUrl interface {
 	Redirect(c *gin.Context)
 }
 type shorternURL struct {
-	svc service.ShorternUrl
+	svc shorten_service.ShorternUrl
 }
 
 // NewShortenURL Handler Initializer
-func NewShortenURL(svc service.ShorternUrl) ShorternUrl {
+func NewShortenURL(svc shorten_service.ShorternUrl) ShorternUrl {
 	return &shorternURL{svc}
 }
 
@@ -73,7 +74,7 @@ func (h *shorternURL) Redirect(c *gin.Context) {
 
 	url, err := h.svc.GetLinkFromCode(c, code)
 	if err != nil {
-		if errors.Is(err, service.ErrCodeDoesntExist) {
+		if errors.Is(err, shorten_service.ErrCodeDoesntExist) {
 			c.JSON(http.StatusBadRequest, response.InputErrResponse)
 			return
 		}

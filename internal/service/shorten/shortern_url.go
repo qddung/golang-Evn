@@ -1,4 +1,4 @@
-package service
+package shorten_service
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/homework/lab/internal/repository"
+	url_repository "github.com/homework/lab/internal/repository/shorten"
 	"github.com/homework/lab/pkg/helpers"
 	"github.com/redis/go-redis/v9"
 )
@@ -22,11 +22,11 @@ type ShorternUrl interface {
 
 type shorternUrl struct {
 	generatorRandom helpers.KeyGenerator
-	repository      repository.URLStorage
+	repository      url_repository.URLStorage
 }
 
 // NewShorternUrl new shortern url
-func NewShorternUrl(repository repository.URLStorage, generator helpers.KeyGenerator) ShorternUrl {
+func NewShorternUrl(repository url_repository.URLStorage, generator helpers.KeyGenerator) ShorternUrl {
 	return &shorternUrl{generator, repository}
 }
 

@@ -1,4 +1,4 @@
-package handler
+package health_check
 
 import (
 	"encoding/json"
@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/homework/lab/internal/service"
-	mocks_health_check "github.com/homework/lab/internal/service/mocks"
+	service "github.com/homework/lab/internal/service/health_check"
+	mocks_health_check "github.com/homework/lab/internal/service/health_check/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

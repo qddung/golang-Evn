@@ -1,4 +1,4 @@
-package service
+package shorten_service
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/homework/lab/internal/repository/mocks"
+	"github.com/homework/lab/internal/repository/shorten/mocks"
 	mocksGenerateHelper "github.com/homework/lab/pkg/helpers/mocks"
 )
 

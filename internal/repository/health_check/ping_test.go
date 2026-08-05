@@ -1,4 +1,4 @@
-package repository
+package health_check_repository
 
 import (
 	"context"

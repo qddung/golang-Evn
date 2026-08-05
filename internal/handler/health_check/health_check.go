@@ -1,10 +1,10 @@
-package handler
+package health_check
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/homework/lab/internal/service"
+	service "github.com/homework/lab/internal/service/health_check"
 )
 
 type HealthCheck interface {

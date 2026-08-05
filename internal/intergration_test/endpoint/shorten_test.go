@@ -10,7 +10,7 @@ import (
 
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
-	redisPkg "github.com/homework/lab/pkg/redis"
+	"github.com/homework/lab/internal/connection"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -151,8 +151,8 @@ func TestShorten_Integration(t *testing.T) {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
 			fmt.Printf("Loaded config: %+v\n", tc.configTest)
-			redisMock := redisPkg.InitMockRedis(testItem)
-			apiEngine := api.NewEngine(tc.configTest, redisMock)
+			connectorMock := connection.InitDBConnectorMock(testItem)
+			apiEngine := api.NewEngine(tc.configTest, connectorMock)
 			rec := tc.setupTestHTTP(apiEngine)
 			// Check the status code of the response
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
@@ -224,8 +224,8 @@ func TestRedirect_Integration(t *testing.T) {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
 			fmt.Printf("Loaded config: %+v\n", tc.configTest)
-			redisMock := redisPkg.InitMockRedis(testItem)
-			apiEngine := api.NewEngine(tc.configTest, redisMock)
+			connectorMock := connection.InitDBConnectorMock(testItem)
+			apiEngine := api.NewEngine(tc.configTest, connectorMock)
 			rec := tc.setupTestHTTP(apiEngine)
 			// Check status code
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
