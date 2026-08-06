@@ -83,7 +83,8 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 
 	// create user handler
 	userRepository := userRepository.NewUserRepository(sqlDB)
-	userService := user_service.NewUserService(userRepository)
+	hasher := helpers.NewHasher()
+	userService := user_service.NewUserService(userRepository, hasher)
 	userHandler := user_handler.NewUserHandler(userService)
 	return handlers{healthCheckHandler, shortenURLHandler, userHandler, cfg}
 }
