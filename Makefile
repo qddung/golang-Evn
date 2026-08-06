@@ -32,6 +32,8 @@ testdir-check:
 
 test: testdir-check
 	# Run your tests here
+	mkdir -p .cache
+	chmod 700 .cache
 	go test ./... -coverprofile=./test/coverage_tmp -covermode=atomic -coverpkg=./... -p 1
 	grep -vE "$(COVERAGE_EXCLUDE)" ./test/coverage_tmp > ./test/coverage_out
 	go tool cover -html=./test/coverage_out -o coverage.html
