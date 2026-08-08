@@ -52,6 +52,7 @@ func (u *userService) Register(ctx context.Context, regiterInput userModel.UserR
 		log.Error().Err(err).Msg("Failed to HashPassword in userService.Register")
 		return nil, err
 	}
+
 	// create service
 	entityUser := &entity.User{
 		DisplayName: regiterInput.DisplayName,

@@ -1,7 +1,6 @@
 package endpoint // Để _test để đảm bảo tính đóng gói độc lập
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
+	general_helpers "github.com/homework/lab/internal/intergration_test/general"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,22 +20,6 @@ func newIntegrationConfig() *config.Config {
 		ServiceName: "app_service",
 		InstanceID:  "instance_01",
 	}
-}
-
-func makeJSONRequest(method, target string, body interface{}) *http.Request {
-	var bodyBytes []byte
-	switch typedBody := body.(type) {
-	case nil:
-		bodyBytes = nil
-	case string:
-		bodyBytes = []byte(typedBody)
-	default:
-		bodyBytes, _ = json.Marshal(typedBody)
-	}
-
-	req := httptest.NewRequest(method, target, bytes.NewBuffer(bodyBytes))
-	req.Header.Set("Content-Type", "application/json")
-	return req
 }
 
 func TestShorten_Integration(t *testing.T) {
@@ -51,7 +35,7 @@ func TestShorten_Integration(t *testing.T) {
 		{
 			name: "Create shorten link successfully",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := makeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
+				req := general_helpers.MakeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
 					"url": "https://www.google.com",
 					"exp": 3600,
 				})
@@ -68,7 +52,7 @@ func TestShorten_Integration(t *testing.T) {
 		{
 			name: "Create shorten link fail - invalid url format",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := makeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
+				req := general_helpers.MakeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
 					"url": "invalid-url-not-a-link",
 					"exp": 3600,
 				})
@@ -85,7 +69,7 @@ func TestShorten_Integration(t *testing.T) {
 		{
 			name: "Create shorten link fail - missing required exp",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := makeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
+				req := general_helpers.MakeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
 					"url": "https://www.google.com",
 				})
 				respRec := httptest.NewRecorder()
@@ -101,7 +85,7 @@ func TestShorten_Integration(t *testing.T) {
 		{
 			name: "Create shorten link fail - exp exceed maximum limit (604800)",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := makeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
+				req := general_helpers.MakeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
 					"url": "https://www.google.com",
 					"exp": 999999,
 				})
@@ -118,7 +102,7 @@ func TestShorten_Integration(t *testing.T) {
 		{
 			name: "Create shorten link fail - invalid json body",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := makeJSONRequest(http.MethodPost, "/v1/links/shorten", "{invalid-json}")
+				req := general_helpers.MakeJSONRequest(http.MethodPost, "/v1/links/shorten", "{invalid-json}")
 				respRec := httptest.NewRecorder()
 				router.ServeHTTP(respRec, req)
 				return respRec
@@ -132,7 +116,7 @@ func TestShorten_Integration(t *testing.T) {
 		{
 			name: "Wrong shorten endpoint",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-				req := makeJSONRequest(http.MethodPost, "/v1/links/shorten_not_found", map[string]interface{}{
+				req := general_helpers.MakeJSONRequest(http.MethodPost, "/v1/links/shorten_not_found", map[string]interface{}{
 					"url": "https://www.google.com",
 					"exp": 3600,
 				})
@@ -174,7 +158,7 @@ func TestRedirect_Integration(t *testing.T) {
 			name: "Redirect successfully to original url",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
 				// Bước 1: Tạo shorten link qua POST /v1/links/shorten để có mã code hợp lệ trong Redis mock
-				reqPost := makeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
+				reqPost := general_helpers.MakeJSONRequest(http.MethodPost, "/v1/links/shorten", map[string]interface{}{
 					"url": "https://www.google.com",
 					"exp": 3600,
 				})

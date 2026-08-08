@@ -28,3 +28,9 @@ services:
       - ./../.env
     ports:
       - 5432:5432
+
+  # portal:
+  #   image: ebvn/bookmark-app-portal:mono
+  #   container_name: portal
+  #   ports:
+  #     - 3000:3000

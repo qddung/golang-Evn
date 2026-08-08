@@ -49,7 +49,13 @@ func InputFieldError(err error) Message {
 // error only related to input validation, so the data field is set to nil.
 func ToDataResponse[T any](err error) api.Response[T] {
 	m := InputFieldError(err)
-	errs := m.Details.([]string)
+	details := []string{}
+	if m.Details == nil {
+		details = []string{err.Error()}
+	} else {
+		details = m.Details.([]string)
+	}
+	errs := details
 	defaultMessage := m.Message
 	message := strings.Join(errs, "; ")
 	if message == "" {

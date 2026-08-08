@@ -22,13 +22,15 @@ func NewUserHandler(svc user_service.UserService) UserHandler {
 	return &userHandler{svc: svc}
 }
 
+var createSuccessMessage = "User created successfully!"
+
 func (u *userHandler) Register(c *gin.Context) {
-	userRequest := userModel.UserRegister{}
+	userRequest := &userModel.UserRegister{}
 	if err := c.ShouldBindJSON(userRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": response.ToDataResponse[any](err)})
 		return
 	}
-	createdUser, err := u.svc.Register(c, userRequest)
+	createdUser, err := u.svc.Register(c, *userRequest)
 	if err == user_service.EmailExistError || err == user_service.UserNameExistError {
 		c.JSON(http.StatusConflict, gin.H{"error": response.ToDataResponse[any](err)})
 		return
@@ -39,7 +41,7 @@ func (u *userHandler) Register(c *gin.Context) {
 	}
 
 	res := &api.Response[userModel.UserInfo]{
-		Message: "User registered successfully!",
+		Message: createSuccessMessage,
 		Data:    createdUser,
 	}
 	c.JSON(http.StatusOK, res)
