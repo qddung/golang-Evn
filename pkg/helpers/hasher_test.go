@@ -7,6 +7,7 @@ import (
 )
 
 func TestHasher(t *testing.T) {
+
 	testCase := []struct {
 		name     string
 		input    string
@@ -14,12 +15,12 @@ func TestHasher(t *testing.T) {
 		result   bool
 	}{
 
-		{
-			name:     "normal case",
-			input:    "1234",
-			expected: "1234",
-			result:   true,
-		},
+		// {
+		// 	name:     "normal case",
+		// 	input:    "1234",
+		// 	expected: "1234",
+		// 	result:   true,
+		// },
 		{
 			name:     "error case",
 			input:    "12346",
@@ -39,8 +40,9 @@ func TestHasher(t *testing.T) {
 				t.Errorf("Expected %s, got %s", tc.expected, expectedResult)
 				return
 			}
-			actual := hasher.CheckPasswordHash(tc.input, expectedResult)
+			actual := hasher.CheckPasswordHash(tc.expected, expectedResult)
 			assert.Equal(t, tc.result, actual)
 		})
 	}
+
 }

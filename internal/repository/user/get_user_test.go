@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateUser(t *testing.T) {
+func TestGetUser(t *testing.T) {
 	db, err := sqldb.NewMiniPostgres(t)
 
 	assert.NoError(t, err)
@@ -35,5 +35,14 @@ func TestCreateUser(t *testing.T) {
 	}
 	errCreateUser := userRepository.CreateUser(ctx, user)
 	assert.NoError(t, errCreateUser)
+	assert.NoError(t, nil)
+
+	userWithName, err := userRepository.GetUserByUserName(ctx, user.UserName)
+
+	assert.Equal(t, userWithName.UserName, user.UserName)
+
+	userWithMail, err := userRepository.GetUserByEmail(ctx, user.Email)
+
+	assert.Equal(t, userWithMail.Email, user.Email)
 
 }
