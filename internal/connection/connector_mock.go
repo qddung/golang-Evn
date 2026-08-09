@@ -8,18 +8,18 @@ import (
 	"github.com/homework/lab/pkg/sqldb"
 )
 
-func InitDBConnectorMock(t *testing.T) DBConnector {
+func InitDBConnectorMock(t *testing.T) (DBConnector, error) {
 	gormSql, err := sqldb.NewMiniPostgres(t) // gorm need run all fixture
 	if err != nil {
-		t.Fatal(err)
+		return nil, err
 	}
 
 	errGorm := gormSql.AutoMigrate(entity.User{})
 	if errGorm != nil {
-		t.Fatal(errGorm)
+		return nil, errGorm
 	}
 	return &dbConnector{
 		redisClient: redisPkg.InitMockRedis(t),
 		db:          gormSql,
-	}
+	}, nil
 }

@@ -1,5 +1,6 @@
 package user
 
+// -- Models
 type UserRegister struct {
 	DisplayName string `json:"display_name" binding:"required"`
 	Email       string `json:"email" binding:"email"`

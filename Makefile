@@ -9,6 +9,10 @@ dev-run:
 swagger:
 	go run github.com/swaggo/swag/cmd/swag init -g ./cmd/api/main.go --output docs
 
+
+swagger2:
+	go run github.com/swaggo/swag/cmd/swag init --parseDependency --parseInternal --parseDepth 5 -g ./cmd/api/main.go --output docs
+
 run-app:
 	go run cmd/api/main.go
 
@@ -36,7 +40,7 @@ test: testdir-check
 	chmod 700 .cache
 	go test ./... -coverprofile=./test/coverage_tmp -covermode=atomic -coverpkg=./... -p 1
 	grep -vE "$(COVERAGE_EXCLUDE)" ./test/coverage_tmp > ./test/coverage_out
-	go tool cover -html=./test/coverage_out -o coverage.html
+	go tool cover -html=./test/coverage_out -o ./test/coverage.html
 	@total=$$(go tool cover -func=./test/coverage_out | grep total: | awk '{print $$3}' | sed 's/%//'); \
 	if [ $$(echo "$$total < $(COVERAGE_THRESHOLD)" | bc -l) -eq 1 ]; then \
 		echo "❌ Coverage ($$total%) is below threshold ($(COVERAGE_THRESHOLD)%)"; \

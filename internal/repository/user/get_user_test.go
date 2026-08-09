@@ -37,6 +37,11 @@ func TestGetUser(t *testing.T) {
 	assert.NoError(t, errCreateUser)
 	assert.NoError(t, nil)
 
+	userId := user.Id
+	userWithID, err := userRepository.GetUserById(ctx, userId)
+
+	assert.Equal(t, userWithID.Id, user.Id)
+
 	userWithName, err := userRepository.GetUserByUserName(ctx, user.UserName)
 
 	assert.Equal(t, userWithName.UserName, user.UserName)

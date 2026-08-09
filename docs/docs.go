@@ -29,7 +29,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.HealthResponse"
+                            "$ref": "#/definitions/internal_handler_health_check.HealthResponse"
                         }
                     }
                 }
@@ -82,7 +82,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.shortenInputBody"
+                            "$ref": "#/definitions/internal_handler_shorten.shortenInputBody"
                         }
                     }
                 ],
@@ -90,7 +90,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.shortenResMessage"
+                            "$ref": "#/definitions/internal_handler_shorten.shortenResMessage"
                         }
                     }
                 }
@@ -98,7 +98,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handler.HealthResponse": {
+        "internal_handler_health_check.HealthResponse": {
             "type": "object",
             "properties": {
                 "instance_id": {
@@ -112,7 +112,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.shortenInputBody": {
+        "internal_handler_shorten.shortenInputBody": {
             "type": "object",
             "required": [
                 "exp",
@@ -128,7 +128,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.shortenResMessage": {
+        "internal_handler_shorten.shortenResMessage": {
             "type": "object",
             "properties": {
                 "code": {

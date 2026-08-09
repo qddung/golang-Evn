@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  handler.HealthResponse:
+  internal_handler_health_check.HealthResponse:
     properties:
       instance_id:
         type: string
@@ -9,7 +9,7 @@ definitions:
       service_name:
         type: string
     type: object
-  handler.shortenInputBody:
+  internal_handler_shorten.shortenInputBody:
     properties:
       exp:
         maximum: 604800
@@ -20,7 +20,7 @@ definitions:
     - exp
     - url
     type: object
-  handler.shortenResMessage:
+  internal_handler_shorten.shortenResMessage:
     properties:
       code:
         type: string
@@ -42,7 +42,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.HealthResponse'
+            $ref: '#/definitions/internal_handler_health_check.HealthResponse'
       summary: Health check endpoint
       tags:
       - health_check
@@ -74,14 +74,14 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/handler.shortenInputBody'
+          $ref: '#/definitions/internal_handler_shorten.shortenInputBody'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.shortenResMessage'
+            $ref: '#/definitions/internal_handler_shorten.shortenResMessage'
       summary: Generate shorten url based on original url that last upto 7 days
       tags:
       - link

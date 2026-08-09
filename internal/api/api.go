@@ -10,7 +10,7 @@ import (
 	_ "github.com/homework/lab/docs"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
-	"github.com/homework/lab/internal/handler/health_check"
+	health_check_handler "github.com/homework/lab/internal/handler/health_check"
 	"github.com/homework/lab/internal/handler/shorten"
 	user_handler "github.com/homework/lab/internal/handler/user"
 	health_check_repository "github.com/homework/lab/internal/repository/health_check"
@@ -60,7 +60,7 @@ func (e *engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 type handlers struct {
-	healthCheck health_check.HealthCheck
+	healthCheck health_check_handler.HealthCheck
 	shorten     shorten.ShorternUrl
 	user        user_handler.UserHandler
 	config      *config.Config
@@ -74,7 +74,7 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	// create handler
 	healthCheckRepository := health_check_repository.NewPing(redisClient)
 	healthCheckService := health_check_service.NewHealthCheck(serviceName, instanceID, healthCheckRepository)
-	healthCheckHandler := health_check.NewHealthCheck(healthCheckService)
+	healthCheckHandler := health_check_handler.NewHealthCheck(healthCheckService)
 
 	// create shorten url handler
 	urlStorage := url_repository.NewURLStorage(redisClient)

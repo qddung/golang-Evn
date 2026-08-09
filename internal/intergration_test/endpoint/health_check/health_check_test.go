@@ -82,7 +82,10 @@ func TestHealthCheck_Integration(t *testing.T) {
 			testItem.Parallel()
 
 			fmt.Printf("Loaded config: %+v\n", tc.configTest)
-			connectorMock := connection.InitDBConnectorMock(testItem)
+			connectorMock, errConnector := connection.InitDBConnectorMock(testItem)
+			if errConnector != nil {
+				testItem.Fatal(errConnector)
+			}
 			apiEngine := api.NewEngine(tc.configTest, connectorMock)
 
 			rec := tc.setupTestHTTP(apiEngine)
