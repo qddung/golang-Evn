@@ -24,7 +24,7 @@ func NewUserHandler(svc user_service.UserService) UserHandler {
 
 var createSuccessMessage = "User created successfully!"
 
-// Register      Register link
+// RegisterLink      Register link
 // @Summary      Register user
 // @Description  Register user
 // @Tags         user
@@ -33,7 +33,6 @@ var createSuccessMessage = "User created successfully!"
 // @Param        input body userModel.UserRegister true "Input required"
 // @Success      200 {object} api.Response[userModel.UserInfo]
 // @Router       /v1/users/register [post]
-
 func (u *userHandler) Register(c *gin.Context) {
 	userRequest := &userModel.UserRegister{}
 	if err := c.ShouldBindJSON(userRequest); err != nil {
