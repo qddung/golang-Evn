@@ -8,10 +8,10 @@ import (
 
 // config represents the configuration of redis
 type config struct {
-	Host     string `default:"localhost:6379" envconfig:"PG_SQL_HOST"`
-	Password string `default:"" envconfig:"PG_SQL_PWD"`
-	DbName   string `default:"" envconfig:"PG_SQL_DB"`
-	User     string `default:"" envconfig:"PG_SQL_USER"`
+	Host     string `default:"localhost" envconfig:"PG_SQL_HOST"`
+	Password string `default:"" envconfig:"POSTGRES_PASSWORD"`
+	DbName   string `default:"" envconfig:"POSTGRES_DB"`
+	User     string `default:"" envconfig:"POSTGRES_USER"`
 	Port     string `default:"5432" envconfig:"PG_SQL_PORT"`
 	SslMode  string `default:"disable" envconfig:"PG_SQL_SSLMODE"`
 	TimeZone string `default:"Asia/Shanghai" envconfig:"PG_SQL_TIMEZONE"`

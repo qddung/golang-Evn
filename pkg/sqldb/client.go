@@ -1,6 +1,8 @@
 package sqldb
 
 import (
+	"log"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -8,6 +10,10 @@ import (
 // coreClient creates a new GORM client
 func buildClient(dsn string) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
+	if err != nil {
+		log.Fatalf("Failed to start DB, with dsn: `%s`: %v", dsn, err)
+	}
 	return db, err
 }
 
