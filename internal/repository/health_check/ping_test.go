@@ -21,7 +21,6 @@ func TestPing_Ping(t *testing.T) {
 				mock := redisPkg.InitMockRedis(t)
 				return mock
 			},
-			expectedErr: nil,
 		},
 		{
 			name: "err case - redis connection err",
@@ -34,7 +33,6 @@ func TestPing_Ping(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			ctx := context.Background()

@@ -10,6 +10,13 @@ import (
 	redisPkg "github.com/homework/lab/pkg/redis"
 )
 
+func BuildTestRepo(t *testing.T, ctx context.Context, setupMock func(ctx context.Context) *redis.Client) (URLStorage, *redis.Client) {
+	t.Parallel()
+	redisMock := setupMock(ctx)
+	testRepo := NewURLStorage(redisMock)
+	return testRepo, redisMock
+}
+
 func TestUrlStorage_GetURL(t *testing.T) {
 	testCases := []struct {
 		name           string
@@ -40,10 +47,8 @@ func TestUrlStorage_GetURL(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
 			ctx := context.Background()
-			redisMock := tc.setupMock(ctx)
-			testRepo := NewURLStorage(redisMock)
+			testRepo, _ := BuildTestRepo(t, ctx, tc.setupMock)
 			result, err := testRepo.GetURL(ctx, "test")
 			assert.ErrorIs(t, err, tc.expectedErr)
 			assert.Equal(t, result, tc.expectedResult)
@@ -82,10 +87,8 @@ func TestUrlStorage_StoreURL(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
 			ctx := context.Background()
-			redisMock := tc.setupMock(ctx)
-			testRepo := NewURLStorage(redisMock)
+			testRepo, redisMock := BuildTestRepo(t, ctx, tc.setupMock)
 			err := testRepo.StoreURL(ctx, "test", "passed", 1)
 			assert.ErrorIs(t, err, tc.expectedErr)
 			if err == nil {
