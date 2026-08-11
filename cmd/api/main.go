@@ -1,9 +1,12 @@
 package main
 
 import (
+	"log"
+
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
+	"github.com/homework/lab/internal/models/entity"
 	redisPkg "github.com/homework/lab/pkg/redis"
 	"github.com/homework/lab/pkg/sqldb"
 	"github.com/redis/go-redis/v9"
@@ -26,6 +29,15 @@ func main() {
 
 	// create SQL client
 	sqlClient := createSqlClient()
+
+	if !sqlClient.Migrator().HasTable(&entity.User{}) {
+		log.Println("Table does not exist. Running AutoMigrate...")
+		if errMigrate := sqlClient.AutoMigrate(&entity.User{}); errMigrate != nil {
+			log.Fatalf("Migration failed: %v", err)
+		}
+	} else {
+		log.Println("Table already exists. Skipping migration pass.")
+	}
 
 	// connector
 	connector := connection.NewDBConnector(rdClient, sqlClient)

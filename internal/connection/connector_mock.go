@@ -3,23 +3,12 @@ package connection
 import (
 	"testing"
 
-	"github.com/homework/lab/internal/models/entity"
+	"github.com/homework/lab/internal/test/data/fixture"
 	redisPkg "github.com/homework/lab/pkg/redis"
-	"github.com/homework/lab/pkg/sqldb"
 )
 
 func InitDBConnectorMock(t *testing.T) (DBConnector, error) {
-	gormSql, err := sqldb.NewMiniPostgres(t) // gorm need run all fixture
-	if err != nil {
-		return nil, err
-	}
-
-	errGorm := gormSql.AutoMigrate(entity.User{})
-	if errGorm != nil {
-		return nil, errGorm
-	}
-	return &dbConnector{
-		redisClient: redisPkg.InitMockRedis(t),
-		db:          gormSql,
-	}, nil
+	fix := fixture.NewUserTestCase(t)
+	gormSql := fixture.NewFixture(t, fix)
+	return NewDBConnector(redisPkg.InitMockRedis(t), gormSql), nil
 }

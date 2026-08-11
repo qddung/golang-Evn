@@ -5,25 +5,13 @@ import (
 	"testing"
 
 	"github.com/homework/lab/internal/models/entity"
-	"github.com/homework/lab/pkg/sqldb"
+	"github.com/homework/lab/internal/test/data/fixture"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateUser(t *testing.T) {
-	db, err := sqldb.NewMiniPostgres(t)
-
-	assert.NoError(t, err)
-	if err != nil {
-		t.Fatal(err)
-		return
-	}
-
-	err_migrate := db.AutoMigrate(entity.User{})
-	assert.NoError(t, err_migrate)
-	if err_migrate != nil {
-		t.Fatal(err_migrate.Error())
-		return
-	}
+	fix := fixture.NewUserTestCase(t)
+	db := fixture.NewFixture(t, fix)
 
 	userRepository := NewUserRepository(db)
 	ctx := context.Background()

@@ -47,7 +47,7 @@
 │   │   ├── health_check.go          # Logic nghiệp vụ Health Check
 │   │   ├── shortern_url.go          # Logic nghiệp vụ rút gọn URL
 │   │   └── mocks/                   # Mocks cho Service layer
-│   └── intergration_test/
+│   └── test/
 │       └── endpoint/
 │           ├── health_check_test.go # Integration test cho endpoint /ping
 │           └── shorten_test.go      # Integration test cho endpoint /v1/links/shorten & redirect
@@ -160,7 +160,7 @@ go test ./...
 
 ### Chạy riêng các Integration Test cho Endpoints:
 ```bash
-go test -v ./internal/intergration_test/endpoint/...
+go test -v ./internal/test/endpoint/...
 ```
 
 ### Chạy kiểm thử kèm đánh giá độ bao phủ mã nguồn (Coverage):

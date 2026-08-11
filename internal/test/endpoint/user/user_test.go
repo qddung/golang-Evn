@@ -10,8 +10,8 @@ import (
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
-	general_helpers "github.com/homework/lab/internal/intergration_test/general"
 	"github.com/homework/lab/internal/models/dto/api/user"
+	general_helpers "github.com/homework/lab/internal/test/general"
 	"github.com/stretchr/testify/assert"
 )
 
