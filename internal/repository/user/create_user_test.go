@@ -16,10 +16,10 @@ func TestCreateUser(t *testing.T) {
 	userRepository := NewUserRepository(db)
 	ctx := context.Background()
 	user := &entity.User{
-		DisplayName: "brad",
-		Email:       "abc@gmail.com",
+		DisplayName: "bradtest",
+		Email:       "bradtest@gmail.com",
 		Password:    "123456",
-		UserName:    "acd",
+		UserName:    "bradtest",
 	}
 	errCreateUser := userRepository.CreateUser(ctx, user)
 	assert.NoError(t, errCreateUser)
