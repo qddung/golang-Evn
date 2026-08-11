@@ -33,7 +33,7 @@ func main() {
 	if !sqlClient.Migrator().HasTable(&entity.User{}) {
 		log.Println("Table does not exist. Running AutoMigrate...")
 		if errMigrate := sqlClient.AutoMigrate(&entity.User{}); errMigrate != nil {
-			log.Fatalf("Migration failed: %v", err)
+			log.Fatalf("Migration failed: %v", errMigrate)
 		}
 	} else {
 		log.Println("Table already exists. Skipping migration pass.")
