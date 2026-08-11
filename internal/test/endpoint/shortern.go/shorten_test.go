@@ -1,4 +1,4 @@
-package endpoint // Để _test để đảm bảo tính đóng gói độc lập
+package shortern_endpoint // Để _test để đảm bảo tính đóng gói độc lập
 
 import (
 	"encoding/json"
@@ -134,7 +134,6 @@ func TestShorten_Integration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			fmt.Printf("Loaded config: %+v\n", tc.configTest)
 			connectorMock, errConnector := connection.InitDBConnectorMock(testItem)
 			if errConnector != nil {
 				testItem.Fatal(errConnector)
@@ -210,7 +209,6 @@ func TestRedirect_Integration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			fmt.Printf("Loaded config: %+v\n", tc.configTest)
 			connectorMock, errConnector := connection.InitDBConnectorMock(testItem)
 			if errConnector != nil {
 				testItem.Fatal(errConnector)

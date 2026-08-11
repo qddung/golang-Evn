@@ -46,7 +46,6 @@ func TestService_Register(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()

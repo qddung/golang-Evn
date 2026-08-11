@@ -19,8 +19,7 @@ var testErr = errors.New("test error")
 
 func TestService_Register(t *testing.T) {
 	testCases := []struct {
-		name string
-
+		name         string
 		setupRepo    func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper)
 		expectedFunc func(t *testing.T, info *user.UserInfo, registerInput *user.UserRegister, err error)
 	}{
@@ -45,7 +44,6 @@ func TestService_Register(t *testing.T) {
 				repo := mocks.NewUserRepository(t)
 				hasher := helper_mocks.NewHashHelper(t)
 				repo.On("GetUserByUserName", ctx, info.UserName).Return(&entity.User{}, nil)
-				// repo.On("GetUserByEmail", ctx, info.Email).Return(nil, nil) // cause it never called :))
 				return repo, hasher
 			},
 			expectedFunc: func(t *testing.T, info *user.UserInfo, registerInput *user.UserRegister, err error) {
@@ -76,21 +74,18 @@ func TestService_Register(t *testing.T) {
 		{
 			name: "Create user successfully",
 			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper) {
-
 				repo := mocks.NewUserRepository(t)
 				hasher := helper_mocks.NewHashHelper(t)
 				expectedHashPass := "hash"
 				hasher.On("HashPassword", info.Password).Return(expectedHashPass, nil)
 				repo.On("GetUserByUserName", ctx, info.UserName).Return(nil, nil)
 				repo.On("GetUserByEmail", ctx, info.Email).Return(nil, nil)
-
 				user := &entity.User{
 					DisplayName: info.DisplayName,
 					Email:       info.Email,
 					Password:    expectedHashPass,
 					UserName:    info.UserName,
 				}
-
 				repo.On("CreateUser", ctx, user).Run(func(args mock.Arguments) {
 					now := time.Now()
 					user.Id = uuid.NewString()
@@ -107,7 +102,6 @@ func TestService_Register(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
@@ -125,5 +119,4 @@ func TestService_Register(t *testing.T) {
 			tc.expectedFunc(testItem, info, &u, err)
 		})
 	}
-
 }

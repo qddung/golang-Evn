@@ -33,15 +33,12 @@ func TestPing_Ping(t *testing.T) {
 			expectedErr: redis.ErrClosed,
 		},
 	}
-
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			ctx := context.Background()
-
 			redisMock := tc.setupMock(ctx)
-
 			testRepo := NewPing(redisMock)
 			err := testRepo.Ping(ctx)
 			assert.ErrorIs(t, err, tc.expectedErr)

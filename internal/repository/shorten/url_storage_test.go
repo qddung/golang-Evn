@@ -12,10 +12,8 @@ import (
 
 func TestUrlStorage_GetURL(t *testing.T) {
 	testCases := []struct {
-		name string
-
-		setupMock func(ctx context.Context) *redis.Client
-
+		name           string
+		setupMock      func(ctx context.Context) *redis.Client
 		expectedResult string
 		expectedErr    error
 	}{
@@ -81,7 +79,6 @@ func TestUrlStorage_StoreURL(t *testing.T) {
 			expectedErr: redis.ErrClosed,
 		},
 	}
-
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
