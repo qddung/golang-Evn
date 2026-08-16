@@ -32,11 +32,8 @@ func main() {
 	// create SQL client
 	sqlClient := createSqlClient()
 
-	if !sqlClient.Migrator().HasTable(&entity.User{}) {
-		log.Println("Table does not exist. Running AutoMigrate...")
-		if errMigrate := sqlClient.AutoMigrate(&entity.User{}); errMigrate != nil {
-			log.Fatalf("Migration failed: %v", errMigrate)
-		}
+	if errMigrate := sqlClient.AutoMigrate(&entity.User{}); errMigrate != nil {
+		log.Fatalf("Migration failed: %v", errMigrate)
 	}
 
 	// connector
