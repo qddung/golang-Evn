@@ -3,10 +3,12 @@ package main
 import (
 	"log"
 
+	"github.com/gin-gonic/gin"
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
 	"github.com/homework/lab/internal/models/entity"
+	jwt_pkg "github.com/homework/lab/pkg/jwt"
 	redisPkg "github.com/homework/lab/pkg/redis"
 	"github.com/homework/lab/pkg/sqldb"
 	"github.com/redis/go-redis/v9"
@@ -41,8 +43,15 @@ func main() {
 
 	// connector
 	connector := connection.NewDBConnector(rdClient, sqlClient)
-
-	apiEngine := api.NewEngine(cfg, connector)
+	jwtGenerator := jwt_pkg.NewJWTGenerator("./privatekey.pem")
+	jwtValidator := jwt_pkg.NewJWTValidator("./publickey.pem")
+	apiEngine := api.NewEngine(&api.EnginOpt{
+		App:          gin.New(),
+		Cfg:          cfg,
+		Connector:    connector,
+		JwtGenerator: jwtGenerator,
+		JwtValidator: jwtValidator,
+	})
 	err = apiEngine.Run()
 	if err != nil {
 		panic(err)

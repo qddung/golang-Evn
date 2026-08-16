@@ -10,20 +10,6 @@ import (
 	"github.com/homework/lab/pkg/response"
 )
 
-type UserHandler interface {
-	Register(c *gin.Context)
-}
-
-type userHandler struct {
-	svc user_service.UserService
-}
-
-func NewUserHandler(svc user_service.UserService) UserHandler {
-	return &userHandler{svc: svc}
-}
-
-var createSuccessMessage = "User created successfully!"
-
 // RegisterLink      Register link
 // @Summary      Register user
 // @Description  Register user
@@ -40,7 +26,7 @@ func (u *userHandler) Register(c *gin.Context) {
 		return
 	}
 	createdUser, err := u.svc.Register(c, *userRequest)
-	if err == user_service.EmailExistError || err == user_service.UserNameExistError {
+	if err == user_service.ServiceErr["EmailExistError"] || err == user_service.ServiceErr["UserNameExistError"] {
 		c.JSON(http.StatusConflict, gin.H{"error": response.ToDataResponse[any](err)})
 		return
 	}

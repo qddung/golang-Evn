@@ -2,31 +2,11 @@ package user_service
 
 import (
 	"context"
-	"errors"
 
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	"github.com/homework/lab/internal/models/entity"
-	"github.com/homework/lab/internal/repository/user"
-	"github.com/homework/lab/pkg/helpers"
 	"github.com/rs/zerolog/log"
 )
-
-//go:generate mockery --name=UserService --filename=user_service_mock.go --outpkg=mocks
-type UserService interface {
-	Register(ctx context.Context, regiterInput userModel.UserRegister) (*userModel.UserInfo, error)
-}
-
-type userService struct {
-	userRepository user.UserRepository
-	hasher         helpers.HashHelper
-}
-
-func NewUserService(userRepository user.UserRepository, hasher helpers.HashHelper) UserService {
-	return &userService{userRepository: userRepository, hasher: hasher}
-}
-
-var EmailExistError = errors.New("Email already exists")
-var UserNameExistError = errors.New("UserName already exists")
 
 func (u *userService) Register(ctx context.Context, regiterInput userModel.UserRegister) (*userModel.UserInfo, error) {
 
@@ -36,7 +16,7 @@ func (u *userService) Register(ctx context.Context, regiterInput userModel.UserR
 		log.Error().Err(err).Msg("Failed to GetUserByUserName in userService.Register")
 		return nil, err
 	} else if userWithUserName != nil {
-		return nil, UserNameExistError
+		return nil, ServiceErr["UserNameExistError"]
 	}
 
 	userWithEmail, err := u.userRepository.GetUserByEmail(ctx, regiterInput.Email)
@@ -44,7 +24,7 @@ func (u *userService) Register(ctx context.Context, regiterInput userModel.UserR
 		log.Error().Err(err).Msg("Failed to GetUserByEmail in userService.Register")
 		return nil, err
 	} else if userWithEmail != nil {
-		return nil, EmailExistError
+		return nil, ServiceErr["EmailExistError"]
 	}
 
 	hashPassword, err := u.hasher.HashPassword(regiterInput.Password)

@@ -14,6 +14,34 @@ type UserService struct {
 	mock.Mock
 }
 
+// Login provides a mock function with given fields: ctx, loginInput
+func (_m *UserService) Login(ctx context.Context, loginInput user.UserLogin) (string, error) {
+	ret := _m.Called(ctx, loginInput)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Login")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, user.UserLogin) (string, error)); ok {
+		return rf(ctx, loginInput)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, user.UserLogin) string); ok {
+		r0 = rf(ctx, loginInput)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, user.UserLogin) error); ok {
+		r1 = rf(ctx, loginInput)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Register provides a mock function with given fields: ctx, regiterInput
 func (_m *UserService) Register(ctx context.Context, regiterInput user.UserRegister) (*user.UserInfo, error) {
 	ret := _m.Called(ctx, regiterInput)

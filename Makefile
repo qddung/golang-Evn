@@ -69,3 +69,7 @@ docker-build:
 
 docker-release:
 	docker push $(IMG_NAME):$(IMG_TAG)
+
+generated-key:
+	openssl genrsa -out private.pem 2048
+	openssl rsa -in private.pem -pubout -out publickey.pem

@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
@@ -138,7 +139,11 @@ func TestShorten_Integration(t *testing.T) {
 			if errConnector != nil {
 				testItem.Fatal(errConnector)
 			}
-			apiEngine := api.NewEngine(tc.configTest, connectorMock)
+			apiEngine := api.NewEngine(&api.EnginOpt{
+				App:       gin.New(),
+				Cfg:       tc.configTest,
+				Connector: connectorMock,
+			})
 			rec := tc.setupTestHTTP(apiEngine)
 			// Check the status code of the response
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
@@ -213,7 +218,11 @@ func TestRedirect_Integration(t *testing.T) {
 			if errConnector != nil {
 				testItem.Fatal(errConnector)
 			}
-			apiEngine := api.NewEngine(tc.configTest, connectorMock)
+			apiEngine := api.NewEngine(&api.EnginOpt{
+				App:       gin.New(),
+				Cfg:       tc.configTest,
+				Connector: connectorMock,
+			})
 			rec := tc.setupTestHTTP(apiEngine)
 			// Check status code
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")

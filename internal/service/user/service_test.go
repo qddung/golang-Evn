@@ -11,6 +11,7 @@ import (
 	"github.com/homework/lab/internal/models/entity"
 	"github.com/homework/lab/internal/repository/user/mocks"
 	helper_mocks "github.com/homework/lab/pkg/helpers/mocks"
+	jwt_pkg_mocks "github.com/homework/lab/pkg/jwt/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -53,7 +54,7 @@ func TestService_Register(t *testing.T) {
 				return repo, hasher
 			},
 			expectedFunc: func(t *testing.T, info *user.UserInfo, registerInput *user.UserRegister, err error) {
-				assert.Equal(t, err, EmailExistError)
+				assert.Equal(t, err, ServiceErr["EmailExistError"])
 			},
 		},
 		{
@@ -65,7 +66,7 @@ func TestService_Register(t *testing.T) {
 				return repo, hasher
 			},
 			expectedFunc: func(t *testing.T, info *user.UserInfo, registerInput *user.UserRegister, err error) {
-				assert.Equal(t, err, UserNameExistError)
+				assert.Equal(t, err, ServiceErr["UserNameExistError"])
 			},
 		},
 		{
@@ -112,7 +113,7 @@ func TestService_Register(t *testing.T) {
 				UserName:    "testuser",
 			}
 			repo, hashMock := tc.setupRepo(ctx, &u)
-			service := NewUserService(repo, hashMock)
+			service := NewUserService(repo, hashMock, jwt_pkg_mocks.NewJWTGenerator(t))
 			info, err := service.Register(ctx, u)
 
 			tc.expectedFunc(testItem, info, &u, err)
