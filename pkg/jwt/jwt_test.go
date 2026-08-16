@@ -48,16 +48,16 @@ func TestToken(t *testing.T) {
 	}
 
 	for _, tc := range testCase {
-			tc := tc
-			t.Run(tc.name, func(t *testing.T) {
-				t.Parallel()
-				privateKey, publicKey := tc.generateKey()
-				jwtGenerator := &jwtGenerator{privateKey: privateKey}
-				tokenString, _ := jwtGenerator.GenerateToken(tc.claimsInput)
-				jwtValidator := &jwtValidator{publicKey: publicKey}
-				claims, err := jwtValidator.ValidateToken(tokenString)
-				tc.verifyFunc(t, claims, err)
-			})
-		}
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			privateKey, publicKey := tc.generateKey()
+			jwtGenerator := &jwtGenerator{privateKey: privateKey}
+			tokenString, _ := jwtGenerator.GenerateToken(tc.claimsInput)
+			jwtValidator := &jwtValidator{publicKey: publicKey}
+			claims, err := jwtValidator.ValidateToken(tokenString)
+			tc.verifyFunc(t, claims, err)
+		})
+	}
 
 }
