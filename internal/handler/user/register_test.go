@@ -39,7 +39,7 @@ func TestService_Register(t *testing.T) {
 			},
 			setupRepo: func(ctx *gin.Context, info user.UserRegister) *mocks.UserService {
 				userServiceMocks := mocks.NewUserService(t)
-				userServiceMocks.On("Register", ctx, info).Return(nil, user_service.ServiceErr["EmailExistError"])
+				userServiceMocks.On("Register", ctx, info).Return(nil, user_service.ServiceErr.EmailExistError)
 
 				return userServiceMocks
 			},
@@ -47,7 +47,7 @@ func TestService_Register(t *testing.T) {
 				code := rec.Code
 				body := rec.Body.String()
 				assert.Equal(t, http.StatusConflict, code)
-				assert.Contains(t, body, user_service.ServiceErr["EmailExistError"].Error())
+				assert.Contains(t, body, user_service.ServiceErr.EmailExistError.Error())
 			},
 		},
 		{
@@ -61,7 +61,7 @@ func TestService_Register(t *testing.T) {
 			},
 			setupRepo: func(ctx *gin.Context, info user.UserRegister) *mocks.UserService {
 				userServiceMocks := mocks.NewUserService(t)
-				userServiceMocks.On("Register", ctx, info).Return(nil, user_service.ServiceErr["UserNameExistError"])
+				userServiceMocks.On("Register", ctx, info).Return(nil, user_service.ServiceErr.UserNameExistError)
 				return userServiceMocks
 			},
 			expectedFunc: func(t *testing.T, rec *httptest.ResponseRecorder, registerInput *user.UserRegister) {
@@ -69,7 +69,7 @@ func TestService_Register(t *testing.T) {
 				body := rec.Body.String()
 
 				assert.Equal(t, http.StatusConflict, code)
-				assert.Contains(t, body, user_service.ServiceErr["UserNameExistError"].Error())
+				assert.Contains(t, body, user_service.ServiceErr.UserNameExistError.Error())
 			},
 		},
 		{
@@ -147,13 +147,10 @@ func TestService_Register(t *testing.T) {
 			// json.Unmarshal(bodyBytes, userDecode)
 			ctx.Request = httptest.NewRequest(http.MethodPost, "/v1/users/register", bytes.NewBuffer(bodyBytes))
 			ctx.Request.Header.Set("Content-Type", "application/json")
-
 			u := tc.input
 			service := tc.setupRepo(ctx, *u)
 			handler := NewUserHandler(service)
-
 			handler.Register(ctx)
-
 			tc.expectedFunc(testItem, rec, u)
 		})
 	}

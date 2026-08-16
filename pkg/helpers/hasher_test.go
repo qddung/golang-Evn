@@ -15,12 +15,12 @@ func TestHasher(t *testing.T) {
 		result   bool
 	}{
 
-		// {
-		// 	name:     "normal case",
-		// 	input:    "1234",
-		// 	expected: "1234",
-		// 	result:   true,
-		// },
+		{
+			name:     "normal case",
+			input:    "1234",
+			expected: "1234",
+			result:   true,
+		},
 		{
 			name:     "error case",
 			input:    "12346",

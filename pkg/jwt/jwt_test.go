@@ -35,7 +35,6 @@ func TestToken(t *testing.T) {
 			claimsInput: jwt.MapClaims{"test": "test"},
 			generateKey: func() (*rsa.PrivateKey, *rsa.PublicKey) {
 				privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
-
 				publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte("AllYourBase"))
 				if err != nil {
 					t.Fatalf("Failed to parse public key: %v", err)

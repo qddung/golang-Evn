@@ -16,7 +16,7 @@ func (u *userService) Register(ctx context.Context, regiterInput userModel.UserR
 		log.Error().Err(err).Msg("Failed to GetUserByUserName in userService.Register")
 		return nil, err
 	} else if userWithUserName != nil {
-		return nil, ServiceErr["UserNameExistError"]
+		return nil, ServiceErr.UserNameExistError
 	}
 
 	userWithEmail, err := u.userRepository.GetUserByEmail(ctx, regiterInput.Email)
@@ -24,7 +24,7 @@ func (u *userService) Register(ctx context.Context, regiterInput userModel.UserR
 		log.Error().Err(err).Msg("Failed to GetUserByEmail in userService.Register")
 		return nil, err
 	} else if userWithEmail != nil {
-		return nil, ServiceErr["EmailExistError"]
+		return nil, ServiceErr.EmailExistError
 	}
 
 	hashPassword, err := u.hasher.HashPassword(regiterInput.Password)

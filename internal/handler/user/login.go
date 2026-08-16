@@ -15,11 +15,12 @@ func (u *userHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	token, err := u.svc.Login(c, *userRequest)
 
 	if err != nil {
 		if user_service.CheckErrorIsServiceErr(err) {
-			c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 

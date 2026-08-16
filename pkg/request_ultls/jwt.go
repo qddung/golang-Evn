@@ -21,9 +21,14 @@ func ModelBindValidation[T any](c *gin.Context) (*T, error) {
 	if err := c.ShouldBindHeader(model); err != nil {
 		return nil, err
 	}
-	if err := c.ShouldBindJSON(model); err != nil {
-		return nil, err
+
+	if c.Request.Method == "POST" {
+		err := c.ShouldBindJSON(model)
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	// validate on validator-go
 	if err := InputValidator.Struct(model); err != nil {
 		return nil, err

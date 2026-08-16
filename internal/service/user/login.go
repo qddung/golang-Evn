@@ -17,7 +17,11 @@ func (u *userService) Login(ctx context.Context, loginInput userModel.UserLogin)
 	}
 
 	if userWithUserName == nil {
-		return "", ServiceErr["UserNameExistError"]
+		return "", ServiceErr.UserNameNotExistError
+	}
+
+	if !u.hasher.CheckPasswordHash(loginInput.Password, userWithUserName.Password) {
+		return "", ServiceErr.PasswordError
 	}
 	claims := jwt.MapClaims{
 		"sub":       userWithUserName.Id,
@@ -28,7 +32,7 @@ func (u *userService) Login(ctx context.Context, loginInput userModel.UserLogin)
 	token, err := u.jwt.GenerateToken(claims)
 	if err != nil {
 		log.Error().Err(err).Msg("Generate Token failed in jwt.GenerateToken")
-		return "", ServiceErr["GenerateTokenError"]
+		return "", ServiceErr.GenerateTokenError
 	}
 	return token, nil
 }

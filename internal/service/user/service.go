@@ -3,6 +3,7 @@ package user_service
 import (
 	"context"
 	"errors"
+	"reflect"
 
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	"github.com/homework/lab/internal/repository/user"
@@ -26,15 +27,27 @@ func NewUserService(userRepository user.UserRepository, hasher helpers.HashHelpe
 	return &userService{userRepository: userRepository, hasher: hasher, jwt: jwt}
 }
 
-var ServiceErr = map[string]error{
-	"EmailExistError":    errors.New("Email already exists"),
-	"UserNameExistError": errors.New("UserName already exists"),
-	"GenerateTokenError": errors.New("Generate token error"),
+type ServiceError struct {
+	EmailExistError       error
+	UserNameExistError    error
+	GenerateTokenError    error
+	UserNameNotExistError error
+	PasswordError         error
+}
+
+var ServiceErr = ServiceError{
+	EmailExistError:       errors.New("Email already exists"),
+	UserNameExistError:    errors.New("UserName already exists"),
+	GenerateTokenError:    errors.New("Generate token error"),
+	UserNameNotExistError: errors.New("UserName not exists"),
+	PasswordError:         errors.New("Password error"),
 }
 
 func CheckErrorIsServiceErr(err error) bool {
-	for _, svcErr := range ServiceErr {
-		if svcErr == err {
+	val := reflect.ValueOf(ServiceErr)
+	for i := 0; i < val.NumField(); i++ {
+		valueField := val.Field(i)
+		if valueField.Interface() == err {
 			return true
 		}
 	}
