@@ -9,10 +9,21 @@ import (
 	"github.com/homework/lab/pkg/request_ultls"
 )
 
+// LoginLink Login
+// @Summary Login
+// @Description Login
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param input body userModel.UserLogin true "Input required"
+// @Success 200 {object} loginResponse
+// @Router /v1/users/login [post]
 func (u *userHandler) Login(c *gin.Context) {
 	userRequest, err := request_ultls.ModelBindValidation[userModel.UserLogin](c)
+	loginResponse := &loginResponse{}
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		loginResponse.Message = err.Error()
+		c.JSON(http.StatusBadRequest, loginResponse)
 		return
 	}
 
@@ -20,12 +31,20 @@ func (u *userHandler) Login(c *gin.Context) {
 
 	if err != nil {
 		if user_service.CheckErrorIsServiceErr(err) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			loginResponse.Message = err.Error()
+			c.JSON(http.StatusBadRequest, loginResponse)
 			return
 		}
-
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		loginResponse.Message = "Internal server error"
+		c.JSON(http.StatusInternalServerError, loginResponse)
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	loginResponse.Token = token
+	loginResponse.Message = "Login successfully"
+	c.JSON(http.StatusOK, loginResponse)
+}
+
+type loginResponse struct {
+	Token   string
+	Message string
 }

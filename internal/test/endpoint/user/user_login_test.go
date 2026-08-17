@@ -12,6 +12,7 @@ import (
 	"github.com/homework/lab/internal/connection"
 	"github.com/homework/lab/internal/models/dto/api/user"
 	general_helpers "github.com/homework/lab/internal/test/general"
+	jwt_pkg "github.com/homework/lab/pkg/jwt"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,12 +26,9 @@ func TestService_Login(t *testing.T) {
 		{
 			name: "Login successfully",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-
-				reqPost := general_helpers.MakeJSONRequest(http.MethodPost, "/v1/users/login", user.UserRegister{
-					DisplayName: "test",
-					Email:       "test@example.com",
-					Password:    "123131242",
-					UserName:    "testuser",
+				reqPost := general_helpers.MakeJSONRequest(http.MethodPost, "/v1/users/login", user.UserLogin{
+					Password: "12345678",
+					UserName: "acd3",
 				})
 				respPost := httptest.NewRecorder()
 				router.ServeHTTP(respPost, reqPost)
@@ -52,13 +50,19 @@ func TestService_Login(t *testing.T) {
 			if errConnector != nil {
 				testItem.Fatal(errConnector)
 			}
+			jwtMock := jwt_pkg.NewMockJwt()
+			jwtGenerator := jwtMock.JwtGenarate
+			jwtValidator := jwtMock.JwtValidate
 			apiEngine := api.NewEngine(&api.EnginOpt{
-				App:       gin.New(),
-				Cfg:       tc.configTest,
-				Connector: connectorMock,
+				App:          gin.New(),
+				Cfg:          tc.configTest,
+				Connector:    connectorMock,
+				JwtGenerator: jwtGenerator,
+				JwtValidator: jwtValidator,
 			})
 			rec := tc.setupTestHTTP(apiEngine)
 			// Check status code
+			// assert.Equal(testItem, "", rec.Body.String())
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
 		})
 	}
