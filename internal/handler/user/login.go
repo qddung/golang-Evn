@@ -17,6 +17,8 @@ import (
 // @Produce json
 // @Param input body userModel.UserLogin true "Input required"
 // @Success 200 {object} loginResponse
+// @Failure      400  {object}  loginResponse
+// @Failure      500  {object}  loginResponse
 // @Router /v1/users/login [post]
 func (u *userHandler) Login(c *gin.Context) {
 	userRequest, err := request_ultls.ModelBindValidation[userModel.UserLogin](c)

@@ -96,6 +96,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/users/login": {
+            "post": {
+                "description": "Login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Input required",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api_user.UserLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler_user.loginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler_user.loginResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler_user.loginResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/users/register": {
             "post": {
                 "description": "Register user",
@@ -126,12 +172,33 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_user_UserInfo"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any"
+                        }
                     }
                 }
             }
         }
     },
     "definitions": {
+        "github_com_homework_lab_internal_models_dto_api.Response-any": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_user_UserInfo": {
             "type": "object",
             "properties": {
@@ -162,6 +229,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userName": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_homework_lab_internal_models_dto_api_user.UserLogin": {
+            "type": "object",
+            "required": [
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -225,6 +307,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handler_user.loginResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "token": {
                     "type": "string"
                 }
             }

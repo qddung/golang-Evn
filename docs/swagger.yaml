@@ -1,5 +1,11 @@
 basePath: /
 definitions:
+  github_com_homework_lab_internal_models_dto_api.Response-any:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
   github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_user_UserInfo:
     properties:
       data:
@@ -21,6 +27,16 @@ definitions:
         type: string
       userName:
         type: string
+    type: object
+  github_com_homework_lab_internal_models_dto_api_user.UserLogin:
+    properties:
+      password:
+        minLength: 8
+        type: string
+      username:
+        type: string
+    required:
+    - username
     type: object
   github_com_homework_lab_internal_models_dto_api_user.UserRegister:
     properties:
@@ -62,6 +78,13 @@ definitions:
       code:
         type: string
       message:
+        type: string
+    type: object
+  internal_handler_user.loginResponse:
+    properties:
+      message:
+        type: string
+      token:
         type: string
     type: object
 info:
@@ -122,6 +145,36 @@ paths:
       summary: Generate shorten url based on original url that last upto 7 days
       tags:
       - link
+  /v1/users/login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      parameters:
+      - description: Input required
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api_user.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handler_user.loginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handler_user.loginResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handler_user.loginResponse'
+      summary: Login
+      tags:
+      - user
   /v1/users/register:
     post:
       consumes:
@@ -141,6 +194,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_user_UserInfo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any'
       summary: Register user
       tags:
       - user

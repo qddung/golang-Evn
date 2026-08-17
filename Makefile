@@ -7,7 +7,7 @@ dev-run:
 	go run cmd/api/main.go
 
 swagger:
-	go run github.com/swaggo/swag/cmd/swag init -g ./cmd/api/main.go --output docs
+	go run github.com/swaggo/swag/cmd/swag init --parseDependency --parseInternal -g ./cmd/api/main.go --output docs
 
 run-app:
 	go run cmd/api/main.go
