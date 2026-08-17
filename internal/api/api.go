@@ -119,6 +119,7 @@ func (e *engine) initRoutes(cfg *config.Config) {
 		v1Routes.POST("/links/shorten", allHandlers.shorten.ShortenUrl)
 		v1Routes.GET("/links/redirect/:code", allHandlers.shorten.Redirect)
 		v1Routes.POST("/users/register", allHandlers.user.Register)
+		v1Routes.Use(jwtMiddeleware.JwtAuth()) // middelware
 
 		v1Routes.Use(jwtMiddeleware.JwtAuth()) // middelware
 		v1Routes.GET("/self/info", allHandlers.user.GetUserInfo)
