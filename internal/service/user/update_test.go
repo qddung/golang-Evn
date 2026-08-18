@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	domain_model "github.com/homework/lab/internal/models/domain"
+	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	"github.com/homework/lab/internal/models/entity"
 	repo_mocks "github.com/homework/lab/internal/repository/user/mocks"
 	helper_mocks "github.com/homework/lab/pkg/helpers/mocks"
@@ -17,14 +17,14 @@ import (
 
 func TestToUpdateUser(t *testing.T) {
 	testCases := []struct {
-		name       string
-		input      *userModel.UpdateUserInput
+		name        string
+		input       *userModel.UpdateUserInput
 		setupHasher func() *helper_mocks.HashHelper
-		expects    func(t *testing.T, out *domain_model.UpdateUser, err error)
+		expects     func(t *testing.T, out *domain_model.UpdateUser, err error)
 	}{
 		{
-			name:  "no password",
-			input: &userModel.UpdateUserInput{UserName: "bob", Password: ""},
+			name:        "no password",
+			input:       &userModel.UpdateUserInput{UserName: "bob", Password: ""},
 			setupHasher: func() *helper_mocks.HashHelper { return nil },
 			expects: func(t *testing.T, out *domain_model.UpdateUser, err error) {
 				assert.NoError(t, err)
@@ -75,11 +75,11 @@ func TestToUpdateUser(t *testing.T) {
 func TestService_UpdateUserInfo(t *testing.T) {
 	ctx := context.Background()
 	testCases := []struct {
-		name       string
-		setupRepo  func() *repo_mocks.UserRepository
-		inputId    string
-		input      *userModel.UpdateUserInput
-		expectErr  error
+		name      string
+		setupRepo func() *repo_mocks.UserRepository
+		inputId   string
+		input     *userModel.UpdateUserInput
+		expectErr error
 	}{
 		{
 			name: "user not found",
