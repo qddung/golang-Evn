@@ -13,6 +13,7 @@ import (
 	user_service "github.com/homework/lab/internal/service/user"
 	service_mocks "github.com/homework/lab/internal/service/user/mocks"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestHandler_UpdateUserInfo(t *testing.T) {
@@ -53,7 +54,10 @@ func TestHandler_UpdateUserInfo(t *testing.T) {
 				claims := jwt.MapClaims{"sub": "u-1"}
 				ctx.Set("claims", claims)
 				svc := service_mocks.NewUserService(t)
-				svc.On("UpdateUserInfo", ctx, "u-1", mockRequestMatcher{expected: &userModel.UpdateUserInput{UserName: "alice"}}).Return(user_service.ServiceErr.UserNameExistError)
+				svc.On("UpdateUserInfo", ctx, "u-1", mock.MatchedBy(func(x interface{}) bool {
+									v, ok := x.(*userModel.UpdateUserInput)
+									return ok && v.UserName == "alice"
+								})).Return(user_service.ServiceErr.UserNameExistError)
 				return svc
 			},
 			expect: func(t *testing.T, rec *httptest.ResponseRecorder) {
@@ -68,7 +72,10 @@ func TestHandler_UpdateUserInfo(t *testing.T) {
 				claims := jwt.MapClaims{"sub": "u-2"}
 				ctx.Set("claims", claims)
 				svc := service_mocks.NewUserService(t)
-				svc.On("UpdateUserInfo", ctx, "u-2", mockRequestMatcher{expected: &userModel.UpdateUserInput{UserName: "alice"}}).Return(assert.AnError)
+				svc.On("UpdateUserInfo", ctx, "u-2", mock.MatchedBy(func(x interface{}) bool {
+									v, ok := x.(*userModel.UpdateUserInput)
+									return ok && v.UserName == "alice"
+								})).Return(assert.AnError)
 				return svc
 			},
 			expect: func(t *testing.T, rec *httptest.ResponseRecorder) {
@@ -84,7 +91,10 @@ func TestHandler_UpdateUserInfo(t *testing.T) {
 				claims := jwt.MapClaims{"sub": "u-3"}
 				ctx.Set("claims", claims)
 				svc := service_mocks.NewUserService(t)
-				svc.On("UpdateUserInfo", ctx, "u-3", mockRequestMatcher{expected: &userModel.UpdateUserInput{UserName: "final", Password: ""}}).Return(nil)
+				svc.On("UpdateUserInfo", ctx, "u-3", mock.MatchedBy(func(x interface{}) bool {
+									v, ok := x.(*userModel.UpdateUserInput)
+									return ok && v.UserName == "final" && v.Password == ""
+								})).Return(nil)
 				return svc
 			},
 			expect: func(t *testing.T, rec *httptest.ResponseRecorder) {
@@ -118,22 +128,3 @@ func TestHandler_UpdateUserInfo(t *testing.T) {
 	}
 }
 
-// mockRequestMatcher helps match the pointer to UpdateUserInput passed into mock expectations
-type mockRequestMatcher struct {
-	expected *userModel.UpdateUserInput
-}
-
-func (m mockRequestMatcher) Matches(x interface{}) bool {
-	if x == nil {
-		return m.expected == nil
-	}
-	v, ok := x.(*userModel.UpdateUserInput)
-	if !ok {
-		return false
-	}
-	return v.UserName == m.expected.UserName && v.Password == m.expected.Password
-}
-
-func (m mockRequestMatcher) String() string {
-	return "match UpdateUserInput"
-}

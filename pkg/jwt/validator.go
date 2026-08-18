@@ -39,7 +39,8 @@ var (
 func (v *jwtValidator) ValidateToken(tokenString string) (jwt.MapClaims, error) {
 	refAlgo := reflect.TypeOf(JwtAlogorithm)
 	tkn, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if reflect.TypeOf(token.Method) == refAlgo {
+		// ensure the token algorithm matches the expected signing method
+		if reflect.TypeOf(token.Method) != refAlgo {
 			return nil, jwt.ErrSignatureInvalid
 		}
 		return v.publicKey, nil
