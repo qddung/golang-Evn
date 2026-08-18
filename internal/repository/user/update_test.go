@@ -11,72 +11,97 @@ import (
 )
 
 func TestUpdateUser(t *testing.T) {
-	fix := fixture.NewUserTestCase(t)
-	db := fixture.NewFixture(t, fix)
-
-	userRepository := NewUserRepository(db)
-	ctx := context.Background()
-
-	// // create a base user
-	user := &entity.User{
-		DisplayName: "bradtest",
-		Email:       "bradtest@gmail.com",
-		Password:    "123456",
-		UserName:    "bradtest",
+	// table-driven test cases; each subtest gets its own isolated DB and runs in parallel
+	tests := []struct {
+		name           string
+		initialUser    *entity.User
+		updateUserName string
+		updatePassword string
+		expectUserName string
+		expectPassword string
+	}{
+		{
+			name: "update username only",
+			initialUser: &entity.User{
+				DisplayName: "bradtest",
+				Email:       "bradtest@gmail.com",
+				Password:    "123456",
+				UserName:    "bradtest",
+			},
+			updateUserName: "newusername",
+			updatePassword: "",
+			expectUserName: "newusername",
+			expectPassword: "123456",
+		},
+		{
+			name: "update password only",
+			initialUser: &entity.User{
+				DisplayName: "bradtest",
+				Email:       "bradtest@gmail.com",
+				Password:    "123456",
+				UserName:    "bradtest",
+			},
+			updateUserName: "",
+			updatePassword: "new-secret",
+			expectUserName: "bradtest",
+			expectPassword: "new-secret",
+		},
+		{
+			name: "update username and password",
+			initialUser: &entity.User{
+				DisplayName: "bradtest",
+				Email:       "bradtest@gmail.com",
+				Password:    "123456",
+				UserName:    "bradtest",
+			},
+			updateUserName: "finalname",
+			updatePassword: "final-pass",
+			expectUserName: "finalname",
+			expectPassword: "final-pass",
+		},
 	}
-	errCreateUser := userRepository.CreateUser(ctx, user)
-	assert.NoError(t, errCreateUser)
 
-	origPassword := user.Password
+	for _, tc := range tests {
+		tc := tc // capture range variable
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	// Subtest: update username only
-	t.Run("update username only", func(t *testing.T) {
-		update := &domain_model.UpdateUser{
-			Id:       user.Id,
-			UserName: "newusername",
-			Password: "",
-		}
-		err := userRepository.UpdateUser(ctx, update)
-		assert.NoError(t, err)
+			fix := fixture.NewUserTestCase(t)
+			db := fixture.NewFixture(t, fix)
 
-		updated, err := userRepository.GetUserById(ctx, user.Id)
-		assert.NoError(t, err)
-		assert.Equal(t, "newusername", updated.UserName)
-		// password should remain unchanged
-		assert.Equal(t, origPassword, updated.Password)
-	})
+			userRepository := NewUserRepository(db)
+			ctx := context.Background()
 
-	// Subtest: update password only
-	t.Run("update password only", func(t *testing.T) {
-		update := &domain_model.UpdateUser{
-			Id:       user.Id,
-			UserName: "",
-			Password: "new-secret",
-		}
-		err := userRepository.UpdateUser(ctx, update)
-		assert.NoError(t, err)
+			// create initial user for this case
+			user := &entity.User{
+				DisplayName: tc.initialUser.DisplayName,
+				Email:       tc.initialUser.Email,
+				Password:    tc.initialUser.Password,
+				UserName:    tc.initialUser.UserName,
+			}
+			if err := userRepository.CreateUser(ctx, user); err != nil {
+				t.Fatalf("failed to create user: %v", err)
+			}
 
-		updated, err := userRepository.GetUserById(ctx, user.Id)
-		assert.NoError(t, err)
-		// username should remain as previously set
-		assert.Equal(t, "newusername", updated.UserName)
-		// password should be updated
-		assert.Equal(t, "new-secret", updated.Password)
-	})
+			// prepare update
+			update := &domain_model.UpdateUser{
+				Id:       user.Id,
+				UserName: tc.updateUserName,
+				Password: tc.updatePassword,
+			}
 
-	// Subtest: update both username and password
-	t.Run("update username and password", func(t *testing.T) {
-		update := &domain_model.UpdateUser{
-			Id:       user.Id,
-			UserName: "finalname",
-			Password: "final-pass",
-		}
-		err := userRepository.UpdateUser(ctx, update)
-		assert.NoError(t, err)
+			// perform update
+			if err := userRepository.UpdateUser(ctx, update); err != nil {
+				t.Fatalf("UpdateUser failed: %v", err)
+			}
 
-		updated, err := userRepository.GetUserById(ctx, user.Id)
-		assert.NoError(t, err)
-		assert.Equal(t, "finalname", updated.UserName)
-		assert.Equal(t, "final-pass", updated.Password)
-	})
+			// verify
+			updated, err := userRepository.GetUserById(ctx, user.Id)
+			if err != nil {
+				t.Fatalf("GetUserById failed: %v", err)
+			}
+			assert.Equal(t, tc.expectUserName, updated.UserName)
+			assert.Equal(t, tc.expectPassword, updated.Password)
+		})
+	}
 }
