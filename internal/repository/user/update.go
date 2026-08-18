@@ -8,20 +8,19 @@ import (
 )
 
 func (u *userRepository) UpdateUser(ctx context.Context, user *domain_model.UpdateUser) error {
-
 	usr := &entity.User{}
-
-	err := u.db.Where(&entity.User{
-		Id: user.Id,
-	}).First(usr).Error
-	if err != nil {
+	if err := u.db.WithContext(ctx).Where(&entity.User{Id: user.Id}).First(usr).Error; err != nil {
 		return err
 	}
+
+	// Apply only provided fields
 	if user.Password != "" {
 		usr.Password = user.Password
 	}
-	if user.Password != "" {
-		user.UserName = usr.UserName
+	if user.UserName != "" {
+		usr.UserName = user.UserName
 	}
-	return u.db.WithContext(ctx).Update("user_name", user.UserName).Error
+
+	// Save the updated entity
+	return u.db.WithContext(ctx).Save(usr).Error
 }
