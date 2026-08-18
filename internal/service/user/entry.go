@@ -15,6 +15,8 @@ import (
 type UserService interface {
 	Register(ctx context.Context, regiterInput userModel.UserRegister) (*userModel.UserInfo, error)
 	Login(ctx context.Context, loginInput userModel.UserLogin) (string, error)
+	GetUserInfo(ctx context.Context, id string) (*userModel.UserInfo, error)
+	UpdateUserInfo(ctx context.Context, userId string, updateInput *userModel.UpdateUserInput) error
 }
 
 type userService struct {
@@ -33,6 +35,7 @@ type ServiceError struct {
 	GenerateTokenError    error
 	UserNameNotExistError error
 	PasswordError         error
+	NotFoundUserInfo      error
 }
 
 var ServiceErr = ServiceError{
@@ -41,6 +44,7 @@ var ServiceErr = ServiceError{
 	GenerateTokenError:    errors.New("Generate token error"),
 	UserNameNotExistError: errors.New("UserName not exists"),
 	PasswordError:         errors.New("Password error"),
+	NotFoundUserInfo:      errors.New("User not found"),
 }
 
 func CheckErrorIsServiceErr(err error) bool {

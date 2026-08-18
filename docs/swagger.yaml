@@ -13,6 +13,13 @@ definitions:
       message:
         type: string
     type: object
+  github_com_homework_lab_internal_models_dto_api_user.UpdateUserInput:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   github_com_homework_lab_internal_models_dto_api_user.UserInfo:
     properties:
       created_at:
@@ -87,6 +94,11 @@ definitions:
       token:
         type: string
     type: object
+  internal_handler_user.updateUserReposonse:
+    properties:
+      message:
+        type: string
+    type: object
 info:
   contact: {}
   description: This is a book API
@@ -145,6 +157,36 @@ paths:
       summary: Generate shorten url based on original url that last upto 7 days
       tags:
       - link
+  /v1/users:
+    put:
+      consumes:
+      - application/json
+      description: Edit current user
+      parameters:
+      - description: Input required
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api_user.UpdateUserInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handler_user.updateUserReposonse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handler_user.updateUserReposonse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handler_user.updateUserReposonse'
+      summary: Edit current user
+      tags:
+      - user
   /v1/users/login:
     post:
       consumes:

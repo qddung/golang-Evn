@@ -17,6 +17,7 @@ func NewJwtAuthMiddleware(jwtTokenService jwt_pkg.JwtValidator) *JwtAuthMiddlewa
 		jwtTokenService: jwtTokenService,
 	}
 }
+
 func (j *JwtAuthMiddleware) JwtAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")

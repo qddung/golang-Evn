@@ -96,6 +96,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/users": {
+            "put": {
+                "description": "Edit current user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Edit current user",
+                "parameters": [
+                    {
+                        "description": "Input required",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api_user.UpdateUserInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler_user.updateUserReposonse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler_user.updateUserReposonse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler_user.updateUserReposonse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/users/login": {
             "post": {
                 "description": "Login",
@@ -210,6 +256,17 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_homework_lab_internal_models_dto_api_user.UpdateUserInput": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_homework_lab_internal_models_dto_api_user.UserInfo": {
             "type": "object",
             "properties": {
@@ -318,6 +375,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handler_user.updateUserReposonse": {
+            "type": "object",
+            "properties": {
+                "message": {
                     "type": "string"
                 }
             }

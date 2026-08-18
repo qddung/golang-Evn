@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	domain_model "github.com/homework/lab/internal/models/domain"
 	"github.com/homework/lab/internal/models/entity"
 )
 
@@ -12,4 +13,5 @@ type UserRepository interface {
 	GetUserById(ctx context.Context, id string) (*entity.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
 	GetUserByUserName(ctx context.Context, userName string) (*entity.User, error)
+	UpdateUser(ctx context.Context, user *domain_model.UpdateUser) error
 }

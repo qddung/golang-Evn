@@ -5,7 +5,9 @@ package mocks
 import (
 	context "context"
 
+	domain_model "github.com/homework/lab/internal/models/domain"
 	entity "github.com/homework/lab/internal/models/entity"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -120,6 +122,24 @@ func (_m *UserRepository) GetUserByUserName(ctx context.Context, userName string
 	}
 
 	return r0, r1
+}
+
+// UpdateUser provides a mock function with given fields: ctx, _a1
+func (_m *UserRepository) UpdateUser(ctx context.Context, _a1 *domain_model.UpdateUser) error {
+	ret := _m.Called(ctx, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateUser")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *domain_model.UpdateUser) error); ok {
+		r0 = rf(ctx, _a1)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // NewUserRepository creates a new instance of UserRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
