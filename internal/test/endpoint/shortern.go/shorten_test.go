@@ -10,6 +10,7 @@ import (
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
+	"github.com/homework/lab/internal/test/data/fixture"
 	general_helpers "github.com/homework/lab/internal/test/general"
 	"github.com/stretchr/testify/assert"
 )
@@ -134,7 +135,8 @@ func TestShorten_Integration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			connectorMock, errConnector := connection.InitDBConnectorMock(testItem)
+			fix := fixture.NewUserTestCase(t)
+			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, fix)
 			if errConnector != nil {
 				testItem.Fatal(errConnector)
 			}
@@ -209,7 +211,8 @@ func TestRedirect_Integration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			connectorMock, errConnector := connection.InitDBConnectorMock(testItem)
+			fix := fixture.NewUserTestCase(t)
+			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, fix)
 			if errConnector != nil {
 				testItem.Fatal(errConnector)
 			}

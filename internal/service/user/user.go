@@ -11,6 +11,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// UserService interface
+//
 //go:generate mockery --name=UserService --filename=user_service_mock.go --outpkg=mocks
 type UserService interface {
 	Register(ctx context.Context, regiterInput userModel.UserRegister) (*userModel.UserInfo, error)
@@ -28,6 +30,7 @@ func NewUserService(userRepository user.UserRepository, hasher helpers.HashHelpe
 var EmailExistError = errors.New("Email already exists")
 var UserNameExistError = errors.New("UserName already exists")
 
+// Register user
 func (u *userService) Register(ctx context.Context, regiterInput userModel.UserRegister) (*userModel.UserInfo, error) {
 
 	// check user exist

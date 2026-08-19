@@ -9,7 +9,7 @@ type UserInfo struct {
 	UpdateAt    string `json:"updated_at"`
 	DisplayName string `json:"display_name"`
 	Email       string `json:"email"`
-	UserName    string `json:"userName"`
+	UserName    string `json:"username"`
 	CreateAt    string `json:"created_at"`
 }
 
