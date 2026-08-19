@@ -55,9 +55,9 @@ func TestHandler_UpdateUserInfo(t *testing.T) {
 				ctx.Set("claims", claims)
 				svc := service_mocks.NewUserService(t)
 				svc.On("UpdateUserInfo", ctx, "u-1", mock.MatchedBy(func(x interface{}) bool {
-									v, ok := x.(*userModel.UpdateUserInput)
-									return ok && v.UserName == "alice"
-								})).Return(user_service.ServiceErr.UserNameExistError)
+					v, ok := x.(*userModel.UpdateUserInput)
+					return ok && v.UserName == "alice"
+				})).Return(user_service.ServiceErr.UserNameExistError)
 				return svc
 			},
 			expect: func(t *testing.T, rec *httptest.ResponseRecorder) {
@@ -73,9 +73,9 @@ func TestHandler_UpdateUserInfo(t *testing.T) {
 				ctx.Set("claims", claims)
 				svc := service_mocks.NewUserService(t)
 				svc.On("UpdateUserInfo", ctx, "u-2", mock.MatchedBy(func(x interface{}) bool {
-									v, ok := x.(*userModel.UpdateUserInput)
-									return ok && v.UserName == "alice"
-								})).Return(assert.AnError)
+					v, ok := x.(*userModel.UpdateUserInput)
+					return ok && v.UserName == "alice"
+				})).Return(assert.AnError)
 				return svc
 			},
 			expect: func(t *testing.T, rec *httptest.ResponseRecorder) {
@@ -92,14 +92,14 @@ func TestHandler_UpdateUserInfo(t *testing.T) {
 				ctx.Set("claims", claims)
 				svc := service_mocks.NewUserService(t)
 				svc.On("UpdateUserInfo", ctx, "u-3", mock.MatchedBy(func(x interface{}) bool {
-									v, ok := x.(*userModel.UpdateUserInput)
-									return ok && v.UserName == "final" && v.Password == ""
-								})).Return(nil)
+					v, ok := x.(*userModel.UpdateUserInput)
+					return ok && v.UserName == "final" && v.Password == ""
+				})).Return(nil)
 				return svc
 			},
 			expect: func(t *testing.T, rec *httptest.ResponseRecorder) {
 				// current handler erroneously returns 400 on success; assert current behavior
-				assert.Equal(t, http.StatusBadRequest, rec.Code)
+				assert.Equal(t, http.StatusOK, rec.Code)
 				assert.Contains(t, rec.Body.String(), "Edit current user successfully")
 			},
 		},
@@ -127,4 +127,3 @@ func TestHandler_UpdateUserInfo(t *testing.T) {
 		})
 	}
 }
-

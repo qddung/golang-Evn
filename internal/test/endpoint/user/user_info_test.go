@@ -45,44 +45,77 @@ func setupEngineWithDB(t *testing.T) (api.Engine, *jwt_pkg.MockJwt, connection.D
 }
 
 func Test_GetUserInfo_Integration(t *testing.T) {
-	eng, mockJwt, conn, _ := setupEngineWithDB(t)
-	db := conn.GetSqlDB()
+	testCases := []struct {
+		name         string
+		displayName  string
+		email        string
+		userName     string
+		expectedID   string
+		expectedMail string
+	}{
+		{
+			name:         "user info success",
+			displayName:  "Integration",
+			email:        "int@example.com",
+			userName:     "intuser",
+			expectedMail: "int@example.com",
+		},
+		{
+			name:         "user info success alt user",
+			displayName:  "Another User",
+			email:        "alt@example.com",
+			userName:     "altuser",
+			expectedMail: "alt@example.com",
+		},
+	}
 
-	// create a user in DB
-	hasher := helpers.NewHasher()
-	pw, err := hasher.HashPassword("password123")
-	if err != nil {
-		t.Fatalf("hash password: %v", err)
-	}
-	user := &user_entity.User{DisplayName: "Integration", Email: "int@example.com", Password: pw, UserName: "intuser"}
-	if err := user_repository.NewUserRepository(db).CreateUser(context.Background(), user); err != nil {
-		t.Fatalf("create user: %v", err)
-	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			eng, mockJwt, conn, _ := setupEngineWithDB(t)
+			db := conn.GetSqlDB()
 
-	// generate token with subject = user.Id
-	claims := map[string]interface{}{"sub": user.Id}
-	token, err := mockJwt.JwtGenarate.GenerateToken(claims)
-	if err != nil {
-		t.Fatalf("generate token: %v", err)
-	}
+			hasher := helpers.NewHasher()
+			pw, err := hasher.HashPassword("password123")
+			if err != nil {
+				t.Fatalf("hash password: %v", err)
+			}
+			user := &user_entity.User{
+				DisplayName: tc.displayName,
+				Email:       tc.email,
+				Password:    pw,
+				UserName:    tc.userName,
+			}
+			if err := user_repository.NewUserRepository(db).CreateUser(context.Background(), user); err != nil {
+				t.Fatalf("create user: %v", err)
+			}
 
-	rec := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/v1/self/info", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
+			claims := map[string]interface{}{"sub": user.Id}
+			token, err := mockJwt.JwtGenarate.GenerateToken(claims)
+			if err != nil {
+				t.Fatalf("generate token: %v", err)
+			}
 
-	eng.ServeHTTP(rec, req)
-	if rec.Code != http.StatusOK {
-		t.Logf("response body: %s", rec.Body.String())
-	}
-	assert.Equal(t, http.StatusOK, rec.Code)
+			rec := httptest.NewRecorder()
+			req, err := http.NewRequest(http.MethodGet, "/v1/self/info", nil)
+			if err != nil {
+				t.Fatalf("new get request: %v", err)
+			}
+			req.Header.Set("Authorization", "Bearer "+token)
 
-	// parse response into DTO
-	var resp struct {
-		Data userModel.UserInfo `json:"data"`
+			eng.ServeHTTP(rec, req)
+			if rec.Code != http.StatusOK {
+				t.Logf("response body: %s", rec.Body.String())
+			}
+			assert.Equal(t, http.StatusOK, rec.Code)
+
+			var resp struct {
+				Data userModel.UserInfo `json:"data"`
+			}
+			if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+				t.Fatalf("unmarshal resp: %v", err)
+			}
+			assert.Equal(t, user.Id, resp.Data.Id)
+			assert.Equal(t, tc.expectedMail, resp.Data.Email)
+		})
 	}
-	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
-		t.Fatalf("unmarshal resp: %v", err)
-	}
-	assert.Equal(t, user.Id, resp.Data.Id)
-	assert.Equal(t, user.Email, resp.Data.Email)
 }
