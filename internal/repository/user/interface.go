@@ -7,6 +7,8 @@ import (
 	"github.com/homework/lab/internal/models/entity"
 )
 
+// UserRepository interface
+//
 //go:generate mockery --name UserRepository --filename user_repository.go
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *entity.User) error

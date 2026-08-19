@@ -1,7 +1,7 @@
 package sqldb
 
 import (
-	"log"
+	"fmt"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -12,7 +12,7 @@ func buildClient(dsn string) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
-		log.Fatalf("Failed to start DB, with dsn: `%s`: %v", dsn, err)
+		panic(fmt.Sprintf("Failed to start DB: %v", err))
 	}
 	return db, err
 }

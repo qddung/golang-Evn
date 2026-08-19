@@ -2,12 +2,17 @@ package user_service
 
 import (
 	"context"
+	"errors"
 
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	"github.com/homework/lab/internal/models/entity"
 	"github.com/rs/zerolog/log"
 )
 
+var EmailExistError = errors.New("Email already exists")
+var UserNameExistError = errors.New("UserName already exists")
+
+// Register user
 func (u *userService) Register(ctx context.Context, regiterInput userModel.UserRegister) (*userModel.UserInfo, error) {
 
 	// check user exist

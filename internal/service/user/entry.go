@@ -11,6 +11,8 @@ import (
 	jwt_pkg "github.com/homework/lab/pkg/jwt"
 )
 
+// UserService interface
+//
 //go:generate mockery --name=UserService --filename=user_service_mock.go --outpkg=mocks
 type UserService interface {
 	Register(ctx context.Context, regiterInput userModel.UserRegister) (*userModel.UserInfo, error)

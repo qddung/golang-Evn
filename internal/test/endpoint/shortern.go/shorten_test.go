@@ -135,7 +135,7 @@ func TestShorten_Integration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			connectorMock, errConnector := connection.InitDBConnectorMock(testItem)
+			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, nil)
 			if errConnector != nil {
 				testItem.Fatal(errConnector)
 			}
@@ -214,7 +214,7 @@ func TestRedirect_Integration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			connectorMock, errConnector := connection.InitDBConnectorMock(testItem)
+			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, nil)
 			if errConnector != nil {
 				testItem.Fatal(errConnector)
 			}

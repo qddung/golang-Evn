@@ -11,6 +11,7 @@ import (
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
 	"github.com/homework/lab/internal/models/dto/api/user"
+	"github.com/homework/lab/internal/test/data/fixture"
 	general_helpers "github.com/homework/lab/internal/test/general"
 	jwt_pkg "github.com/homework/lab/pkg/jwt"
 	"github.com/stretchr/testify/assert"
@@ -46,7 +47,8 @@ func TestService_Login(t *testing.T) {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
 			fmt.Printf("Loaded config: %+v\n", tc.configTest)
-			connectorMock, errConnector := connection.InitDBConnectorMock(testItem)
+			fix := fixture.NewUserTestCase(t)
+			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, fix)
 			if errConnector != nil {
 				testItem.Fatal(errConnector)
 			}

@@ -34,6 +34,10 @@ func NewFixture(t *testing.T, fix Fixture) *gorm.DB {
 	if err != nil {
 		t.Fatalf("Failed to start DB: %v", err)
 	}
+
+	if fix == nil {
+		return db
+	}
 	fix.SetDB(db)
 	err = fix.Migrate()
 	if err != nil {
