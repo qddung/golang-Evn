@@ -73,7 +73,7 @@ func (_m *UserService) Login(ctx context.Context, loginInput user.UserLogin) (st
 }
 
 // Register provides a mock function with given fields: ctx, regiterInput
-func (_m *UserService) Register(ctx context.Context, regiterInput user.UserRegister) (*user.UserInfo, error) {
+func (_m *UserService) Register(ctx context.Context, regiterInput *user.UserRegister) (*user.UserInfo, error) {
 	ret := _m.Called(ctx, regiterInput)
 
 	if len(ret) == 0 {
@@ -82,10 +82,10 @@ func (_m *UserService) Register(ctx context.Context, regiterInput user.UserRegis
 
 	var r0 *user.UserInfo
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, user.UserRegister) (*user.UserInfo, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *user.UserRegister) (*user.UserInfo, error)); ok {
 		return rf(ctx, regiterInput)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, user.UserRegister) *user.UserInfo); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *user.UserRegister) *user.UserInfo); ok {
 		r0 = rf(ctx, regiterInput)
 	} else {
 		if ret.Get(0) != nil {
@@ -93,7 +93,7 @@ func (_m *UserService) Register(ctx context.Context, regiterInput user.UserRegis
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, user.UserRegister) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *user.UserRegister) error); ok {
 		r1 = rf(ctx, regiterInput)
 	} else {
 		r1 = ret.Error(1)

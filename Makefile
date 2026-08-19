@@ -32,12 +32,12 @@ COVERAGE_EXCLUDE=mocks|main.go|test|config.go
 COVERAGE_THRESHOLD ?= 80
 
 # 2. Xử lý logic điều kiện (Sử dụng cú pháp ifeq/ifneq chuẩn của Make)
-ifeq ($(OPTION),cache)
-    # Giữ nguyên cache mặc định của Go
-    CACHECMD := go test ./... -coverprofile=./test/coverage_tmp -covermode=atomic -coverpkg=./... -p 1
-else
+ifeq ($(OPTION),nocache)
     # Thêm biến môi trường tắt cache (Goflags hoặc -count=1)
     CACHECMD := GOFLAGS="-count=1" go test ./... -coverprofile=./test/coverage_tmp -covermode=atomic -coverpkg=./... -p 1
+else
+	# Giữ nguyên cache mặc định của Go
+    CACHECMD := go test ./... -coverprofile=./test/coverage_tmp -covermode=atomic -coverpkg=./... -p 1
 endif
 
 testdir-check:
@@ -60,6 +60,7 @@ test: testdir-check
 		echo "✅ Coverage ($$total%) meets threshold ($(COVERAGE_THRESHOLD)%)"; \
 	fi
 
+test-nocache: test OPTION=nocache
 
 docker-up:
 	docker compose -f deployment/docker-compose.yml up -d 

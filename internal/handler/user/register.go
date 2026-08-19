@@ -27,7 +27,7 @@ func (u *userHandler) Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response.ToDataResponse[any](err))
 		return
 	}
-	createdUser, err := u.svc.Register(c, *userRequest)
+	createdUser, err := u.svc.Register(c, userRequest)
 	if err == user_service.ServiceErr.EmailExistError || err == user_service.ServiceErr.UserNameExistError {
 		c.JSON(http.StatusConflict, response.ToDataResponse[any](err))
 		return

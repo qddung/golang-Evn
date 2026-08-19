@@ -15,7 +15,7 @@ import (
 //
 //go:generate mockery --name=UserService --filename=user_service_mock.go --outpkg=mocks
 type UserService interface {
-	Register(ctx context.Context, regiterInput userModel.UserRegister) (*userModel.UserInfo, error)
+	Register(ctx context.Context, regiterInput *userModel.UserRegister) (*userModel.UserInfo, error)
 	Login(ctx context.Context, loginInput userModel.UserLogin) (string, error)
 	GetUserInfo(ctx context.Context, id string) (*userModel.UserInfo, error)
 	UpdateUserInfo(ctx context.Context, userId string, updateInput *userModel.UpdateUserInput) error

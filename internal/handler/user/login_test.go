@@ -23,6 +23,7 @@ func TestService_Login(t *testing.T) {
 		name string
 
 		setupRepo    func(ctx *gin.Context) *mocks.UserService
+		requestBody  []byte
 		expectedFunc func(t *testing.T, rec *httptest.ResponseRecorder)
 	}{
 		{
@@ -69,6 +70,37 @@ func TestService_Login(t *testing.T) {
 				assert.Contains(t, body, "token_123")
 			},
 		},
+
+		{
+			name: "Internal server error",
+			setupRepo: func(ctx *gin.Context) *mocks.UserService {
+				userServiceMocks := mocks.NewUserService(t)
+				userServiceMocks.On("Login", ctx, *defaultUser).Return("", assert.AnError)
+				return userServiceMocks
+			},
+			expectedFunc: func(t *testing.T, rec *httptest.ResponseRecorder) {
+				code := rec.Code
+				body := rec.Body.String()
+				assert.Equal(t, http.StatusInternalServerError, code)
+				assert.Contains(t, body, "Internal server error")
+			},
+		},
+
+		{
+			name: "ModelBindValidation failed",
+			// no service expectation needed because binding should fail before service call
+			setupRepo: func(ctx *gin.Context) *mocks.UserService {
+				return mocks.NewUserService(t)
+			},
+			requestBody: []byte(`{"username":"","password":"123"}`),
+			expectedFunc: func(t *testing.T, rec *httptest.ResponseRecorder) {
+				code := rec.Code
+				body := rec.Body.String()
+				assert.Equal(t, http.StatusBadRequest, code)
+				// validation error should mention required/min tags
+				assert.Contains(t, body, "required")
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -76,9 +108,15 @@ func TestService_Login(t *testing.T) {
 			testItem.Parallel()
 			rec := httptest.NewRecorder()
 			ctx, _ := gin.CreateTestContext(rec)
-			var bodyBytes, errDecode = json.Marshal(defaultUser)
-			if errDecode != nil {
-				testItem.Fatal(errDecode)
+			var bodyBytes []byte
+			var errDecode error
+			if tc.requestBody != nil {
+				bodyBytes = tc.requestBody
+			} else {
+				bodyBytes, errDecode = json.Marshal(defaultUser)
+				if errDecode != nil {
+					testItem.Fatal(errDecode)
+				}
 			}
 			ctx.Request = httptest.NewRequest(http.MethodPost, "/v1/users/login", bytes.NewBuffer(bodyBytes))
 			ctx.Request.Header.Set("Content-Type", "application/json")

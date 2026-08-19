@@ -108,7 +108,10 @@ func TestService_UpdateUserInfo(t *testing.T) {
 			setupRepo: func() *repo_mocks.UserRepository {
 				repo := repo_mocks.NewUserRepository(t)
 				repo.On("GetUserById", ctx, "u-1").Return(&entity.User{Id: "u-1"}, nil)
-				repo.On("UpdateUser", ctx, mock.Anything).Return(assert.AnError)
+				repo.On("UpdateUser", ctx, mock.MatchedBy(func(x interface{}) bool {
+					v, ok := x.(*domain_model.UpdateUser)
+					return ok && v.Id == "u-1" && v.UserName == "new" && v.Password == ""
+				})).Return(assert.AnError)
 				return repo
 			},
 			inputId:   "u-1",
@@ -120,7 +123,10 @@ func TestService_UpdateUserInfo(t *testing.T) {
 			setupRepo: func() *repo_mocks.UserRepository {
 				repo := repo_mocks.NewUserRepository(t)
 				repo.On("GetUserById", ctx, "u-2").Return(&entity.User{Id: "u-2"}, nil)
-				repo.On("UpdateUser", ctx, mock.Anything).Return(nil)
+				repo.On("UpdateUser", ctx, mock.MatchedBy(func(x interface{}) bool {
+					v, ok := x.(*domain_model.UpdateUser)
+					return ok && v.Id == "u-2" && v.UserName == "ok" && v.Password == ""
+				})).Return(nil)
 				return repo
 			},
 			inputId:   "u-2",

@@ -19,12 +19,14 @@ import (
 )
 
 var testErr = errors.New("test error")
+var hashPwdErr = errors.New("Failed to HashPassword in userService.Register")
+var getUserByEmailErr = errors.New("Failed to GetUserByEmail in userService.Register")
 
 func TestService_Register(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		setupRepo    func(ctx *gin.Context, info user.UserRegister) *mocks.UserService
+		setupRepo    func(ctx *gin.Context, info *user.UserRegister) *mocks.UserService
 		input        *user.UserRegister
 		expectedFunc func(t *testing.T, rec *httptest.ResponseRecorder, registerInput *user.UserRegister)
 	}{
@@ -37,7 +39,7 @@ func TestService_Register(t *testing.T) {
 				Password:    "123131242",
 				UserName:    "testuser",
 			},
-			setupRepo: func(ctx *gin.Context, info user.UserRegister) *mocks.UserService {
+			setupRepo: func(ctx *gin.Context, info *user.UserRegister) *mocks.UserService {
 				userServiceMocks := mocks.NewUserService(t)
 				userServiceMocks.On("Register", ctx, info).Return(nil, user_service.ServiceErr.EmailExistError)
 
@@ -59,7 +61,7 @@ func TestService_Register(t *testing.T) {
 				Password:    "123131242",
 				UserName:    "testuser",
 			},
-			setupRepo: func(ctx *gin.Context, info user.UserRegister) *mocks.UserService {
+			setupRepo: func(ctx *gin.Context, info *user.UserRegister) *mocks.UserService {
 				userServiceMocks := mocks.NewUserService(t)
 				userServiceMocks.On("Register", ctx, info).Return(nil, user_service.ServiceErr.UserNameExistError)
 				return userServiceMocks
@@ -80,7 +82,7 @@ func TestService_Register(t *testing.T) {
 				Password:    "123131242",
 				UserName:    "testuser",
 			},
-			setupRepo: func(ctx *gin.Context, info user.UserRegister) *mocks.UserService {
+			setupRepo: func(ctx *gin.Context, info *user.UserRegister) *mocks.UserService {
 				userServiceMocks := mocks.NewUserService(t)
 				userServiceMocks.On("Register", ctx, info).Return(nil, testErr)
 				return userServiceMocks
@@ -101,7 +103,7 @@ func TestService_Register(t *testing.T) {
 				Password:    "123131242",
 				UserName:    "testuser",
 			},
-			setupRepo: func(ctx *gin.Context, info user.UserRegister) *mocks.UserService {
+			setupRepo: func(ctx *gin.Context, info *user.UserRegister) *mocks.UserService {
 				userServiceMocks := mocks.NewUserService(t)
 				userServiceMocks.On("Register", ctx, info).Return(&user.UserInfo{
 					Id:          uuid.NewString(),
@@ -131,6 +133,48 @@ func TestService_Register(t *testing.T) {
 				assert.NotEmpty(t, userInfo.Id)
 			},
 		},
+
+		{
+			name: "Failed to HashPassword in userService.Register",
+			input: &user.UserRegister{
+				DisplayName: "test",
+				Email:       "test@example.com",
+				Password:    "123131242",
+				UserName:    "testuser",
+			},
+			setupRepo: func(ctx *gin.Context, info *user.UserRegister) *mocks.UserService {
+				userServiceMocks := mocks.NewUserService(t)
+				userServiceMocks.On("Register", ctx, info).Return(nil, hashPwdErr)
+				return userServiceMocks
+			},
+			expectedFunc: func(t *testing.T, rec *httptest.ResponseRecorder, registerInput *user.UserRegister) {
+				code := rec.Code
+				body := rec.Body.String()
+				assert.Equal(t, http.StatusInternalServerError, code)
+				assert.Contains(t, body, hashPwdErr.Error())
+			},
+		},
+
+		{
+			name: "Failed to GetUserByEmail in userService.Register",
+			input: &user.UserRegister{
+				DisplayName: "test",
+				Email:       "test@example.com",
+				Password:    "123131242",
+				UserName:    "testuser",
+			},
+			setupRepo: func(ctx *gin.Context, info *user.UserRegister) *mocks.UserService {
+				userServiceMocks := mocks.NewUserService(t)
+				userServiceMocks.On("Register", ctx, info).Return(nil, getUserByEmailErr)
+				return userServiceMocks
+			},
+			expectedFunc: func(t *testing.T, rec *httptest.ResponseRecorder, registerInput *user.UserRegister) {
+				code := rec.Code
+				body := rec.Body.String()
+				assert.Equal(t, http.StatusInternalServerError, code)
+				assert.Contains(t, body, getUserByEmailErr.Error())
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -148,7 +192,7 @@ func TestService_Register(t *testing.T) {
 			ctx.Request = httptest.NewRequest(http.MethodPost, "/v1/users/register", bytes.NewBuffer(bodyBytes))
 			ctx.Request.Header.Set("Content-Type", "application/json")
 			u := tc.input
-			service := tc.setupRepo(ctx, *u)
+			service := tc.setupRepo(ctx, u)
 			handler := NewUserHandler(service)
 			handler.Register(ctx)
 			tc.expectedFunc(testItem, rec, u)
