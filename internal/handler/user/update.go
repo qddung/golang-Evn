@@ -38,5 +38,5 @@ func (u *userHandler) UpdateUserInfo(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	c.JSON(http.StatusBadRequest, response)
+	c.JSON(http.StatusOK, response)
 }

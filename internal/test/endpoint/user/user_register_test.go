@@ -1,15 +1,12 @@
 package user_endpoint
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
-	"github.com/homework/lab/internal/connection"
 	"github.com/homework/lab/internal/models/dto/api/user"
 	"github.com/homework/lab/internal/test/data/fixture"
 	general_helpers "github.com/homework/lab/internal/test/general"
@@ -26,7 +23,6 @@ func TestService_Register(t *testing.T) {
 		{
 			name: "Register successfully",
 			setupTestHTTP: func(router api.Engine) *httptest.ResponseRecorder {
-
 				reqPost := general_helpers.MakeJSONRequest(http.MethodPost, "/v1/users/register", user.UserRegister{
 					DisplayName: "test",
 					Email:       "test@example.com",
@@ -48,19 +44,12 @@ func TestService_Register(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			fmt.Printf("Loaded config: %+v\n", tc.configTest)
-			fix := fixture.NewUserTestCase(t)
-			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, fix)
-			if errConnector != nil {
-				testItem.Fatal(errConnector)
-			}
-			apiEngine := api.NewEngine(&api.EnginOpt{
-				App:       gin.New(),
-				Cfg:       tc.configTest,
-				Connector: connectorMock,
-			})
+			fix := fixture.NewUserTestCase(testItem)
+			apiEngine := BuildApiEngine(testItem, fix,
+				&api.EnginOpt{
+					Cfg: tc.configTest,
+				})
 			rec := tc.setupTestHTTP(apiEngine)
-			// Check status code
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
 		})
 	}
