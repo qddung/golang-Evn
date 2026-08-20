@@ -24,7 +24,3 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	}
 	return
 }
-
-func (u *User) AfterCreate(tx *gorm.DB) (err error) {
-	return
-}

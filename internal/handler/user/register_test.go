@@ -110,8 +110,8 @@ func TestService_Register(t *testing.T) {
 					DisplayName: "test",
 					Email:       "test@example.com",
 					UserName:    "testuser",
-					UpdateAt:    time.Now().String(),
-					CreateAt:    time.Now().String(),
+					UpdateAt:    time.Now(),
+					CreateAt:    time.Now(),
 				}, nil)
 				return userServiceMocks
 			},
