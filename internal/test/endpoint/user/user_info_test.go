@@ -11,12 +11,12 @@ import (
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
+	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	user_entity "github.com/homework/lab/internal/models/entity"
 	user_repository "github.com/homework/lab/internal/repository/user"
-	userModel "github.com/homework/lab/internal/models/dto/api/user"
+	"github.com/homework/lab/pkg/helpers"
 	jwt_pkg "github.com/homework/lab/pkg/jwt"
 	"github.com/homework/lab/pkg/sqldb"
-	"github.com/homework/lab/pkg/helpers"
 	"github.com/stretchr/testify/assert"
 )
 
