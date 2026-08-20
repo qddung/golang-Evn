@@ -4,3 +4,4 @@
 .cache/
 privatekey.pem
 publickey.pem
+/cmd/test

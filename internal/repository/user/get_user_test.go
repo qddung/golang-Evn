@@ -21,21 +21,67 @@ func TestGetUser(t *testing.T) {
 		Password:    "123456",
 		UserName:    "bradtest",
 	}
-	errCreateUser := userRepository.CreateUser(ctx, user)
-	assert.NoError(t, errCreateUser)
-	assert.NoError(t, nil)
+	if err := userRepository.CreateUser(ctx, user); !assert.NoError(t, err) {
+		t.Fatal(err)
+	}
 
-	userId := user.Id
-	userWithID, err := userRepository.GetUserById(ctx, userId)
-	assert.NoError(t, err)
-	assert.Equal(t, userWithID.Id, user.Id)
+	testCases := []struct {
+		name      string
+		action    func() (interface{}, error)
+		expects   func(t *testing.T, res interface{}, err error)
+	}{
+		{
+			name: "Get by ID",
+			action: func() (interface{}, error) {
+				return userRepository.GetUserById(ctx, user.Id)
+			},
+			expects: func(t *testing.T, res interface{}, err error) {
+				assert.NoError(t, err)
+				u, ok := res.(*entity.User)
+				assert.True(t, ok)
+				assert.Equal(t, user.Id, u.Id)
+			},
+		},
+		{
+			name: "Get by UserName",
+			action: func() (interface{}, error) {
+				return userRepository.GetUserByUserName(ctx, user.UserName)
+			},
+			expects: func(t *testing.T, res interface{}, err error) {
+				assert.NoError(t, err)
+				u, ok := res.(*entity.User)
+				assert.True(t, ok)
+				assert.Equal(t, user.UserName, u.UserName)
+			},
+		},
+		{
+			name: "Get by Email",
+			action: func() (interface{}, error) {
+				return userRepository.GetUserByEmail(ctx, user.Email)
+			},
+			expects: func(t *testing.T, res interface{}, err error) {
+				assert.NoError(t, err)
+				u, ok := res.(*entity.User)
+				assert.True(t, ok)
+				assert.Equal(t, user.Email, u.Email)
+			},
+		},
+		{
+			name: "Get by unknown ID returns nil",
+			action: func() (interface{}, error) {
+				return userRepository.GetUserById(ctx, "non-existent-id")
+			},
+			expects: func(t *testing.T, res interface{}, err error) {
+				// expect nil result and non-nil error from repo (gorm.ErrRecordNotFound or nil result)
+				assert.Error(t, err)
+			},
+		},
+	}
 
-	userWithName, err := userRepository.GetUserByUserName(ctx, user.UserName)
-
-	assert.Equal(t, userWithName.UserName, user.UserName)
-
-	userWithMail, err := userRepository.GetUserByEmail(ctx, user.Email)
-
-	assert.Equal(t, userWithMail.Email, user.Email)
-
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			res, err := tc.action()
+			tc.expects(t, res, err)
+		})
+	}
 }
