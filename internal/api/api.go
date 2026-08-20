@@ -124,9 +124,5 @@ func (e *engine) initRoutes(cfg *config.Config) {
 		v1Routes.GET("/self/info", allHandlers.user.GetUserInfo)
 		v1Routes.PUT("/self/info", allHandlers.user.UpdateUserInfo)
 
-		v1Routes.Use(jwtMiddeleware.JwtAuth()) // middelware
-		v1Routes.GET("/self/info", allHandlers.user.GetUserInfo)
-		v1Routes.PUT("/self/info", allHandlers.user.UpdateUserInfo)
-
 	}
 }
