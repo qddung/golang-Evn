@@ -1,11 +1,8 @@
 .PHONY: dev-run swagger run-app test
 
 
-
-
 swagger:
 	go run github.com/swaggo/swag/cmd/swag init --parseDependency --parseInternal -g ./cmd/api/main.go --output docs
-
 
 dev-run: swagger
 	go run github.com/joho/godotenv/cmd/godotenv go run cmd/api/main.go
@@ -13,44 +10,24 @@ dev-run: swagger
 run-app:
 	go run cmd/api/main.go
 
-IMG_NAME=dungi3/golang-learn-bookmark_service
-GIT_TAG := $(shell git describe --tags --exact-match --abbrev=0 2>/dev/null)
-IMG_TAG := latest
-ifneq ($(GIT_TAG),)
-	IMG_TAG := $(GIT_TAG)
-endif
 
-testdir := ./test
-
-testdir-check:
-	@if [ ! -d "$(testdir)" ]; then \
-		echo "Directory does not exist. Creating..."; \
-		mkdir -p "$(testdir)"; \
-	fi
 # 1. Định nghĩa giá trị mặc định (người dùng có thể đè bằng: make test OPTION=cache)
 OPTION ?= cache
 COVERAGE_EXCLUDE=mocks|main.go|test|config.go|infrastructure/**
 COVERAGE_THRESHOLD ?= 80
 
 # 2. Xử lý logic điều kiện (Sử dụng cú pháp ifeq/ifneq chuẩn của Make)
+CACHECMD := 
 ifeq ($(OPTION),nocache)
-    # Thêm biến môi trường tắt cache (Goflags hoặc -count=1)
-    CACHECMD := GOFLAGS="-count=1" go test ./... -coverprofile=./test/coverage_tmp -covermode=atomic -coverpkg=./... -p 1
-else
-	# Giữ nguyên cache mặc định của Go
-    CACHECMD := go test ./... -coverprofile=./test/coverage_tmp -covermode=atomic -coverpkg=./... -p 1
+    CACHECMD := go clean -testcache    
 endif
 
-testdir-check:
+test: 
 	@mkdir -p ./test
-
-test: testdir-check
-	mkdir -p .cache
-	chmod 700 .cache
-
-	# 3. Thực thi lệnh test đã cấu hình
+	# run clean test cache
 	$(CACHECMD)
-	
+
+	go test ./... -coverprofile=./test/coverage_tmp -covermode=atomic -coverpkg=./... -p 1	
 	grep -vE "$(COVERAGE_EXCLUDE)" ./test/coverage_tmp > ./test/coverage_out
 	go tool cover -html=./test/coverage_out -o ./test/coverage.html
 	@total=$$(go tool cover -func=./test/coverage_out | grep total: | awk '{print $$3}' | sed 's/%//'); \
@@ -68,6 +45,14 @@ docker-up:
 
 rebuild:
 	docker compose -f deployment/docker-compose.yml build
+
+
+IMG_NAME=dungi3/golang-learn-bookmark_service
+GIT_TAG := $(shell git describe --tags --exact-match --abbrev=0 2>/dev/null)
+IMG_TAG := latest
+ifneq ($(GIT_TAG),)
+	IMG_TAG := $(GIT_TAG)
+endif
 
 docker-build:
 	docker build -f deployment/Dockerfile -t $(IMG_NAME):$(IMG_TAG) .
