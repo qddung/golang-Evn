@@ -2,12 +2,13 @@
 
 
 
-dev-run:
-	go run github.com/swaggo/swag/cmd/swag init -g ./cmd/api/main.go --output docs
-	go run cmd/api/main.go
 
 swagger:
 	go run github.com/swaggo/swag/cmd/swag init --parseDependency --parseInternal -g ./cmd/api/main.go --output docs
+
+
+dev-run: swagger
+	go run github.com/joho/godotenv/cmd/godotenv go run cmd/api/main.go
 
 run-app:
 	go run cmd/api/main.go
@@ -28,7 +29,7 @@ testdir-check:
 	fi
 # 1. Định nghĩa giá trị mặc định (người dùng có thể đè bằng: make test OPTION=cache)
 OPTION ?= cache
-COVERAGE_EXCLUDE=mocks|main.go|test|config.go
+COVERAGE_EXCLUDE=mocks|main.go|test|config.go|infrastructure/**
 COVERAGE_THRESHOLD ?= 80
 
 # 2. Xử lý logic điều kiện (Sử dụng cú pháp ifeq/ifneq chuẩn của Make)
@@ -65,6 +66,9 @@ test-nocache: test OPTION=nocache
 docker-up:
 	docker compose -f deployment/docker-compose.yml up -d 
 
+rebuild:
+	docker compose -f deployment/docker-compose.yml build
+
 docker-build:
 	docker build -f deployment/Dockerfile -t $(IMG_NAME):$(IMG_TAG) .
 
@@ -72,5 +76,5 @@ docker-release:
 	docker push $(IMG_NAME):$(IMG_TAG)
 
 generated-key:
-	openssl genrsa -out private.pem 2048
-	openssl rsa -in private.pem -pubout -out publickey.pem
+	openssl genrsa -out privatekey.pem 2048
+	openssl rsa -in privatekey.pem -pubout -out publickey.pem

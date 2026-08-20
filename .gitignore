@@ -2,5 +2,6 @@
 /bin
 /test
 .cache/
+/cmd/test
 privatekey.pem
 publickey.pem

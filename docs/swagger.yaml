@@ -32,7 +32,7 @@ definitions:
         type: string
       updated_at:
         type: string
-      userName:
+      username:
         type: string
     type: object
   github_com_homework_lab_internal_models_dto_api_user.UserLogin:
