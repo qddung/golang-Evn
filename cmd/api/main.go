@@ -35,8 +35,6 @@ func main() {
 		if errMigrate := sqlClient.AutoMigrate(&entity.User{}); errMigrate != nil {
 			log.Fatalf("Migration failed: %v", errMigrate)
 		}
-	} else {
-		log.Println("Table already exists. Skipping migration pass.")
 	}
 
 	// connector
