@@ -5,14 +5,20 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
 
 	"github.com/homework/lab/docs"
 	_ "github.com/homework/lab/docs"
 	"github.com/homework/lab/internal/config"
-	"github.com/homework/lab/internal/handler"
-	"github.com/homework/lab/internal/repository"
-	"github.com/homework/lab/internal/service"
+	"github.com/homework/lab/internal/connection"
+	health_check_handler "github.com/homework/lab/internal/handler/health_check"
+	"github.com/homework/lab/internal/handler/shorten"
+	user_handler "github.com/homework/lab/internal/handler/user"
+	health_check_repository "github.com/homework/lab/internal/repository/health_check"
+	url_repository "github.com/homework/lab/internal/repository/shorten"
+	userRepository "github.com/homework/lab/internal/repository/user"
+	health_check_service "github.com/homework/lab/internal/service/health_check"
+	shorten_service "github.com/homework/lab/internal/service/shorten"
+	user_service "github.com/homework/lab/internal/service/user"
 	"github.com/homework/lab/pkg/helpers"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -26,17 +32,17 @@ type Engine interface {
 
 // engine struct for app engine
 type engine struct {
-	app   *gin.Engine
-	cfg   *config.Config
-	redis *redis.Client
+	app       *gin.Engine
+	cfg       *config.Config
+	connector connection.DBConnector
 }
 
 // NewEngine creates a new engine instance
-func NewEngine(cfg *config.Config, rClient *redis.Client) Engine {
+func NewEngine(cfg *config.Config, conn connection.DBConnector) Engine {
 	api := &engine{
-		app:   gin.New(),
-		cfg:   cfg,
-		redis: rClient,
+		app:       gin.New(),
+		cfg:       cfg,
+		connector: conn,
 	}
 
 	api.initRoutes(cfg)
@@ -54,24 +60,33 @@ func (e *engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 type handlers struct {
-	healthCheck handler.HealthCheck
-	shorten     handler.ShorternUrl
+	healthCheck health_check_handler.HealthCheck
+	shorten     shorten.ShorternUrl
+	user        user_handler.UserHandler
 	config      *config.Config
 }
 
 func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	serviceName := cfg.ServiceName
 	instanceID := cfg.InstanceID
+	redisClient := e.connector.GetRedisClient()
+	sqlDB := e.connector.GetSqlDB()
 	// create handler
-	healthCheckRepository := repository.NewPing(e.redis)
-	healthCheckService := service.NewHealthCheck(serviceName, instanceID, healthCheckRepository)
-	healthCheckHandler := handler.NewHealthCheck(healthCheckService)
+	healthCheckRepository := health_check_repository.NewPing(redisClient)
+	healthCheckService := health_check_service.NewHealthCheck(serviceName, instanceID, healthCheckRepository)
+	healthCheckHandler := health_check_handler.NewHealthCheck(healthCheckService)
 
-	// create shrotten url handler
-	urlStorage := repository.NewURLStorage(e.redis)
-	shortenService := service.NewShorternUrl(urlStorage, helpers.NewKeyGenerator())
-	shortenURLHandler := handler.NewShortenURL(shortenService)
-	return handlers{healthCheckHandler, shortenURLHandler, cfg}
+	// create shorten url handler
+	urlStorage := url_repository.NewURLStorage(redisClient)
+	shortenService := shorten_service.NewShorternUrl(urlStorage, helpers.NewKeyGenerator())
+	shortenURLHandler := shorten.NewShortenURL(shortenService)
+
+	// create user handler
+	userRepository := userRepository.NewUserRepository(sqlDB)
+	hasher := helpers.NewHasher()
+	userService := user_service.NewUserService(userRepository, hasher)
+	userHandler := user_handler.NewUserHandler(userService)
+	return handlers{healthCheckHandler, shortenURLHandler, userHandler, cfg}
 }
 
 // initRoutes initializes the routes for the app engine
@@ -87,5 +102,6 @@ func (e *engine) initRoutes(cfg *config.Config) {
 	{
 		v1Routes.POST("/links/shorten", allHandlers.shorten.ShortenUrl)
 		v1Routes.GET("/links/redirect/:code", allHandlers.shorten.Redirect)
+		v1Routes.POST("/users/register", allHandlers.user.Register)
 	}
 }

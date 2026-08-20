@@ -29,7 +29,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.HealthResponse"
+                            "$ref": "#/definitions/internal_handler_health_check.HealthResponse"
                         }
                     }
                 }
@@ -82,7 +82,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.shortenInputBody"
+                            "$ref": "#/definitions/internal_handler_shorten.shortenInputBody"
                         }
                     }
                 ],
@@ -90,7 +90,41 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.shortenResMessage"
+                            "$ref": "#/definitions/internal_handler_shorten.shortenResMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/users/register": {
+            "post": {
+                "description": "Register user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Register user",
+                "parameters": [
+                    {
+                        "description": "Input required",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api_user.UserRegister"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_user_UserInfo"
                         }
                     }
                 }
@@ -98,7 +132,63 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handler.HealthResponse": {
+        "github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_user_UserInfo": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api_user.UserInfo"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_homework_lab_internal_models_dto_api_user.UserInfo": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "userName": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_homework_lab_internal_models_dto_api_user.UserRegister": {
+            "type": "object",
+            "required": [
+                "display_name",
+                "username"
+            ],
+            "properties": {
+                "display_name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handler_health_check.HealthResponse": {
             "type": "object",
             "properties": {
                 "instance_id": {
@@ -112,7 +202,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.shortenInputBody": {
+        "internal_handler_shorten.shortenInputBody": {
             "type": "object",
             "required": [
                 "exp",
@@ -128,7 +218,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.shortenResMessage": {
+        "internal_handler_shorten.shortenResMessage": {
             "type": "object",
             "properties": {
                 "code": {
