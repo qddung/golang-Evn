@@ -8,7 +8,6 @@ import (
 	"gorm.io/gorm"
 
 	domain_model "github.com/homework/lab/internal/models/domain"
-	"github.com/homework/lab/internal/models/dto/api/user"
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	"github.com/homework/lab/pkg/helpers"
 )
@@ -17,7 +16,7 @@ var ErrorParse = errors.New("error parse")
 var UpdateUserFailed = errors.New("update user failed")
 var ErrorGetUser = errors.New("error get user")
 
-func ToUpdateUser(input *user.UpdateUserInput, hasher helpers.HashHelper) (*domain_model.UpdateUser, error) {
+func ToUpdateUser(input *userModel.UpdateUserInput, hasher helpers.HashHelper) (*domain_model.UpdateUser, error) {
 	pass := ""
 	if input.Password != "" {
 		hash, err := hasher.HashPassword(input.Password)
