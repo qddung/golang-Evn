@@ -2,7 +2,8 @@ package sqldb
 
 import (
 	"fmt"
-	"log"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -12,13 +13,17 @@ import (
 
 func CatchDBError(err error) {
 	if err != nil {
-		log.Fatal(err)
+		log.Error().Err(err).Str("db error", err.Error()).Msg("DB Error")
 		panic(err)
 	}
 }
 
+type Migrator struct {
+	migrator *migrate.Migrate
+}
+
 // BuildMigrate return migrate.Migrate
-func BuildMigrate(db *gorm.DB, migrationPath string) *migrate.Migrate {
+func BuildMigrate(db *gorm.DB, migrationPath string) *Migrator {
 	sqlDb, err := db.DB()
 	CatchDBError(err)
 	pgDriver, err := postgres.WithInstance(sqlDb, &postgres.Config{})
@@ -26,23 +31,26 @@ func BuildMigrate(db *gorm.DB, migrationPath string) *migrate.Migrate {
 	migrator, err := migrate.NewWithDatabaseInstance(fmt.Sprintf("file://%v", migrationPath),
 		db.Name(), pgDriver)
 	CatchDBError(err)
-	return migrator
+	return &Migrator{migrator}
 }
 
-// MigrateUp and MigrateDown
-func MigrateUp(migrator *migrate.Migrate, step ...int) error {
+// MigrateUp: no step is migrate all
+func (m *Migrator) MigrateUp(step ...int) error {
+	if len(step) == 0 {
+		return m.migrator.Up()
+	}
 	defaultStep := 1
 	if len(step) > 0 {
 		defaultStep = step[0]
 	}
-	return migrator.Steps(defaultStep)
+	return m.migrator.Steps(defaultStep)
 }
 
-// MigrateUp and MigrateDown
-func MigrateDown(migrator *migrate.Migrate, step ...int) error {
+// MigrateDown: no step is migrate single one
+func (m *Migrator) MigrateDown(step ...int) error {
 	defaultStep := -1
 	if len(step) > 0 && step[0] < -1 {
 		defaultStep = step[0]
 	}
-	return migrator.Steps(defaultStep)
+	return m.migrator.Steps(defaultStep)
 }

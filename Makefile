@@ -46,7 +46,6 @@ docker-up:
 rebuild:
 	docker compose -f deployment/docker-compose.yml build
 
-
 IMG_NAME=dungi3/golang-learn-bookmark_service
 GIT_TAG := $(shell git describe --tags --exact-match --abbrev=0 2>/dev/null)
 IMG_TAG := latest
@@ -57,9 +56,30 @@ endif
 docker-build:
 	docker build -f deployment/Dockerfile -t $(IMG_NAME):$(IMG_TAG) .
 
-docker-release:
+docker-release: docker-build
+	docker push $(IMG_NAME):$(IMG_TAG)
+
+docker-release:	
 	docker push $(IMG_NAME):$(IMG_TAG)
 
 generated-key:
 	openssl genrsa -out privatekey.pem 2048
 	openssl rsa -in privatekey.pem -pubout -out publickey.pem
+
+# Region: Local build
+docker-local-build: 
+	docker build -f deployment/Dockerfile -t bookmark_service:latest .
+
+docker-local-dev: docker-build
+	docker compose -f deployment/docker-compose.yml up -d --remove-orphans bookmark_service
+
+docker-local-stop:
+	docker compose -f .\deployment\docker-compose.yml down --remove-orphans bookmark_service
+
+NEW_MIGRATION_NAME:=override_new_migration_name
+atlas-local-diff-cmd:
+	atlas migrate diff $(NEW_MIGRATION_NAME) -c file://./cmd/tools/generate_diff_schema/atlas.hcl --env local 
+	
+atlas-rehash:
+	atlas migrate hash -c file://cmd/tools/generate_diff_schema/atlas.hcl --env local
+# End Local build

@@ -6,3 +6,4 @@
 privatekey.pem
 publickey.pem
 /cmd/test
+/deployment/postgres-data

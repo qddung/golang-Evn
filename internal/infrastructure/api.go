@@ -7,7 +7,9 @@ import (
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
+	"github.com/homework/lab/internal/models/constant"
 	"github.com/homework/lab/internal/models/entity"
+	"github.com/homework/lab/pkg/sqldb"
 )
 
 func CreateApi() api.Engine {
@@ -29,6 +31,12 @@ func CreateApi() api.Engine {
 		}
 	} else {
 		log.Println("Table already exists. Skipping migration pass.")
+	}
+
+	migrator := sqldb.BuildMigrate(sqlClient, constant.MigrationPath)
+	err = migrator.MigrateUp()
+	if err != nil {
+		panic("start migration failed " + err.Error())
 	}
 
 	// connector

@@ -15,6 +15,7 @@ type User struct {
 	UserName    string    `json:"user_name" gorm:"type:text;unique"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	Bookmarks   []Bookmark
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
