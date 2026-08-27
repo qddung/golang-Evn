@@ -7,6 +7,7 @@ import (
 	"github.com/homework/lab/internal/models/entity"
 )
 
+// UpdateUser
 func (u *userRepository) UpdateUser(ctx context.Context, user *domain_model.UpdateUser) error {
 	usr := &entity.User{}
 	if err := u.db.WithContext(ctx).Where(&entity.User{Id: user.Id}).First(usr).Error; err != nil {

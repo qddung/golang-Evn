@@ -18,6 +18,7 @@ func NewJwtAuthMiddleware(jwtTokenService jwt_pkg.JwtValidator) *JwtAuthMiddlewa
 	}
 }
 
+// JwtAuth: Check Bearer and token parser
 func (j *JwtAuthMiddleware) JwtAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
@@ -29,7 +30,7 @@ func (j *JwtAuthMiddleware) JwtAuth() gin.HandlerFunc {
 		token := parts[1]
 		tokenClaims, err := j.jwtTokenService.ValidateToken(token)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Parse token error."})
 			return
 		}
 		c.Set("claims", tokenClaims)
