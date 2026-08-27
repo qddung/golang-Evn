@@ -29,7 +29,7 @@ func (j *JwtAuthMiddleware) JwtAuth() gin.HandlerFunc {
 		token := parts[1]
 		tokenClaims, err := j.jwtTokenService.ValidateToken(token)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Parse token error."})
 			return
 		}
 		c.Set("claims", tokenClaims)

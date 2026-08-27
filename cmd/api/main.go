@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/homework/lab/constant"
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
@@ -38,8 +39,8 @@ func main() {
 
 	// connector
 	connector := connection.NewDBConnector(rdClient, sqlClient)
-	jwtGenerator := jwt_pkg.NewJWTGenerator("./privatekey.pem")
-	jwtValidator := jwt_pkg.NewJWTValidator("./publickey.pem")
+	jwtGenerator := jwt_pkg.NewJWTGenerator(constant.PrivateKeyPath)
+	jwtValidator := jwt_pkg.NewJWTValidator(constant.PublicKeyPath)
 	apiEngine := api.NewEngine(&api.EnginOpt{
 		App:          gin.New(),
 		Cfg:          cfg,
