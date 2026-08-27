@@ -4,10 +4,11 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/homework/lab/constant"
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
-	"github.com/homework/lab/internal/models/constant"
+
 	"github.com/homework/lab/internal/models/entity"
 	"github.com/homework/lab/pkg/sqldb"
 )

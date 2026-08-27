@@ -1,9 +1,12 @@
 package infrastructure
 
-import jwt_pkg "github.com/homework/lab/pkg/jwt"
+import (
+	"github.com/homework/lab/constant"
+	jwt_pkg "github.com/homework/lab/pkg/jwt"
+)
 
 func CreateJwtProvider() (jwt_pkg.JwtGenerator, jwt_pkg.JwtValidator) {
-	jwtGenerator := jwt_pkg.NewJWTGenerator("./privatekey.pem")
-	jwtValidator := jwt_pkg.NewJWTValidator("./publickey.pem")
+	jwtGenerator := jwt_pkg.NewJWTGenerator(constant.PrivateKeyPath)
+	jwtValidator := jwt_pkg.NewJWTValidator(constant.PublicKeyPath)
 	return jwtGenerator, jwtValidator
 }
