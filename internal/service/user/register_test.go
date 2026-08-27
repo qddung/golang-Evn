@@ -11,6 +11,7 @@ import (
 	"github.com/homework/lab/internal/models/entity"
 	"github.com/homework/lab/internal/repository/user/mocks"
 	helper_mocks "github.com/homework/lab/pkg/helpers/mocks"
+	jwt_pkg "github.com/homework/lab/pkg/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -44,6 +45,17 @@ func TestService_Register(t *testing.T) {
 		expectedFunc func(t *testing.T, info *user.UserInfo, registerInput *user.UserRegister, err error)
 	}{
 		{
+			name: "Failed to GetUserByUserName in userService.Register",
+			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper) {
+				repo, hasher := SetupRepo(t)
+				repo.On("GetUserByUserName", ctx, info.UserName).Return(nil, testErr)
+				return repo, hasher
+			},
+			expectedFunc: func(t *testing.T, info *user.UserInfo, registerInput *user.UserRegister, err error) {
+				assert.Equal(t, testErr, err)
+			},
+		},
+		{
 			// Duplicate email
 			name: "Duplicate email",
 			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper) {
@@ -53,7 +65,7 @@ func TestService_Register(t *testing.T) {
 				return repo, hasher
 			},
 			expectedFunc: func(t *testing.T, info *user.UserInfo, registerInput *user.UserRegister, err error) {
-				assert.Equal(t, err, EmailExistError)
+				assert.Equal(t, err, ServiceErr.EmailExistError)
 			},
 		},
 		{
@@ -65,7 +77,7 @@ func TestService_Register(t *testing.T) {
 				return repo, hasher
 			},
 			expectedFunc: func(t *testing.T, info *user.UserInfo, registerInput *user.UserRegister, err error) {
-				assert.Equal(t, err, UserNameExistError)
+				assert.Equal(t, err, ServiceErr.UserNameExistError)
 			},
 		},
 		{
@@ -100,22 +112,54 @@ func TestService_Register(t *testing.T) {
 				assert.Equal(t, info.UserName, registerInput.UserName)
 			},
 		},
+
+		{
+			name: "Failed to HashPassword in userService.Register",
+			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper) {
+				repo, hasher := SetupRepo(t)
+				// existence checks succeed
+				repo.On("GetUserByUserName", ctx, info.UserName).Return(nil, nil)
+				repo.On("GetUserByEmail", ctx, info.Email).Return(nil, nil)
+				// hasher fails
+				hasher.On("HashPassword", info.Password).Return("", testErr)
+				return repo, hasher
+			},
+			expectedFunc: func(t *testing.T, info *user.UserInfo, registerInput *user.UserRegister, err error) {
+				assert.Equal(t, testErr, err)
+			},
+		},
+
+		{
+			name: "Failed to GetUserByEmail in userService.Register",
+			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper) {
+				repo, hasher := SetupRepo(t)
+				// username check passes
+				repo.On("GetUserByUserName", ctx, info.UserName).Return(nil, nil)
+				// GetUserByEmail returns error
+				repo.On("GetUserByEmail", ctx, info.Email).Return(nil, testErr)
+				return repo, hasher
+			},
+			expectedFunc: func(t *testing.T, info *user.UserInfo, registerInput *user.UserRegister, err error) {
+				assert.Equal(t, testErr, err)
+			},
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
 			ctx := context.Background()
-			u := user.UserRegister{
+			jwtMock := jwt_pkg.NewMockJwt()
+			u := &user.UserRegister{
 				DisplayName: "test",
 				Email:       "test@example.com",
 				Password:    "123131242",
 				UserName:    "testuser",
 			}
-			repo, hashMock := tc.setupRepo(ctx, &u)
-			service := NewUserService(repo, hashMock)
+			repo, hashMock := tc.setupRepo(ctx, u)
+			service := NewUserService(repo, hashMock, jwtMock.JwtGenarate)
 			info, err := service.Register(ctx, u)
 
-			tc.expectedFunc(testItem, info, &u, err)
+			tc.expectedFunc(testItem, info, u, err)
 		})
 	}
 }

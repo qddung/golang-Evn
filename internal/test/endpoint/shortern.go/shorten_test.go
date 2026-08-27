@@ -7,10 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/homework/lab/internal/api"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
-	"github.com/homework/lab/internal/test/data/fixture"
 	general_helpers "github.com/homework/lab/internal/test/general"
 	"github.com/stretchr/testify/assert"
 )
@@ -135,12 +135,15 @@ func TestShorten_Integration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			fix := fixture.NewUserTestCase(t)
-			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, fix)
+			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, nil)
 			if errConnector != nil {
 				testItem.Fatal(errConnector)
 			}
-			apiEngine := api.NewEngine(tc.configTest, connectorMock)
+			apiEngine := api.NewEngine(&api.EnginOpt{
+				App:       gin.New(),
+				Cfg:       tc.configTest,
+				Connector: connectorMock,
+			})
 			rec := tc.setupTestHTTP(apiEngine)
 			// Check the status code of the response
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
@@ -211,12 +214,15 @@ func TestRedirect_Integration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			fix := fixture.NewUserTestCase(t)
-			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, fix)
+			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, nil)
 			if errConnector != nil {
 				testItem.Fatal(errConnector)
 			}
-			apiEngine := api.NewEngine(tc.configTest, connectorMock)
+			apiEngine := api.NewEngine(&api.EnginOpt{
+				App:       gin.New(),
+				Cfg:       tc.configTest,
+				Connector: connectorMock,
+			})
 			rec := tc.setupTestHTTP(apiEngine)
 			// Check status code
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")

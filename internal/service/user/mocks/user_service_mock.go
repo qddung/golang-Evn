@@ -14,8 +14,66 @@ type UserService struct {
 	mock.Mock
 }
 
+// GetUserInfo provides a mock function with given fields: ctx, id
+func (_m *UserService) GetUserInfo(ctx context.Context, id string) (*user.UserInfo, error) {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetUserInfo")
+	}
+
+	var r0 *user.UserInfo
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*user.UserInfo, error)); ok {
+		return rf(ctx, id)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *user.UserInfo); ok {
+		r0 = rf(ctx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*user.UserInfo)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Login provides a mock function with given fields: ctx, loginInput
+func (_m *UserService) Login(ctx context.Context, loginInput user.UserLogin) (string, error) {
+	ret := _m.Called(ctx, loginInput)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Login")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, user.UserLogin) (string, error)); ok {
+		return rf(ctx, loginInput)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, user.UserLogin) string); ok {
+		r0 = rf(ctx, loginInput)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, user.UserLogin) error); ok {
+		r1 = rf(ctx, loginInput)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Register provides a mock function with given fields: ctx, regiterInput
-func (_m *UserService) Register(ctx context.Context, regiterInput user.UserRegister) (*user.UserInfo, error) {
+func (_m *UserService) Register(ctx context.Context, regiterInput *user.UserRegister) (*user.UserInfo, error) {
 	ret := _m.Called(ctx, regiterInput)
 
 	if len(ret) == 0 {
@@ -24,10 +82,10 @@ func (_m *UserService) Register(ctx context.Context, regiterInput user.UserRegis
 
 	var r0 *user.UserInfo
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, user.UserRegister) (*user.UserInfo, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *user.UserRegister) (*user.UserInfo, error)); ok {
 		return rf(ctx, regiterInput)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, user.UserRegister) *user.UserInfo); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *user.UserRegister) *user.UserInfo); ok {
 		r0 = rf(ctx, regiterInput)
 	} else {
 		if ret.Get(0) != nil {
@@ -35,13 +93,31 @@ func (_m *UserService) Register(ctx context.Context, regiterInput user.UserRegis
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, user.UserRegister) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *user.UserRegister) error); ok {
 		r1 = rf(ctx, regiterInput)
 	} else {
 		r1 = ret.Error(1)
 	}
 
 	return r0, r1
+}
+
+// UpdateUserInfo provides a mock function with given fields: ctx, userId, updateInput
+func (_m *UserService) UpdateUserInfo(ctx context.Context, userId string, updateInput *user.UpdateUserInput) error {
+	ret := _m.Called(ctx, userId, updateInput)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateUserInfo")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, *user.UpdateUserInput) error); ok {
+		r0 = rf(ctx, userId, updateInput)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // NewUserService creates a new instance of UserService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

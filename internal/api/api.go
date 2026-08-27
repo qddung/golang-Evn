@@ -8,6 +8,7 @@ import (
 
 	"github.com/homework/lab/docs"
 	_ "github.com/homework/lab/docs"
+	"github.com/homework/lab/internal/api/middleware"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
 	health_check_handler "github.com/homework/lab/internal/handler/health_check"
@@ -20,6 +21,7 @@ import (
 	shorten_service "github.com/homework/lab/internal/service/shorten"
 	user_service "github.com/homework/lab/internal/service/user"
 	"github.com/homework/lab/pkg/helpers"
+	jwt_pkg "github.com/homework/lab/pkg/jwt"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -32,20 +34,32 @@ type Engine interface {
 
 // engine struct for app engine
 type engine struct {
-	app       *gin.Engine
-	cfg       *config.Config
-	connector connection.DBConnector
+	app          *gin.Engine
+	cfg          *config.Config
+	connector    connection.DBConnector
+	jwtGenerator jwt_pkg.JwtGenerator
+	jwtValidator jwt_pkg.JwtValidator
+}
+
+type EnginOpt struct {
+	App          *gin.Engine
+	Cfg          *config.Config
+	Connector    connection.DBConnector
+	JwtGenerator jwt_pkg.JwtGenerator
+	JwtValidator jwt_pkg.JwtValidator
 }
 
 // NewEngine creates a new engine instance
-func NewEngine(cfg *config.Config, conn connection.DBConnector) Engine {
+func NewEngine(opt *EnginOpt) Engine {
 	api := &engine{
-		app:       gin.New(),
-		cfg:       cfg,
-		connector: conn,
+		app:          opt.App,
+		cfg:          opt.Cfg,
+		connector:    opt.Connector,
+		jwtGenerator: opt.JwtGenerator,
+		jwtValidator: opt.JwtValidator,
 	}
 
-	api.initRoutes(cfg)
+	api.initRoutes(opt.Cfg)
 	return api
 }
 
@@ -84,7 +98,7 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	// create user handler
 	userRepository := userRepository.NewUserRepository(sqlDB)
 	hasher := helpers.NewHasher()
-	userService := user_service.NewUserService(userRepository, hasher)
+	userService := user_service.NewUserService(userRepository, hasher, e.jwtGenerator)
 	userHandler := user_handler.NewUserHandler(userService)
 	return handlers{healthCheckHandler, shortenURLHandler, userHandler, cfg}
 }
@@ -97,11 +111,18 @@ func (e *engine) initRoutes(cfg *config.Config) {
 
 	docs.SwaggerInfo.BasePath = allHandlers.config.BasePath
 	e.app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	jwtMiddeleware := middleware.NewJwtAuthMiddleware(e.jwtValidator)
 
 	v1Routes := e.app.Group("/v1")
 	{
+		v1Routes.POST("/users/login", allHandlers.user.Login)
 		v1Routes.POST("/links/shorten", allHandlers.shorten.ShortenUrl)
 		v1Routes.GET("/links/redirect/:code", allHandlers.shorten.Redirect)
 		v1Routes.POST("/users/register", allHandlers.user.Register)
+
+		v1Routes.Use(jwtMiddeleware.JwtAuth()) // middelware
+		v1Routes.GET("/self/info", allHandlers.user.GetUserInfo)
+		v1Routes.PUT("/self/info", allHandlers.user.UpdateUserInfo)
+
 	}
 }

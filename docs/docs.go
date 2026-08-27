@@ -96,6 +96,98 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/users": {
+            "put": {
+                "description": "Edit current user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Edit current user",
+                "parameters": [
+                    {
+                        "description": "Input required",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api_user.UpdateUserInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler_user.updateUserReposonse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler_user.updateUserReposonse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler_user.updateUserReposonse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/users/login": {
+            "post": {
+                "description": "Login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Input required",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api_user.UserLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler_user.loginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler_user.loginResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler_user.loginResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/users/register": {
             "post": {
                 "description": "Register user",
@@ -126,12 +218,33 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_user_UserInfo"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any"
+                        }
                     }
                 }
             }
         }
     },
     "definitions": {
+        "github_com_homework_lab_internal_models_dto_api.Response-any": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_user_UserInfo": {
             "type": "object",
             "properties": {
@@ -139,6 +252,17 @@ const docTemplate = `{
                     "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api_user.UserInfo"
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_homework_lab_internal_models_dto_api_user.UpdateUserInput": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -161,7 +285,22 @@ const docTemplate = `{
                 "updated_at": {
                     "type": "string"
                 },
-                "userName": {
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_homework_lab_internal_models_dto_api_user.UserLogin": {
+            "type": "object",
+            "required": [
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -224,6 +363,25 @@ const docTemplate = `{
                 "code": {
                     "type": "string"
                 },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handler_user.loginResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handler_user.updateUserReposonse": {
+            "type": "object",
+            "properties": {
                 "message": {
                     "type": "string"
                 }
