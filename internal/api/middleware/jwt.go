@@ -18,6 +18,7 @@ func NewJwtAuthMiddleware(jwtTokenService jwt_pkg.JwtValidator) *JwtAuthMiddlewa
 	}
 }
 
+// JwtAuth: Check Bearer and token parser
 func (j *JwtAuthMiddleware) JwtAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")

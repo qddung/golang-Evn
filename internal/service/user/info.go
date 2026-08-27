@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// GetUserInfo
 func (u *userService) GetUserInfo(ctx context.Context, id string) (*userModel.UserInfo, error) {
 	user, err := u.userRepository.GetUserById(ctx, id)
 	if err == gorm.ErrRecordNotFound {

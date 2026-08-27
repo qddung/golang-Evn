@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Login
 func (u *userService) Login(ctx context.Context, loginInput userModel.UserLogin) (string, error) {
 	userWithUserName, err := u.userRepository.GetUserByUserName(ctx, loginInput.UserName)
 	if err != nil {
