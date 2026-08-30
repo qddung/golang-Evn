@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/homework/lab/internal/handler/authorization"
 	"github.com/homework/lab/internal/models/dto/api"
+	_ "github.com/homework/lab/internal/models/dto/api"
 	bookmark_model "github.com/homework/lab/internal/models/dto/api/bookmark"
 	"github.com/homework/lab/pkg/request_ultils"
 	"github.com/homework/lab/pkg/response"
@@ -13,6 +14,16 @@ import (
 
 var SuccessCreateBookmark = "success create bookmark"
 
+// CreateBookmark
+// @Summary Create bookmark
+// @Tags bookmark
+// @Accept json
+// @Produce json
+// @Param input body bookmark_model.NewBookmarkRequest true "Input required"
+// @Success 200 {object} api.Response[bookmark_model.BookmarkInfo]
+// @Failure      400  {object}  api.Response[bookmark_model.BookmarkInfo]
+// @Failure      500  {object}  api.Response[bookmark_model.BookmarkInfo]
+// @Router /v1/bookmarks [post]
 func (h *bookmarkHandler) CreateBookmark(c *gin.Context) {
 	request, err := request_ultils.ModelBindValidation[bookmark_model.NewBookmarkRequest](c)
 	if err != nil {
@@ -31,7 +42,7 @@ func (h *bookmarkHandler) CreateBookmark(c *gin.Context) {
 
 	res := &api.Response[bookmark_model.BookmarkInfo]{}
 	if err != nil {
-		res.Message = err.Error()
+		res.Message = response.ErrorHandling(err).Error()
 		c.JSON(response.MapErrorToHttpCode[err], res)
 		return
 	}

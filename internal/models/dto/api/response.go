@@ -1,5 +1,9 @@
 package api
 
+type MessageResponse struct {
+	Message string "json:\"message\""
+}
+
 type Response[T any] struct {
 	Message string "json:\"message\""
 	Data    *T     "json:\"data,omitempty\""

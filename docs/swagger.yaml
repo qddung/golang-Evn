@@ -1,8 +1,38 @@
 basePath: /
 definitions:
+  github_com_homework_lab_internal_models_dto_api.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  ? github_com_homework_lab_internal_models_dto_api.PaginatedResponse-github_com_homework_lab_internal_models_dto_api_bookmark_BookmarkInfo
+  : properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api_bookmark.BookmarkInfo'
+        type: array
+      pagination:
+        $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Pagination'
+    type: object
+  github_com_homework_lab_internal_models_dto_api.Pagination:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
   github_com_homework_lab_internal_models_dto_api.Response-any:
     properties:
       data: {}
+      message:
+        type: string
+    type: object
+  github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_bookmark_BookmarkInfo:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api_bookmark.BookmarkInfo'
       message:
         type: string
     type: object
@@ -11,6 +41,35 @@ definitions:
       data:
         $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api_user.UserInfo'
       message:
+        type: string
+    type: object
+  github_com_homework_lab_internal_models_dto_api_bookmark.BookmarkInfo:
+    properties:
+      code:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      updatedAt:
+        type: string
+      url:
+        type: string
+    type: object
+  github_com_homework_lab_internal_models_dto_api_bookmark.NewBookmarkRequest:
+    properties:
+      description:
+        type: string
+      url:
+        type: string
+    type: object
+  github_com_homework_lab_internal_models_dto_api_bookmark.UpdateBookmarkRequest:
+    properties:
+      description:
+        type: string
+      url:
         type: string
     type: object
   github_com_homework_lab_internal_models_dto_api_user.UpdateUserInput:
@@ -118,6 +177,127 @@ paths:
       summary: Health check endpoint
       tags:
       - health_check
+  /v1/bookmarks:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.PaginatedResponse-github_com_homework_lab_internal_models_dto_api_bookmark_BookmarkInfo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+      summary: Get bookmarks
+      tags:
+      - bookmark
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Input required
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api_bookmark.NewBookmarkRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_bookmark_BookmarkInfo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_bookmark_BookmarkInfo'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_bookmark_BookmarkInfo'
+      summary: Create bookmark
+      tags:
+      - bookmark
+  /v1/bookmarks/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Bookmark id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+      summary: Delete bookmark
+      tags:
+      - bookmark
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Bookmark id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Input required
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api_bookmark.UpdateBookmarkRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+      summary: Update bookmark
+      tags:
+      - bookmark
   /v1/links/redirect/{code}:
     get:
       consumes:
