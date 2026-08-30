@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate mockery --name BookmarkRepository --filename bookmark_repository.go
 type BookmarkRepository interface {
 	CreateBookmark(ctx context.Context, userId, url, description, code string) (*entity.Bookmark, error)
 	GetBookmarksByUserId(ctx context.Context, userId string, limit, offset int, sort string) ([]*entity.Bookmark, int64, error)
