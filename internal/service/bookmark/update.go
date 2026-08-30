@@ -7,6 +7,7 @@ import (
 	"github.com/homework/lab/pkg/response"
 )
 
+// UpdateBookmark
 func (s *bookmarkService) UpdateBookmark(ctx context.Context, request *bookmark_model.UpdateBookmarkRequest, userId, bookmarkId string) error {
 	err := s.bookmarkRepository.UpdateBookmark(ctx, userId, bookmarkId, request.Url, request.Description)
 	if err != nil {

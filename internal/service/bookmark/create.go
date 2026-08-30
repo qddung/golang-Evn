@@ -8,6 +8,7 @@ import (
 	"github.com/homework/lab/pkg/response"
 )
 
+// NewBookmark
 func (s *bookmarkService) NewBookmark(ctx context.Context, userId string, bookmark *bookmark_model.NewBookmarkRequest) (*bookmark_model.BookmarkInfo, error) {
 	code := s.keyGenerator.GenerateRandomCode(10)
 	bookmarkCreate, err := s.bookmarkRepository.CreateBookmark(ctx, userId, bookmark.Url, bookmark.Description, code)

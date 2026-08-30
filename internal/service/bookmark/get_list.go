@@ -10,6 +10,7 @@ import (
 
 var SuccessGetBookmarks = "success get bookmarks"
 
+// GetBookmarks
 func (s *bookmarkService) GetBookmarks(ctx context.Context, userId string, query *bookmark_model.GetBookmarksQuery) (*api.PaginatedResponse[bookmark_model.BookmarkInfo], error) {
 	page := query.Page
 	if page <= 0 {
@@ -42,4 +43,3 @@ func (s *bookmarkService) GetBookmarks(ctx context.Context, userId string, query
 	}
 	return res, nil
 }
-
