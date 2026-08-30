@@ -10,7 +10,10 @@ import (
 )
 
 type BookmarkService interface {
-	NewBookmark(ctx context.Context, bookmark *bookmark_model.NewBookmarkRequest) *api.Response[bookmark_model.BookmarkInfo]
+	NewBookmark(ctx context.Context, userId string, bookmark *bookmark_model.NewBookmarkRequest) (*bookmark_model.BookmarkInfo, error)
+	GetBookmarks(ctx context.Context, userId string, query *bookmark_model.GetBookmarksQuery) (*api.PaginatedResponse[bookmark_model.BookmarkInfo], error)
+	UpdateBookmark(ctx context.Context, request *bookmark_model.UpdateBookmarkRequest, userId, bookmarkId string) error
+	DeleteBookmark(ctx context.Context, userId, bookmarkId string) error
 }
 
 type bookmarkService struct {

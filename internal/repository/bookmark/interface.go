@@ -8,7 +8,10 @@ import (
 )
 
 type BookmarkRepository interface {
-	CreateBookmark(ctx context.Context, url, description, code string) (*entity.Bookmark, error)
+	CreateBookmark(ctx context.Context, userId, url, description, code string) (*entity.Bookmark, error)
+	GetBookmarksByUserId(ctx context.Context, userId string, limit, offset int, sort string) ([]*entity.Bookmark, int64, error)
+	UpdateBookmark(ctx context.Context, userId, bookmarkId, url, description string) error
+	DeleteBookmark(ctx context.Context, userId, bookmarkId string) error
 }
 
 type bookmarkRepository struct {

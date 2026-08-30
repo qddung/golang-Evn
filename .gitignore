@@ -7,3 +7,4 @@ privatekey.pem
 publickey.pem
 /cmd/test
 /deployment/postgres-data
+/migrations/atlas.sum

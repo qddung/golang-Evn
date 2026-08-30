@@ -11,12 +11,12 @@ import (
 // Fields follow the project's JSON and GORM tag conventions.
 type Bookmark struct {
 	Id          string    `json:"id" gorm:"type:uuid;primaryKey"`
-	Code        string    `json:"code" gorm:"type:text"`
+	Code        string    `json:"code" gorm:"not null;type:text"`
 	Description string    `json:"description" gorm:"type:text"`
-	Url         string    `json:"url" gorm:"type:text;index:idx_id,unique"`
-	UserId      string    `json:"user_id" gorm:"type:uuid;index:idx_id,unique"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	Url         string    `json:"url" gorm:"not null;type:text;index:idx_id,unique"`
+	UserId      string    `json:"user_id" gorm:"not null;type:uuid;index:idx_id,unique"`
+	CreatedAt   time.Time `json:"created_at" gorm:"not null"`
+	UpdatedAt   time.Time `json:"updated_at" gorm:"not null"`
 	// Navigation Attribute
 	User User `gorm:foreignKey:UserId`
 }

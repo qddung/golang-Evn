@@ -1,12 +1,12 @@
 -- create "bookmarks" table
 CREATE TABLE "public"."bookmarks" (
   "id" uuid NOT NULL,
-  "code" text NULL,
+  "code" text NOT NULL,
   "description" text NULL,
-  "url" text NULL,
-  "user_id" uuid NULL,
-  "created_at" timestamptz NULL,
-  "updated_at" timestamptz NULL,
+  "url" text NOT NULL,
+  "user_id" uuid NOT NULL,
+  "created_at" timestamptz NOT NULL,
+  "updated_at" timestamptz NOT NULL,
   PRIMARY KEY ("id"),
   CONSTRAINT "fk_users_bookmarks" FOREIGN KEY ("user_id") REFERENCES "public"."users" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION
 );

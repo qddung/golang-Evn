@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/homework/lab/internal/handler/authorization"
 	"github.com/homework/lab/internal/models/dto/api"
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	user_service "github.com/homework/lab/internal/service/user"
@@ -11,7 +12,7 @@ import (
 
 func (u *userHandler) GetUserInfo(c *gin.Context) {
 
-	claims, err := GetClaims(c)
+	claims, err := authorization.GetClaims(c)
 
 	apiResponse := &api.Response[userModel.UserInfo]{}
 	if err != nil {

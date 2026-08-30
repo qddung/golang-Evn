@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/homework/lab/internal/handler/authorization"
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	user_service "github.com/homework/lab/internal/service/user"
 	service_mocks "github.com/homework/lab/internal/service/user/mocks"
@@ -32,7 +33,7 @@ func TestHandler_UpdateUserInfo(t *testing.T) {
 			},
 			expect: func(t *testing.T, rec *httptest.ResponseRecorder) {
 				assert.Equal(t, http.StatusBadRequest, rec.Code)
-				assert.Contains(t, rec.Body.String(), ClaimsNotFound.Error())
+				assert.Contains(t, rec.Body.String(), authorization.ClaimsNotFound.Error())
 			},
 		},
 		{
@@ -44,7 +45,7 @@ func TestHandler_UpdateUserInfo(t *testing.T) {
 			},
 			expect: func(t *testing.T, rec *httptest.ResponseRecorder) {
 				assert.Equal(t, http.StatusBadRequest, rec.Code)
-				assert.Contains(t, rec.Body.String(), ErrorExtractClaims.Error())
+				assert.Contains(t, rec.Body.String(), authorization.ErrorExtractClaims.Error())
 			},
 		},
 		{
