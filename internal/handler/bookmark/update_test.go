@@ -4,38 +4,16 @@ import (
 	"bytes"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	jwt "github.com/golang-jwt/jwt/v5"
 	bookmark_model "github.com/homework/lab/internal/models/dto/api/bookmark"
 	bookmark_service_mocks "github.com/homework/lab/internal/service/bookmark/mocks"
-	"github.com/homework/lab/pkg/request_ultils"
 	"github.com/homework/lab/pkg/response"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
-
-func init() {
-	request_ultils.InputValidator.RegisterValidation("url", func(fl validator.FieldLevel) bool {
-		value, ok := fl.Field().Interface().(string)
-		if !ok || value == "" {
-			return false
-		}
-		_, err := url.ParseRequestURI(value)
-		return err == nil
-	})
-	request_ultils.InputValidator.RegisterValidation("url;required", func(fl validator.FieldLevel) bool {
-		value, ok := fl.Field().Interface().(string)
-		if !ok || value == "" {
-			return false
-		}
-		_, err := url.ParseRequestURI(value)
-		return err == nil
-	})
-}
 
 func TestBookmarkHandler_UpdateBookmark(t *testing.T) {
 	testCases := []struct {

@@ -27,9 +27,9 @@ func ErrorHandling(err error) error {
 		return NotFoundError
 	case errors.Is(err, gorm.ErrDuplicatedKey), errors.Is(err, gorm.ErrForeignKeyViolated):
 		return ConflictError
-	case errors.Is(err, gorm.ErrInvalidTransaction),
-		errors.Is(err, gorm.ErrMissingWhereClause),
-		errors.Is(err, gorm.ErrInvalidValue),
+	case errors.Is(err, gorm.ErrInvalidTransaction) ||
+		errors.Is(err, gorm.ErrMissingWhereClause) ||
+		errors.Is(err, gorm.ErrInvalidValue) ||
 		errors.Is(err, gorm.ErrInvalidData):
 		return BadRequestError
 	default:

@@ -72,7 +72,7 @@ func (e *engine) Run() error {
 	return e.app.Run(fmt.Sprintf(":%s", e.cfg.AppPort))
 }
 
-// config ServeHTTP serves the app engine
+// override config ServeHTTP serves the app engine
 func (e *engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	e.app.ServeHTTP(w, req)
 }
