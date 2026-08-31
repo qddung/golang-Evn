@@ -30,8 +30,8 @@ func (u *userService) Login(ctx context.Context, loginInput userModel.UserLogin)
 		"sub":       userWithUserName.Id,
 		"user_name": userWithUserName.UserName,
 		"email":     userWithUserName.Email,
-		"iat":       time.Now().String(),
-		"exp":       time.Now().Add(Timeout).String(),
+		"iat":       time.Now().Unix(),
+		"exp":       time.Now().Add(Timeout).Unix(),
 	}
 	token, err := u.jwt.GenerateToken(claims)
 	if err != nil {
