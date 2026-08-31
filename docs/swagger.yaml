@@ -64,6 +64,8 @@ definitions:
         type: string
       url:
         type: string
+    required:
+    - url
     type: object
   github_com_homework_lab_internal_models_dto_api_bookmark.UpdateBookmarkRequest:
     properties:
@@ -71,6 +73,8 @@ definitions:
         type: string
       url:
         type: string
+    required:
+    - url
     type: object
   github_com_homework_lab_internal_models_dto_api_user.UpdateUserInput:
     properties:
@@ -148,9 +152,9 @@ definitions:
     type: object
   internal_handler_user.loginResponse:
     properties:
-      message:
+      data:
         type: string
-      token:
+      message:
         type: string
     type: object
   internal_handler_user.updateUserReposonse:
@@ -338,6 +342,28 @@ paths:
       tags:
       - link
   /v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Get user info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_user_UserInfo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any'
+      summary: Get user info
+      tags:
+      - User
     put:
       consumes:
       - application/json

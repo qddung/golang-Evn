@@ -8,8 +8,8 @@ import (
 )
 
 type Base struct {
-	Id        string `gorm:"type:uuid;primaryKey"`
-	CreatedAt time.Time
+	Id        string    `gorm:"type:uuid;primaryKey"`
+	CreatedAt time.Time `gorm:"not null"`
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }

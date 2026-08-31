@@ -284,6 +284,39 @@ const docTemplate = `{
             }
         },
         "/v1/users": {
+            "get": {
+                "description": "Get user info",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_user_UserInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any"
+                        }
+                    }
+                }
+            },
             "put": {
                 "description": "Edit current user",
                 "consumes": [
@@ -515,6 +548,9 @@ const docTemplate = `{
         },
         "github_com_homework_lab_internal_models_dto_api_bookmark.NewBookmarkRequest": {
             "type": "object",
+            "required": [
+                "url"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -526,6 +562,9 @@ const docTemplate = `{
         },
         "github_com_homework_lab_internal_models_dto_api_bookmark.UpdateBookmarkRequest": {
             "type": "object",
+            "required": [
+                "url"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -650,10 +689,10 @@ const docTemplate = `{
         "internal_handler_user.loginResponse": {
             "type": "object",
             "properties": {
-                "message": {
+                "data": {
                     "type": "string"
                 },
-                "token": {
+                "message": {
                     "type": "string"
                 }
             }

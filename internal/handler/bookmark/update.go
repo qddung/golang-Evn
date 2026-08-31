@@ -22,6 +22,9 @@ import (
 // @Failure      400  {object}  api.MessageResponse
 // @Failure      500  {object}  api.MessageResponse
 // @Router /v1/bookmarks/{id} [put]
+// @securityDefinitions.apiKey JWT
+// @in header
+// @name Authorization
 func (handler *bookmarkHandler) UpdateBookmark(c *gin.Context) {
 	id := c.Params.ByName("id")
 	res := &api.MessageResponse{

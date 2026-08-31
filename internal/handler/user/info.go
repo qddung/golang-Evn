@@ -10,6 +10,19 @@ import (
 	user_service "github.com/homework/lab/internal/service/user"
 )
 
+// GetUserInfo
+// @Summary Get user info
+// @Description Get user info
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200 {object} api.Response[userModel.UserInfo]
+// @Failure      400  {object}  api.Response[any]
+// @Failure      500  {object}  api.Response[any]
+// @Router /v1/users [get]
+// @securityDefinitions.apiKey JWT
+// @in header
+// @name Authorization
 func (u *userHandler) GetUserInfo(c *gin.Context) {
 
 	claims, err := authorization.GetClaims(c)
