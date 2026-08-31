@@ -41,12 +41,12 @@ func (u *userHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, loginResponse)
 		return
 	}
-	loginResponse.Token = token
+	loginResponse.Data = token
 	loginResponse.Message = "Login successfully"
 	c.JSON(http.StatusOK, loginResponse)
 }
 
 type loginResponse struct {
-	Token   string
-	Message string
+	Data    string `json:"data"`
+	Message string `json:"message"`
 }

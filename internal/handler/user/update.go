@@ -9,7 +9,7 @@ import (
 )
 
 type updateUserReposonse struct {
-	Message string
+	Message string `json:"message"`
 }
 
 // UpdateUserInfo godoc
