@@ -47,6 +47,6 @@ func (u *userHandler) Login(c *gin.Context) {
 }
 
 type loginResponse struct {
-	Token   string
-	Message string
+	Token   string `json:"token"`
+	Message string `json:"message"`
 }
