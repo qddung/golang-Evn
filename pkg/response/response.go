@@ -45,9 +45,8 @@ func InputFieldError(err error) Message {
 	}
 }
 
-// ToDataResponse converts a Message struct to a Response struct.
-// error only related to input validation, so the data field is set to nil.
-func ToDataResponse[T any](err error) api.Response[T] {
+// ToMessageReposnse
+func ToMessageReposnse(err error) api.MessageResponse {
 	m := InputFieldError(err)
 	details := []string{}
 	if m.Details == nil {
@@ -61,6 +60,17 @@ func ToDataResponse[T any](err error) api.Response[T] {
 	if message == "" {
 		message = defaultMessage
 	}
+	return api.MessageResponse{
+		Message: message,
+	}
+
+}
+
+// ToDataResponse converts a Message struct to a Response struct.
+// error only related to input validation, so the data field is set to nil.
+func ToDataResponse[T any](err error) api.Response[T] {
+	messRes := ToMessageReposnse(err)
+	message := messRes.Message
 	return api.Response[T]{
 		Message: message,
 		Data:    nil,

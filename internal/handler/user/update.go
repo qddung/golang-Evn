@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/homework/lab/internal/handler/authorization"
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 )
 
@@ -26,7 +27,7 @@ func (u *userHandler) UpdateUserInfo(c *gin.Context) {
 	request := &userModel.UpdateUserInput{}
 	c.ShouldBindJSON(request)
 	response := &updateUserReposonse{Message: "Edit current user successfully"}
-	claims, err := GetClaims(c)
+	claims, err := authorization.GetClaims(c)
 	if err != nil {
 		response.Message = err.Error()
 		c.JSON(http.StatusBadRequest, response)

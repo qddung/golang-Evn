@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	user_service "github.com/homework/lab/internal/service/user"
-	"github.com/homework/lab/pkg/request_ultls"
+	request_ultils "github.com/homework/lab/pkg/request_ultils"
 )
 
 // LoginLink Login
@@ -21,7 +21,7 @@ import (
 // @Failure      500  {object}  loginResponse
 // @Router /v1/users/login [post]
 func (u *userHandler) Login(c *gin.Context) {
-	userRequest, err := request_ultls.ModelBindValidation[userModel.UserLogin](c)
+	userRequest, err := request_ultils.ModelBindValidation[userModel.UserLogin](c)
 	loginResponse := &loginResponse{}
 	if err != nil {
 		loginResponse.Message = err.Error()

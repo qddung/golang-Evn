@@ -9,14 +9,18 @@ import (
 	"github.com/homework/lab/docs"
 	_ "github.com/homework/lab/docs"
 	"github.com/homework/lab/internal/api/middleware"
+	"github.com/homework/lab/internal/api/route"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
+	bookmark_handler "github.com/homework/lab/internal/handler/bookmark"
 	health_check_handler "github.com/homework/lab/internal/handler/health_check"
 	"github.com/homework/lab/internal/handler/shorten"
 	user_handler "github.com/homework/lab/internal/handler/user"
+	bookmark_repository "github.com/homework/lab/internal/repository/bookmark"
 	health_check_repository "github.com/homework/lab/internal/repository/health_check"
 	url_repository "github.com/homework/lab/internal/repository/shorten"
 	userRepository "github.com/homework/lab/internal/repository/user"
+	bookmark_service "github.com/homework/lab/internal/service/bookmark"
 	health_check_service "github.com/homework/lab/internal/service/health_check"
 	shorten_service "github.com/homework/lab/internal/service/shorten"
 	user_service "github.com/homework/lab/internal/service/user"
@@ -68,7 +72,7 @@ func (e *engine) Run() error {
 	return e.app.Run(fmt.Sprintf(":%s", e.cfg.AppPort))
 }
 
-// config ServeHTTP serves the app engine
+// override config ServeHTTP serves the app engine
 func (e *engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	e.app.ServeHTTP(w, req)
 }
@@ -77,6 +81,7 @@ type handlers struct {
 	healthCheck health_check_handler.HealthCheck
 	shorten     shorten.ShorternUrl
 	user        user_handler.UserHandler
+	bookmark    bookmark_handler.BookmarkHandler
 	config      *config.Config
 }
 
@@ -85,6 +90,7 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	instanceID := cfg.InstanceID
 	redisClient := e.connector.GetRedisClient()
 	sqlDB := e.connector.GetSqlDB()
+
 	// create handler
 	healthCheckRepository := health_check_repository.NewPing(redisClient)
 	healthCheckService := health_check_service.NewHealthCheck(serviceName, instanceID, healthCheckRepository)
@@ -100,7 +106,13 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	hasher := helpers.NewHasher()
 	userService := user_service.NewUserService(userRepository, hasher, e.jwtGenerator)
 	userHandler := user_handler.NewUserHandler(userService)
-	return handlers{healthCheckHandler, shortenURLHandler, userHandler, cfg}
+
+	// create bookmark handler
+	bookmarkRepo := bookmark_repository.NewBookmarkRepository(sqlDB)
+	bookmarkSvc := bookmark_service.NewBookmarkService(bookmarkRepo, helpers.NewKeyGenerator())
+	bookmarkHdl := bookmark_handler.NewBookmarkHandler(bookmarkSvc)
+
+	return handlers{healthCheckHandler, shortenURLHandler, userHandler, bookmarkHdl, cfg}
 }
 
 // initRoutes initializes the routes for the app engine
@@ -115,14 +127,11 @@ func (e *engine) initRoutes(cfg *config.Config) {
 
 	v1Routes := e.app.Group("/v1")
 	{
-		v1Routes.POST("/users/login", allHandlers.user.Login)
 		v1Routes.POST("/links/shorten", allHandlers.shorten.ShortenUrl)
 		v1Routes.GET("/links/redirect/:code", allHandlers.shorten.Redirect)
-		v1Routes.POST("/users/register", allHandlers.user.Register)
-
-		v1Routes.Use(jwtMiddeleware.JwtAuth()) // middelware
-		v1Routes.GET("/self/info", allHandlers.user.GetUserInfo)
-		v1Routes.PUT("/self/info", allHandlers.user.UpdateUserInfo)
-
+		// UserRoute
+		route.UserRoute(v1Routes, allHandlers.user, jwtMiddeleware)
+		// Bookmark
+		route.BookmarkRoute(v1Routes, allHandlers.bookmark)
 	}
 }
