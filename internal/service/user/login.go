@@ -9,6 +9,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var Timeout = 5 * time.Hour
+
 // Login
 func (u *userService) Login(ctx context.Context, loginInput userModel.UserLogin) (string, error) {
 	userWithUserName, err := u.userRepository.GetUserByUserName(ctx, loginInput.UserName)
@@ -28,7 +30,8 @@ func (u *userService) Login(ctx context.Context, loginInput userModel.UserLogin)
 		"sub":       userWithUserName.Id,
 		"user_name": userWithUserName.UserName,
 		"email":     userWithUserName.Email,
-		"iat":       time.Now().String(),
+		"iat":       time.Now().Unix(),
+		"exp":       time.Now().Add(Timeout).Unix(),
 	}
 	token, err := u.jwt.GenerateToken(claims)
 	if err != nil {
