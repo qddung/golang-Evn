@@ -23,7 +23,7 @@ import (
 // @Security JWT
 func (u *userHandler) GetUserInfo(c *gin.Context) {
 
-	claims, err := authorization.GetClaims(c)
+	userId, err := authorization.GetSubjectFromClaims(c)
 
 	apiResponse := &api.Response[userModel.UserInfo]{}
 	if err != nil {
@@ -32,7 +32,7 @@ func (u *userHandler) GetUserInfo(c *gin.Context) {
 		return
 	}
 
-	userInfo, err := u.svc.GetUserInfo(c, claims["sub"].(string))
+	userInfo, err := u.svc.GetUserInfo(c, userId)
 	if user_service.CheckErrorIsServiceErr(err) {
 		apiResponse.Message = err.Error()
 		c.JSON(http.StatusBadRequest, apiResponse)

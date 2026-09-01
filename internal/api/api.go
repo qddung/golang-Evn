@@ -9,7 +9,6 @@ import (
 	"github.com/homework/lab/docs"
 	_ "github.com/homework/lab/docs"
 	"github.com/homework/lab/internal/api/middleware"
-	"github.com/homework/lab/internal/api/route"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
 	bookmark_handler "github.com/homework/lab/internal/handler/bookmark"
@@ -122,15 +121,25 @@ func (e *engine) initRoutes(cfg *config.Config) {
 
 	docs.SwaggerInfo.BasePath = allHandlers.config.BasePath
 	e.app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	jwtMiddeleware := middleware.NewJwtAuthMiddleware(e.jwtValidator)
+	jwtMiddleware := middleware.NewJwtAuthMiddleware(e.jwtValidator)
 
 	v1Routes := e.app.Group("/v1")
 	{
+		// --- Public API
+		v1Routes.POST("/users/login", allHandlers.user.Login)
 		v1Routes.POST("/links/shorten", allHandlers.shorten.ShortenUrl)
 		v1Routes.GET("/links/redirect/:code", allHandlers.shorten.Redirect)
-		// UserRoute
-		route.UserRoute(v1Routes, allHandlers.user, jwtMiddeleware)
-		// Bookmark
-		route.BookmarkRoute(v1Routes, allHandlers.bookmark)
+		v1Routes.POST("/users/register", allHandlers.user.Register)
+
+		// -- Private Api
+		v1Routes.Use(jwtMiddleware.JwtAuth()) // middelware
+		v1Routes.GET("/self/info", allHandlers.user.GetUserInfo)
+		v1Routes.PUT("/self/info", allHandlers.user.UpdateUserInfo)
+
+		v1Routes.POST("/bookmarks", allHandlers.bookmark.CreateBookmark)
+		v1Routes.GET("/bookmarks", allHandlers.bookmark.GetBookmarks)
+		v1Routes.PUT("/bookmarks/:id", allHandlers.bookmark.UpdateBookmark)
+		v1Routes.DELETE("/bookmarks/:id", allHandlers.bookmark.DeleteBookmark)
+
 	}
 }

@@ -32,12 +32,11 @@ func (h *bookmarkHandler) CreateBookmark(c *gin.Context) {
 		return
 	}
 
-	claims, err := authorization.GetClaims(c)
+	userId, err := authorization.GetSubjectFromClaims(c)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, response.ToDataResponse[*bookmark_model.BookmarkInfo](authorization.ClaimsNotFound))
 		return
 	}
-	userId := claims["sub"].(string)
 
 	bookmark, err := h.svc.NewBookmark(c, userId, request)
 

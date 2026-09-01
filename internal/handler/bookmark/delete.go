@@ -23,12 +23,12 @@ import (
 func (handler *bookmarkHandler) DeleteBookmark(c *gin.Context) {
 	id := c.Params.ByName("id")
 	// authorization
-	claims, err := authorization.GetClaims(c)
+	userId, err := authorization.GetSubjectFromClaims(c)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, response.ToMessageReposnse(authorization.ClaimsNotFound))
 		return
 	}
-	userId := claims["sub"].(string)
+
 	// call service
 	err = handler.svc.DeleteBookmark(c, userId, id)
 	res := &api.MessageResponse{
