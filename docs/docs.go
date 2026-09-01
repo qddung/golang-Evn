@@ -735,6 +735,13 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "JWT": {
+            "type": "apiKey",
+            "name": "JWT",
+            "in": "header"
+        }
     }
 }`
 

@@ -465,4 +465,9 @@ paths:
       summary: Register user
       tags:
       - user
+securityDefinitions:
+  JWT:
+    in: header
+    name: JWT
+    type: apiKey
 swagger: "2.0"

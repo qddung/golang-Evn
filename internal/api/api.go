@@ -115,10 +115,6 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	return handlers{healthCheckHandler, shortenURLHandler, userHandler, bookmarkHdl, cfg}
 }
 
-// initRoutes initializes the routes for the app engine
-// @securityDefinitions.apikey <YourTypeOfKey>
-// @in header
-// @name <YourTokenName>
 func (e *engine) initRoutes(cfg *config.Config) {
 	allHandlers := e.InitHandlers(cfg)
 
