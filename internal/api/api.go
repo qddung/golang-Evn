@@ -115,7 +115,6 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	return handlers{healthCheckHandler, shortenURLHandler, userHandler, bookmarkHdl, cfg}
 }
 
-// initRoutes initializes the routes for the app engine
 func (e *engine) initRoutes(cfg *config.Config) {
 	allHandlers := e.InitHandlers(cfg)
 

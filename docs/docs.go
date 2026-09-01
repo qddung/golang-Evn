@@ -83,7 +83,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse"
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
             },
             "post": {
                 "consumes": [
@@ -126,7 +131,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_bookmark_BookmarkInfo"
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
             }
         },
         "/v1/bookmarks/{id}": {
@@ -178,7 +188,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse"
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
             },
             "delete": {
                 "consumes": [
@@ -219,7 +234,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse"
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
             }
         },
         "/v1/links/redirect/{code}": {
@@ -284,6 +304,44 @@ const docTemplate = `{
             }
         },
         "/v1/users": {
+            "get": {
+                "description": "Get user info",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_user_UserInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
+            },
             "put": {
                 "description": "Edit current user",
                 "consumes": [
@@ -326,7 +384,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/internal_handler_user.updateUserReposonse"
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
             }
         },
         "/v1/users/login": {
@@ -515,6 +578,9 @@ const docTemplate = `{
         },
         "github_com_homework_lab_internal_models_dto_api_bookmark.NewBookmarkRequest": {
             "type": "object",
+            "required": [
+                "url"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -526,6 +592,9 @@ const docTemplate = `{
         },
         "github_com_homework_lab_internal_models_dto_api_bookmark.UpdateBookmarkRequest": {
             "type": "object",
+            "required": [
+                "url"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -650,10 +719,10 @@ const docTemplate = `{
         "internal_handler_user.loginResponse": {
             "type": "object",
             "properties": {
-                "message": {
+                "data": {
                     "type": "string"
                 },
-                "token": {
+                "message": {
                     "type": "string"
                 }
             }
@@ -665,6 +734,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "JWT": {
+            "type": "apiKey",
+            "name": "JWT",
+            "in": "header"
         }
     }
 }`

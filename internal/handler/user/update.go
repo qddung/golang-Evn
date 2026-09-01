@@ -23,6 +23,7 @@ type updateUserReposonse struct {
 // @Failure      400  {object}  updateUserReposonse
 // @Failure      500  {object}  updateUserReposonse
 // @Router /v1/users [put]
+// @Security JWT
 func (u *userHandler) UpdateUserInfo(c *gin.Context) {
 	request := &userModel.UpdateUserInput{}
 	c.ShouldBindJSON(request)

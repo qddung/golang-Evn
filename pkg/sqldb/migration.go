@@ -22,6 +22,26 @@ type Migrator struct {
 	migrator *migrate.Migrate
 }
 
+// MigrateLog
+
+type MigrateLog struct{}
+
+func NewMigrationLog() *MigrateLog {
+	return &MigrateLog{}
+}
+
+// MigrateLog Printf
+func (m *MigrateLog) Printf(format string, v ...interface{}) {
+	log.Info().Msgf(format, v...)
+}
+
+// MigrateLog Verbose
+func (m *MigrateLog) Verbose() bool {
+	return true
+}
+
+// end log
+
 // BuildMigrate return migrate.Migrate
 func BuildMigrate(db *gorm.DB, migrationPath string) *Migrator {
 	sqlDb, err := db.DB()
@@ -33,11 +53,22 @@ func BuildMigrate(db *gorm.DB, migrationPath string) *Migrator {
 	CatchDBError(err)
 	return &Migrator{migrator}
 }
+func (m *Migrator) MigrateVersion() (uint, bool, error) {
+	return m.migrator.Version()
+}
+
+func (m *Migrator) SetLogging() {
+	m.migrator.Log = NewMigrationLog()
+}
 
 // MigrateUp: no step is migrate all
 func (m *Migrator) MigrateUp(step ...int) error {
 	if len(step) == 0 {
-		return m.migrator.Up()
+		err := m.migrator.Up()
+		if err == migrate.ErrNoChange {
+			return nil
+		}
+		return err
 	}
 	defaultStep := 1
 	if len(step) > 0 {

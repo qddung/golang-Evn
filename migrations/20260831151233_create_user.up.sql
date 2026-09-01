@@ -1,7 +1,9 @@
+DROP TABLE IF EXISTS "public"."users";
+
 -- create "users" table
 CREATE TABLE "public"."users" (
   "id" uuid NOT NULL,
-  "created_at" timestamptz NULL,
+  "created_at" timestamptz NOT NULL,
   "updated_at" timestamptz NULL,
   "deleted_at" timestamptz NULL,
   "display_name" text NULL,

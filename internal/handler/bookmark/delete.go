@@ -19,6 +19,7 @@ import (
 // @Failure      400  {object}  api.MessageResponse
 // @Failure      500  {object}  api.MessageResponse
 // @Router /v1/bookmarks/{id} [delete]
+// @Security JWT
 func (handler *bookmarkHandler) DeleteBookmark(c *gin.Context) {
 	id := c.Params.ByName("id")
 	// authorization

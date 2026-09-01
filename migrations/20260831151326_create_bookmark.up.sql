@@ -1,7 +1,7 @@
 -- create "bookmarks" table
 CREATE TABLE "public"."bookmarks" (
   "id" uuid NOT NULL,
-  "created_at" timestamptz NULL,
+  "created_at" timestamptz NOT NULL,
   "updated_at" timestamptz NULL,
   "deleted_at" timestamptz NULL,
   "code" text NOT NULL,

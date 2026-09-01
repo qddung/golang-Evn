@@ -64,6 +64,8 @@ definitions:
         type: string
       url:
         type: string
+    required:
+    - url
     type: object
   github_com_homework_lab_internal_models_dto_api_bookmark.UpdateBookmarkRequest:
     properties:
@@ -71,6 +73,8 @@ definitions:
         type: string
       url:
         type: string
+    required:
+    - url
     type: object
   github_com_homework_lab_internal_models_dto_api_user.UpdateUserInput:
     properties:
@@ -148,9 +152,9 @@ definitions:
     type: object
   internal_handler_user.loginResponse:
     properties:
-      message:
+      data:
         type: string
-      token:
+      message:
         type: string
     type: object
   internal_handler_user.updateUserReposonse:
@@ -206,6 +210,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+      security:
+      - JWT: []
       summary: Get bookmarks
       tags:
       - bookmark
@@ -234,6 +240,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_bookmark_BookmarkInfo'
+      security:
+      - JWT: []
       summary: Create bookmark
       tags:
       - bookmark
@@ -262,6 +270,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+      security:
+      - JWT: []
       summary: Delete bookmark
       tags:
       - bookmark
@@ -295,6 +305,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+      security:
+      - JWT: []
       summary: Update bookmark
       tags:
       - bookmark
@@ -338,6 +350,30 @@ paths:
       tags:
       - link
   /v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Get user info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_user_UserInfo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any'
+      security:
+      - JWT: []
+      summary: Get user info
+      tags:
+      - User
     put:
       consumes:
       - application/json
@@ -364,6 +400,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/internal_handler_user.updateUserReposonse'
+      security:
+      - JWT: []
       summary: Edit current user
       tags:
       - user
@@ -427,4 +465,9 @@ paths:
       summary: Register user
       tags:
       - user
+securityDefinitions:
+  JWT:
+    in: header
+    name: JWT
+    type: apiKey
 swagger: "2.0"

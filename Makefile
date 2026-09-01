@@ -77,9 +77,10 @@ docker-local-stop:
 	docker compose -f .\deployment\docker-compose.yml down --remove-orphans bookmark_service
 
 NEW_MIGRATION_NAME:=override_new_migration_name
-atlas-local-diff-cmd:
-	atlas migrate diff $(NEW_MIGRATION_NAME) -c file://./cmd/tools/generate_diff_schema/atlas.hcl --env local 
-	
 atlas-rehash:
 	atlas migrate hash -c file://cmd/tools/generate_diff_schema/atlas.hcl --env local
+atlas-local-diff-cmd: atlas-rehash
+	atlas migrate diff $(NEW_MIGRATION_NAME) -c file://./cmd/tools/generate_diff_schema/atlas.hcl --env local 
+	
+
 # End Local build
