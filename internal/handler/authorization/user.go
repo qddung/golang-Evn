@@ -24,3 +24,15 @@ func GetClaims(c *gin.Context) (jwt.MapClaims, error) {
 	}
 	return tokenClaims.(jwt.MapClaims), nil
 }
+
+func GetSubjectFromClaims(c *gin.Context) (string, error) {
+	claims, err := GetClaims(c)
+	if err != nil {
+		return string(""), err
+	}
+	userId, err := claims.GetSubject()
+	if err != nil {
+		return string(""), err
+	}
+	return userId, nil
+}

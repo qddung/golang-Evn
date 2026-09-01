@@ -5,11 +5,10 @@ swagger:
 	go run github.com/swaggo/swag/cmd/swag init --parseDependency --parseInternal -g ./cmd/api/main.go --output docs
 
 dev-run: swagger
-	go run github.com/joho/godotenv/cmd/godotenv go run cmd/api/main.go
+	go run github.com/joho/godotenv/cmd/godotenv -f ./.env go run cmd/api/main.go
 
 run-app:
 	go run cmd/api/main.go
-
 
 # 1. Định nghĩa giá trị mặc định (người dùng có thể đè bằng: make test OPTION=cache)
 OPTION ?= cache
