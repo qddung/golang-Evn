@@ -22,7 +22,7 @@ import (
 // @Failure      400  {object}  api.MessageResponse
 // @Failure      500  {object}  api.MessageResponse
 // @Router /v1/bookmarks/{id} [put]
-// @Security JWT
+// @Security BearerAuth
 func (handler *bookmarkHandler) UpdateBookmark(c *gin.Context) {
 	id := c.Params.ByName("id")
 	res := &api.MessageResponse{

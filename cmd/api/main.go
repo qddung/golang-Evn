@@ -9,9 +9,9 @@ import (
 // @description This is a book API
 // @BasePath /
 // initRoutes initializes the routes for the app engine
-// @securityDefinitions.apikey JWT
+// @securityDefinitions.apiKey BearerAuth
 // @in header
-// @name JWT
+// @name Authorization
 func main() {
 	apiEngine := infrastructure.CreateApi()
 	err := apiEngine.Run()

@@ -47,13 +47,13 @@ definitions:
     properties:
       code:
         type: string
-      createdAt:
+      created_at:
         type: string
       description:
         type: string
       id:
         type: string
-      updatedAt:
+      updated_at:
         type: string
       url:
         type: string
@@ -187,9 +187,11 @@ paths:
       - application/json
       parameters:
       - in: query
+        minimum: 1
         name: limit
         type: integer
       - in: query
+        minimum: 1
         name: page
         type: integer
       - in: query
@@ -211,7 +213,7 @@ paths:
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
       security:
-      - JWT: []
+      - BearerAuth: []
       summary: Get bookmarks
       tags:
       - bookmark
@@ -241,7 +243,7 @@ paths:
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_bookmark_BookmarkInfo'
       security:
-      - JWT: []
+      - BearerAuth: []
       summary: Create bookmark
       tags:
       - bookmark
@@ -271,7 +273,7 @@ paths:
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
       security:
-      - JWT: []
+      - BearerAuth: []
       summary: Delete bookmark
       tags:
       - bookmark
@@ -306,7 +308,7 @@ paths:
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
       security:
-      - JWT: []
+      - BearerAuth: []
       summary: Update bookmark
       tags:
       - bookmark
@@ -370,7 +372,7 @@ paths:
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any'
       security:
-      - JWT: []
+      - BearerAuth: []
       summary: Get user info
       tags:
       - User
@@ -401,7 +403,7 @@ paths:
           schema:
             $ref: '#/definitions/internal_handler_user.updateUserReposonse'
       security:
-      - JWT: []
+      - BearerAuth: []
       summary: Edit current user
       tags:
       - user
@@ -466,8 +468,8 @@ paths:
       tags:
       - user
 securityDefinitions:
-  JWT:
+  BearerAuth:
     in: header
-    name: JWT
+    name: Authorization
     type: apiKey
 swagger: "2.0"
