@@ -28,14 +28,14 @@ func (h *bookmarkHandler) GetBookmarks(c *gin.Context) {
 		return
 	}
 
-	claims, err := authorization.GetClaims(c)
+	userId, err := authorization.GetSubjectFromClaims(c)
 	error_response := &api.MessageResponse{}
 	if err != nil {
 		error_response.Message = authorization.ClaimsNotFound.Error()
 		c.JSON(http.StatusUnauthorized, error_response)
 		return
 	}
-	userId := claims["sub"].(string)
+
 	// call service
 	res, err := h.svc.GetBookmarks(c, userId, &query)
 	if err != nil {

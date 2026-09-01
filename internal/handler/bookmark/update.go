@@ -36,12 +36,11 @@ func (handler *bookmarkHandler) UpdateBookmark(c *gin.Context) {
 		return
 	}
 	// authorizaton
-	claims, err := authorization.GetClaims(c)
+	userId, err := authorization.GetSubjectFromClaims(c)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, response.ToDataResponse[*bookmark_model.BookmarkInfo](authorization.ClaimsNotFound))
 		return
 	}
-	userId := claims["sub"].(string)
 	// call service
 	err = handler.svc.UpdateBookmark(c, request, userId, id)
 	if err != nil {
