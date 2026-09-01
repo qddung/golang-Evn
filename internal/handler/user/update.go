@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/homework/lab/internal/handler/authorization"
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 )
 
@@ -22,17 +23,18 @@ type updateUserReposonse struct {
 // @Failure      400  {object}  updateUserReposonse
 // @Failure      500  {object}  updateUserReposonse
 // @Router /v1/users [put]
+// @Security JWT
 func (u *userHandler) UpdateUserInfo(c *gin.Context) {
 	request := &userModel.UpdateUserInput{}
 	c.ShouldBindJSON(request)
 	response := &updateUserReposonse{Message: "Edit current user successfully"}
-	claims, err := GetClaims(c)
+	userId, err := authorization.GetSubjectFromClaims(c)
 	if err != nil {
 		response.Message = err.Error()
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	err = u.svc.UpdateUserInfo(c, claims["sub"].(string), request)
+	err = u.svc.UpdateUserInfo(c, userId, request)
 	if err != nil {
 		response.Message = err.Error()
 		c.JSON(http.StatusBadRequest, response)

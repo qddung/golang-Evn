@@ -1,6 +1,9 @@
-package request_ultls
+package request_ultils
 
 import (
+	"errors"
+	"io"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
@@ -22,9 +25,9 @@ func ModelBindValidation[T any](c *gin.Context) (*T, error) {
 		return nil, err
 	}
 
-	if c.Request.Method == "POST" {
+	if c.Request.Method != "GET" {
 		err := c.ShouldBindJSON(model)
-		if err != nil {
+		if err != nil && !errors.Is(err, io.EOF) {
 			return nil, err
 		}
 	}

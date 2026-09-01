@@ -9,6 +9,7 @@ import (
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	"github.com/homework/lab/internal/models/entity"
 	repo_mocks "github.com/homework/lab/internal/repository/user/mocks"
+	"github.com/homework/lab/internal/test/data/fixture"
 	helper_mocks "github.com/homework/lab/pkg/helpers/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -107,7 +108,7 @@ func TestService_UpdateUserInfo(t *testing.T) {
 			name: "update fails",
 			setupRepo: func() *repo_mocks.UserRepository {
 				repo := repo_mocks.NewUserRepository(t)
-				repo.On("GetUserById", ctx, "u-1").Return(&entity.User{Id: "u-1"}, nil)
+				repo.On("GetUserById", ctx, "u-1").Return(&entity.User{Base: fixture.GetBaseEntity("u-1")}, nil)
 				repo.On("UpdateUser", ctx, mock.MatchedBy(func(x interface{}) bool {
 					v, ok := x.(*domain_model.UpdateUser)
 					return ok && v.Id == "u-1" && v.UserName == "new" && v.Password == ""
@@ -122,7 +123,7 @@ func TestService_UpdateUserInfo(t *testing.T) {
 			name: "success",
 			setupRepo: func() *repo_mocks.UserRepository {
 				repo := repo_mocks.NewUserRepository(t)
-				repo.On("GetUserById", ctx, "u-2").Return(&entity.User{Id: "u-2"}, nil)
+				repo.On("GetUserById", ctx, "u-2").Return(&entity.User{Base: fixture.GetBaseEntity("u-2")}, nil)
 				repo.On("UpdateUser", ctx, mock.MatchedBy(func(x interface{}) bool {
 					v, ok := x.(*domain_model.UpdateUser)
 					return ok && v.Id == "u-2" && v.UserName == "ok" && v.Password == ""

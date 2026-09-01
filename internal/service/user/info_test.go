@@ -8,6 +8,7 @@ import (
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	"github.com/homework/lab/internal/models/entity"
 	repo_mocks "github.com/homework/lab/internal/repository/user/mocks"
+	"github.com/homework/lab/internal/test/data/fixture"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -51,7 +52,7 @@ func TestService_GetUserInfo(t *testing.T) {
 			setupRepo: func(ctx context.Context) *repo_mocks.UserRepository {
 				repo := SetupRepoForInfo(t)
 				existing := &entity.User{
-					Id:          "u-123",
+					Base:        fixture.GetBaseEntity("u-123"),
 					DisplayName: "Alice",
 					Email:       "alice@example.com",
 					UserName:    "alice",

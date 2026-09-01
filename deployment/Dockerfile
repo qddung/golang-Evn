@@ -24,6 +24,7 @@ COPY --from=build /opt/app/privatekey.pem /app/privatekey.pem
 COPY --from=build /opt/app/publickey.pem /app/publickey.pem
 COPY --from=build /opt/app/bookmark_service /app/bookmark_service
 COPY --from=build /opt/app/docs /app/docs
+COPY --from=build /opt/app/migrations /app/migrations
 COPY --from=build /usr/share/zoneinfo /usr/share/zoneinfo
 
 RUN ln -snf /usr/share/zoneinfo/"$TZ" /etc/localtime && echo "$TZ" > /etc/timezone
