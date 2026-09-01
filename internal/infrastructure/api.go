@@ -23,6 +23,7 @@ func CreateApi() api.Engine {
 	sqlClient := CreateSqlClient()
 
 	migrator := sqldb.BuildMigrate(sqlClient, constant.MigrationPath)
+	migrator.SetLogging()
 	err = migrator.MigrateUp()
 	if err != nil {
 		panic("start migration failed " + err.Error())

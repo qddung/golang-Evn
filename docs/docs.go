@@ -83,7 +83,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse"
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
             },
             "post": {
                 "consumes": [
@@ -126,7 +131,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_bookmark_BookmarkInfo"
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
             }
         },
         "/v1/bookmarks/{id}": {
@@ -178,7 +188,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse"
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
             },
             "delete": {
                 "consumes": [
@@ -219,7 +234,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse"
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
             }
         },
         "/v1/links/redirect/{code}": {
@@ -315,7 +335,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any"
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
             },
             "put": {
                 "description": "Edit current user",
@@ -359,7 +384,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/internal_handler_user.updateUserReposonse"
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ]
             }
         },
         "/v1/users/login": {

@@ -20,9 +20,7 @@ import (
 // @Failure      400  {object}  api.MessageResponse
 // @Failure      500  {object}  api.MessageResponse
 // @Router /v1/bookmarks [get]
-// @securityDefinitions.apiKey JWT
-// @in header
-// @name Authorization
+// @Security JWT
 func (h *bookmarkHandler) GetBookmarks(c *gin.Context) {
 	var query bookmark_model.GetBookmarksQuery
 	if err := c.ShouldBindQuery(&query); err != nil {

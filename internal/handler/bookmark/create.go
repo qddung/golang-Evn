@@ -24,9 +24,7 @@ var SuccessCreateBookmark = "success create bookmark"
 // @Failure      400  {object}  api.Response[bookmark_model.BookmarkInfo]
 // @Failure      500  {object}  api.Response[bookmark_model.BookmarkInfo]
 // @Router /v1/bookmarks [post]
-// @securityDefinitions.apiKey JWT
-// @in header
-// @name Authorization
+// @Security JWT
 func (h *bookmarkHandler) CreateBookmark(c *gin.Context) {
 	request, err := request_ultils.ModelBindValidation[bookmark_model.NewBookmarkRequest](c)
 	if err != nil {

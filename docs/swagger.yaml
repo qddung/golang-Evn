@@ -210,6 +210,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+      security:
+      - JWT: []
       summary: Get bookmarks
       tags:
       - bookmark
@@ -238,6 +240,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-github_com_homework_lab_internal_models_dto_api_bookmark_BookmarkInfo'
+      security:
+      - JWT: []
       summary: Create bookmark
       tags:
       - bookmark
@@ -266,6 +270,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+      security:
+      - JWT: []
       summary: Delete bookmark
       tags:
       - bookmark
@@ -299,6 +305,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.MessageResponse'
+      security:
+      - JWT: []
       summary: Update bookmark
       tags:
       - bookmark
@@ -361,6 +369,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/github_com_homework_lab_internal_models_dto_api.Response-any'
+      security:
+      - JWT: []
       summary: Get user info
       tags:
       - User
@@ -390,6 +400,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/internal_handler_user.updateUserReposonse'
+      security:
+      - JWT: []
       summary: Edit current user
       tags:
       - user

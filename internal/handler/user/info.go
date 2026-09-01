@@ -20,9 +20,7 @@ import (
 // @Failure      400  {object}  api.Response[any]
 // @Failure      500  {object}  api.Response[any]
 // @Router /v1/users [get]
-// @securityDefinitions.apiKey JWT
-// @in header
-// @name Authorization
+// @Security JWT
 func (u *userHandler) GetUserInfo(c *gin.Context) {
 
 	claims, err := authorization.GetClaims(c)
