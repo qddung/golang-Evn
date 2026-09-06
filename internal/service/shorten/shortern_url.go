@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 
 	url_repository "github.com/homework/lab/internal/repository/shorten"
 	"github.com/homework/lab/pkg/helpers"
@@ -48,6 +49,7 @@ func (s *shorternUrl) ShortenUrlShortenUrl(ctx context.Context, url string, exp 
 	secondDuration := time.Duration(exp) * time.Second
 	err = s.repository.StoreURL(ctx, randomCode, url, secondDuration)
 	if err != nil {
+		log.Error().Err(err).Msg("Failed to StoreURL in shorternUrl.ShortenUrlShortenUrl")
 		return "", err
 	}
 

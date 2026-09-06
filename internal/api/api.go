@@ -9,6 +9,7 @@ import (
 	"github.com/homework/lab/docs"
 	_ "github.com/homework/lab/docs"
 	"github.com/homework/lab/internal/api/middleware"
+	bookmark_cache "github.com/homework/lab/internal/cache/bookmark"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
 	bookmark_handler "github.com/homework/lab/internal/handler/bookmark"
@@ -16,6 +17,7 @@ import (
 	"github.com/homework/lab/internal/handler/shorten"
 	user_handler "github.com/homework/lab/internal/handler/user"
 	bookmark_repository "github.com/homework/lab/internal/repository/bookmark"
+	"github.com/homework/lab/internal/repository/cache"
 	health_check_repository "github.com/homework/lab/internal/repository/health_check"
 	url_repository "github.com/homework/lab/internal/repository/shorten"
 	userRepository "github.com/homework/lab/internal/repository/user"
@@ -89,6 +91,7 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	instanceID := cfg.InstanceID
 	redisClient := e.connector.GetRedisClient()
 	sqlDB := e.connector.GetSqlDB()
+	cacheRedis := cache.NewCache(redisClient)
 
 	// create handler
 	healthCheckRepository := health_check_repository.NewPing(redisClient)
@@ -109,7 +112,8 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	// create bookmark handler
 	bookmarkRepo := bookmark_repository.NewBookmarkRepository(sqlDB)
 	bookmarkSvc := bookmark_service.NewBookmarkService(bookmarkRepo, helpers.NewKeyGenerator())
-	bookmarkHdl := bookmark_handler.NewBookmarkHandler(bookmarkSvc)
+	bookmarkCache := bookmark_cache.NewBookmarkCacheInstance(bookmarkSvc, cacheRedis)
+	bookmarkHdl := bookmark_handler.NewBookmarkHandler(bookmarkCache)
 
 	return handlers{healthCheckHandler, shortenURLHandler, userHandler, bookmarkHdl, cfg}
 }

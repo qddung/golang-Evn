@@ -8,8 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v5"
+	bookmark_cache_mocks "github.com/homework/lab/internal/cache/bookmark/mocks"
 	bookmark_model "github.com/homework/lab/internal/models/dto/api/bookmark"
-	bookmark_service_mocks "github.com/homework/lab/internal/service/bookmark/mocks"
 	"github.com/homework/lab/pkg/response"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -18,7 +18,7 @@ import (
 func TestBookmarkHandler_UpdateBookmark(t *testing.T) {
 	testCases := []struct {
 		name         string
-		setupMock    func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService
+		setupMock    func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache
 		body         string
 		withClaims   bool
 		expectedCode int
@@ -26,8 +26,8 @@ func TestBookmarkHandler_UpdateBookmark(t *testing.T) {
 	}{
 		{
 			name: "success",
-			setupMock: func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService {
-				mockSvc := bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache {
+				mockSvc := bookmark_cache_mocks.NewBookmarkCache(t)
 				mockSvc.On("UpdateBookmark", ctx, mock.MatchedBy(func(req *bookmark_model.UpdateBookmarkRequest) bool {
 					return req != nil && req.Url == "https://example.com/updated" && req.Description == "updated demo"
 				}), "user-1", "bookmark-1").Return(nil)
@@ -40,8 +40,8 @@ func TestBookmarkHandler_UpdateBookmark(t *testing.T) {
 		},
 		{
 			name: "missing claims",
-			setupMock: func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService {
-				return bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache {
+				return bookmark_cache_mocks.NewBookmarkCache(t)
 			},
 			body:         `{"url":"https://example.com/updated","description":"updated demo"}`,
 			withClaims:   false,
@@ -50,8 +50,8 @@ func TestBookmarkHandler_UpdateBookmark(t *testing.T) {
 		},
 		{
 			name: "invalid request",
-			setupMock: func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService {
-				return bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache {
+				return bookmark_cache_mocks.NewBookmarkCache(t)
 			},
 			body:         `{"url":"not a url"}`,
 			withClaims:   true,
@@ -60,8 +60,8 @@ func TestBookmarkHandler_UpdateBookmark(t *testing.T) {
 		},
 		{
 			name: "service error",
-			setupMock: func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService {
-				mockSvc := bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache {
+				mockSvc := bookmark_cache_mocks.NewBookmarkCache(t)
 				mockSvc.On("UpdateBookmark", ctx, mock.MatchedBy(func(req *bookmark_model.UpdateBookmarkRequest) bool {
 					return req != nil && req.Url == "https://example.com/updated" && req.Description == "updated demo"
 				}), "user-1", "bookmark-1").Return(response.NotFoundError)
