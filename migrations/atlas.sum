@@ -1,3 +1,4 @@
-h1:qCTomUpTBXZ4Jd/O4Asw9Co9Dkq+DIEl0mhNrSp3p+o=
-20260831151233_create_user.up.sql h1:LYKgLOX+rqvgiuxPDPeD1kaqGDm4Dk9BkuA55brDHNU=
-20260831151326_create_bookmark.up.sql h1:I9ry6DrhcyuuAUYxW7wr3igewrAUpAc4hMgzuQ5WQhQ=
+h1:8CsJfLccuBsWls4GxACaYUzMeRh4nEfD9e1O+cC9nVY=
+20260831151233_create_user.up.sql h1:3Us6TC3q0Ez+N9NZc6Nwcyn248QnYvq+HSSW32+7SN4=
+20260831151326_create_bookmark.up.sql h1:GT19lpSnazJkSM+9V+sl1UKQsWXRSXmfMOjj0PugM6c=
+20260907162214_add_unique_constraint_bookmark_code.up.sql h1:wSjfyIBQMxlHpEQuYFWfWaclQSTFDT4tjQ8ApAZutFw=

@@ -2,11 +2,14 @@ package shorten_service
 
 import (
 	"context"
+
 	"time"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
+	"github.com/homework/lab/constant"
+	bookmark_repository "github.com/homework/lab/internal/repository/bookmark"
 	url_repository "github.com/homework/lab/internal/repository/shorten"
 	"github.com/homework/lab/pkg/helpers"
 	"github.com/redis/go-redis/v9"
@@ -22,18 +25,19 @@ type ShorternUrl interface {
 }
 
 type shorternUrl struct {
-	generatorRandom helpers.KeyGenerator
-	repository      url_repository.URLStorage
+	generatorRandom    helpers.KeyGenerator
+	repository         url_repository.URLStorage
+	bookmarkRepository bookmark_repository.BookmarkRepository
 }
 
 // NewShorternUrl new shortern url
-func NewShorternUrl(repository url_repository.URLStorage, generator helpers.KeyGenerator) ShorternUrl {
-	return &shorternUrl{generator, repository}
+func NewShorternUrl(repository url_repository.URLStorage, generator helpers.KeyGenerator, bookmarkRepository bookmark_repository.BookmarkRepository) ShorternUrl {
+	return &shorternUrl{generator, repository, bookmarkRepository}
 }
 
 // ShortenUrl shortern url
 func (s *shorternUrl) ShortenUrlShortenUrl(ctx context.Context, url string, exp int64) (string, error) {
-	randomCode := s.generatorRandom.GenerateRandomCode(6)
+	randomCode := s.generatorRandom.GenerateRandomCode(constant.ShortenCodeLength)
 	res, err := s.repository.GetURL(ctx, randomCode)
 	// redis exeption
 	if err != nil && !errors.Is(err, redis.Nil) {
@@ -60,10 +64,25 @@ var ErrCodeDoesntExist = errors.New("code does not exist")
 
 // GetLinkFromCode return the original from shorten code
 func (s *shorternUrl) GetLinkFromCode(ctx context.Context, code string) (string, error) {
+	if len(code) == constant.BookmarkCodeLength {
+		return getLinkFromBookmarkCode(s, ctx, code)
+	}
+	return getLinkFromShortenCode(s, ctx, code)
+}
+
+func getLinkFromShortenCode(s *shorternUrl, ctx context.Context, code string) (string, error) {
 	link, err := s.repository.GetURL(ctx, code)
 	if errors.Is(err, redis.Nil) {
 		return "", ErrCodeDoesntExist
 	}
 
 	return link, err
+}
+
+func getLinkFromBookmarkCode(s *shorternUrl, ctx context.Context, code string) (string, error) {
+	bookmark, err := s.bookmarkRepository.FindBookmarkByCode(ctx, code)
+	if errors.Is(err, redis.Nil) {
+		return "", ErrCodeDoesntExist
+	}
+	return bookmark.Url, err
 }

@@ -34,3 +34,11 @@ func (b *bookmarkRepository) GetBookmarksByUserId(ctx context.Context, userId st
 
 	return bookmarks, total, nil
 }
+
+func (b *bookmarkRepository) FindBookmarkByCode(ctx context.Context, code string) (*entity.Bookmark, error) {
+	var bookmark entity.Bookmark
+	if err := b.db.WithContext(ctx).Where("code = ?", code).First(&bookmark).Error; err != nil {
+		return nil, err
+	}
+	return &bookmark, nil
+}

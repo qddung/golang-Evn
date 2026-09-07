@@ -93,29 +93,28 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	sqlDB := e.connector.GetSqlDB()
 	cacheRedis := cache.NewCache(redisClient)
 
-	// create handler
-	healthCheckRepository := health_check_repository.NewPing(redisClient)
-	healthCheckService := health_check_service.NewHealthCheck(serviceName, instanceID, healthCheckRepository)
-	healthCheckHandler := health_check_handler.NewHealthCheck(healthCheckService)
-
-	// create shorten url handler
-	urlStorage := url_repository.NewURLStorage(redisClient)
-	shortenService := shorten_service.NewShorternUrl(urlStorage, helpers.NewKeyGenerator())
-	shortenURLHandler := shorten.NewShortenURL(shortenService)
-
-	// create user handler
-	userRepository := userRepository.NewUserRepository(sqlDB)
+	// create helper
 	hasher := helpers.NewHasher()
-	userService := user_service.NewUserService(userRepository, hasher, e.jwtGenerator)
-	userHandler := user_handler.NewUserHandler(userService)
-
-	// create bookmark handler
+	// create repository
+	healthCheckRepository := health_check_repository.NewPing(redisClient)
+	urlStorage := url_repository.NewURLStorage(redisClient)
+	userRepository := userRepository.NewUserRepository(sqlDB)
 	bookmarkRepo := bookmark_repository.NewBookmarkRepository(sqlDB)
+	// create service
+	healthCheckService := health_check_service.NewHealthCheck(serviceName, instanceID, healthCheckRepository)
+	shortenService := shorten_service.NewShorternUrl(urlStorage, helpers.NewKeyGenerator(), bookmarkRepo)
+	userService := user_service.NewUserService(userRepository, hasher, e.jwtGenerator)
 	bookmarkSvc := bookmark_service.NewBookmarkService(bookmarkRepo, helpers.NewKeyGenerator())
-	bookmarkCache := bookmark_cache.NewBookmarkCacheInstance(bookmarkSvc, cacheRedis)
-	bookmarkHdl := bookmark_handler.NewBookmarkHandler(bookmarkCache)
 
-	return handlers{healthCheckHandler, shortenURLHandler, userHandler, bookmarkHdl, cfg}
+	// create cache
+	bookmarkCache := bookmark_cache.NewBookmarkCacheInstance(bookmarkSvc, cacheRedis)
+	// create handler
+	healthCheckHandler := health_check_handler.NewHealthCheck(healthCheckService)
+	shortenURLHandler := shorten.NewShortenURL(shortenService)
+	userHandler := user_handler.NewUserHandler(userService)
+	bookmarkHandler := bookmark_handler.NewBookmarkHandler(bookmarkCache)
+
+	return handlers{healthCheckHandler, shortenURLHandler, userHandler, bookmarkHandler, cfg}
 }
 
 func (e *engine) initRoutes(cfg *config.Config) {

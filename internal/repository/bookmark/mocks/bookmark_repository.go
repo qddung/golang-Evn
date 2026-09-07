@@ -62,6 +62,36 @@ func (_m *BookmarkRepository) DeleteBookmark(ctx context.Context, userId string,
 	return r0
 }
 
+// FindBookmarkByCode provides a mock function with given fields: ctx, code
+func (_m *BookmarkRepository) FindBookmarkByCode(ctx context.Context, code string) (*entity.Bookmark, error) {
+	ret := _m.Called(ctx, code)
+
+	if len(ret) == 0 {
+		panic("no return value specified for FindBookmarkByCode")
+	}
+
+	var r0 *entity.Bookmark
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*entity.Bookmark, error)); ok {
+		return rf(ctx, code)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *entity.Bookmark); ok {
+		r0 = rf(ctx, code)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entity.Bookmark)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, code)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetBookmarksByUserId provides a mock function with given fields: ctx, userId, limit, offset, sort
 func (_m *BookmarkRepository) GetBookmarksByUserId(ctx context.Context, userId string, limit int, offset int, sort string) ([]*entity.Bookmark, int64, error) {
 	ret := _m.Called(ctx, userId, limit, offset, sort)

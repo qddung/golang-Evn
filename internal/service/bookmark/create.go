@@ -3,6 +3,7 @@ package bookmark_service
 import (
 	"context"
 
+	"github.com/homework/lab/constant"
 	domain_model "github.com/homework/lab/internal/models/domain"
 	bookmark_model "github.com/homework/lab/internal/models/dto/api/bookmark"
 	"github.com/homework/lab/pkg/response"
@@ -10,7 +11,7 @@ import (
 
 // NewBookmark
 func (s *bookmarkService) NewBookmark(ctx context.Context, userId string, bookmark *bookmark_model.NewBookmarkRequest) (*bookmark_model.BookmarkInfo, error) {
-	code := s.keyGenerator.GenerateRandomCode(10)
+	code := s.keyGenerator.GenerateRandomCode(constant.BookmarkCodeLength)
 	bookmarkCreate, err := s.bookmarkRepository.CreateBookmark(ctx, userId, bookmark.Url, bookmark.Description, code)
 
 	if err != nil {

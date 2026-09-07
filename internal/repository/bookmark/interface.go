@@ -13,6 +13,7 @@ type BookmarkRepository interface {
 	GetBookmarksByUserId(ctx context.Context, userId string, limit, offset int, sort string) ([]*entity.Bookmark, int64, error)
 	UpdateBookmark(ctx context.Context, userId, bookmarkId, url, description string) error
 	DeleteBookmark(ctx context.Context, userId, bookmarkId string) error
+	FindBookmarkByCode(ctx context.Context, code string) (*entity.Bookmark, error)
 }
 
 type bookmarkRepository struct {
