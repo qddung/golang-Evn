@@ -11,7 +11,7 @@ import (
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	user_entity "github.com/homework/lab/internal/models/entity"
 	user_repository "github.com/homework/lab/internal/repository/user"
-	"github.com/homework/lab/pkg/helpers"
+	"github.com/homework/lab/pkg/helpers/hasher"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,7 +41,7 @@ func Test_UpdateUserInfo_Integration(t *testing.T) {
 			eng, mockJwt, conn, _ := setupEngineWithDB(t)
 			db := conn.GetSqlDB()
 
-			hasher := helpers.NewHasher()
+			hasher := hasher.NewHasher()
 			pw, err := hasher.HashPassword("password123")
 			if err != nil {
 				t.Fatalf("hash password: %v", err)

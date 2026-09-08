@@ -10,22 +10,22 @@ import (
 	bookmark_model "github.com/homework/lab/internal/models/dto/api/bookmark"
 	"github.com/homework/lab/internal/models/entity"
 	bookmark_mocks "github.com/homework/lab/internal/repository/bookmark/mocks"
-	helpers_mocks "github.com/homework/lab/pkg/helpers/mocks"
+	code_gen_mocks "github.com/homework/lab/pkg/helpers/code_gen/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestService_GetBookmarks(t *testing.T) {
 	testCases := []struct {
 		name         string
-		setupRepo    func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *helpers_mocks.KeyGenerator)
+		setupRepo    func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *code_gen_mocks.KeyGenerator)
 		query        *bookmark_model.GetBookmarksQuery
 		expectedFunc func(t *testing.T, res *api.PaginatedResponse[bookmark_model.BookmarkInfo], err error)
 	}{
 		{
 			name: "success",
-			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *helpers_mocks.KeyGenerator) {
+			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *code_gen_mocks.KeyGenerator) {
 				repo := bookmark_mocks.NewBookmarkRepository(t)
-				keyGen := helpers_mocks.NewKeyGenerator(t)
+				keyGen := code_gen_mocks.NewKeyGenerator(t)
 				repo.On("GetBookmarksByUserId", ctx, "user-1", 10, 0, "created_at desc").Return([]*entity.Bookmark{
 					{
 						Base:        base.Base{Id: "b-1", CreatedAt: time.Now(), UpdatedAt: time.Now()},
@@ -49,9 +49,9 @@ func TestService_GetBookmarks(t *testing.T) {
 		},
 		{
 			name: "repository error",
-			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *helpers_mocks.KeyGenerator) {
+			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *code_gen_mocks.KeyGenerator) {
 				repo := bookmark_mocks.NewBookmarkRepository(t)
-				keyGen := helpers_mocks.NewKeyGenerator(t)
+				keyGen := code_gen_mocks.NewKeyGenerator(t)
 				repo.On("GetBookmarksByUserId", ctx, "user-1", 10, 0, "created_at desc").Return([]*entity.Bookmark(nil), int64(0), assert.AnError)
 				return repo, keyGen
 			},
@@ -63,9 +63,9 @@ func TestService_GetBookmarks(t *testing.T) {
 		},
 		{
 			name: "default page and limit",
-			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *helpers_mocks.KeyGenerator) {
+			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *code_gen_mocks.KeyGenerator) {
 				repo := bookmark_mocks.NewBookmarkRepository(t)
-				keyGen := helpers_mocks.NewKeyGenerator(t)
+				keyGen := code_gen_mocks.NewKeyGenerator(t)
 				repo.On("GetBookmarksByUserId", ctx, "user-1", 10, 0, "").Return([]*entity.Bookmark{}, int64(0), nil)
 				return repo, keyGen
 			},

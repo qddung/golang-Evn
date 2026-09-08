@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	bookmark_mocks "github.com/homework/lab/internal/repository/bookmark/mocks"
-	helpers_mocks "github.com/homework/lab/pkg/helpers/mocks"
+	code_gen_mocks "github.com/homework/lab/pkg/helpers/code_gen/mocks"
 	"github.com/homework/lab/pkg/response"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
@@ -14,14 +14,14 @@ import (
 func TestService_DeleteBookmark(t *testing.T) {
 	testCases := []struct {
 		name         string
-		setupRepo    func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *helpers_mocks.KeyGenerator)
+		setupRepo    func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *code_gen_mocks.KeyGenerator)
 		expectedFunc func(t *testing.T, err error)
 	}{
 		{
 			name: "success",
-			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *helpers_mocks.KeyGenerator) {
+			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *code_gen_mocks.KeyGenerator) {
 				repo := bookmark_mocks.NewBookmarkRepository(t)
-				keyGen := helpers_mocks.NewKeyGenerator(t)
+				keyGen := code_gen_mocks.NewKeyGenerator(t)
 				repo.On("DeleteBookmark", ctx, "user-1", "bookmark-1").Return(nil)
 				return repo, keyGen
 			},
@@ -31,9 +31,9 @@ func TestService_DeleteBookmark(t *testing.T) {
 		},
 		{
 			name: "repository error",
-			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *helpers_mocks.KeyGenerator) {
+			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *code_gen_mocks.KeyGenerator) {
 				repo := bookmark_mocks.NewBookmarkRepository(t)
-				keyGen := helpers_mocks.NewKeyGenerator(t)
+				keyGen := code_gen_mocks.NewKeyGenerator(t)
 				repo.On("DeleteBookmark", ctx, "user-1", "bookmark-1").Return(gorm.ErrRecordNotFound)
 				return repo, keyGen
 			},

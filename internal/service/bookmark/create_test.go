@@ -9,7 +9,7 @@ import (
 	bookmark_model "github.com/homework/lab/internal/models/dto/api/bookmark"
 	"github.com/homework/lab/internal/models/entity"
 	bookmark_mocks "github.com/homework/lab/internal/repository/bookmark/mocks"
-	helpers_mocks "github.com/homework/lab/pkg/helpers/mocks"
+	code_gen_mocks "github.com/homework/lab/pkg/helpers/code_gen/mocks"
 	"github.com/homework/lab/pkg/response"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,15 +17,15 @@ import (
 func TestService_NewBookmark(t *testing.T) {
 	testCases := []struct {
 		name         string
-		setupRepo    func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *helpers_mocks.KeyGenerator)
+		setupRepo    func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *code_gen_mocks.KeyGenerator)
 		input        *bookmark_model.NewBookmarkRequest
 		expectedFunc func(t *testing.T, info *bookmark_model.BookmarkInfo, err error)
 	}{
 		{
 			name: "success",
-			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *helpers_mocks.KeyGenerator) {
+			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *code_gen_mocks.KeyGenerator) {
 				repo := bookmark_mocks.NewBookmarkRepository(t)
-				keyGen := helpers_mocks.NewKeyGenerator(t)
+				keyGen := code_gen_mocks.NewKeyGenerator(t)
 				keyGen.On("GenerateRandomCode", 10).Return("ABC123XYZ9")
 				repo.On("CreateBookmark", ctx, "user-1", "https://example.com", "demo bookmark", "ABC123XYZ9").Return(&entity.Bookmark{
 					Base:        base.Base{Id: "b-1", CreatedAt: time.Now(), UpdatedAt: time.Now()},
@@ -50,9 +50,9 @@ func TestService_NewBookmark(t *testing.T) {
 		},
 		{
 			name: "repository error",
-			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *helpers_mocks.KeyGenerator) {
+			setupRepo: func(ctx context.Context) (*bookmark_mocks.BookmarkRepository, *code_gen_mocks.KeyGenerator) {
 				repo := bookmark_mocks.NewBookmarkRepository(t)
-				keyGen := helpers_mocks.NewKeyGenerator(t)
+				keyGen := code_gen_mocks.NewKeyGenerator(t)
 				keyGen.On("GenerateRandomCode", 10).Return("ABC123XYZ9")
 				repo.On("CreateBookmark", ctx, "user-1", "https://example.com", "demo bookmark", "ABC123XYZ9").Return(nil, assert.AnError)
 				return repo, keyGen

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/homework/lab/internal/models/entity"
-	"github.com/homework/lab/pkg/helpers"
+	"github.com/homework/lab/pkg/helpers/hasher"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +19,7 @@ func (u *user_test_case) Migrate() error {
 func (u *user_test_case) GenerateData() error {
 	db := u.db.Session(&gorm.Session{SkipHooks: true})
 	var DefaultPassword = "12345678"
-	hasher := helpers.NewHasher()
+	hasher := hasher.NewHasher()
 	var defaultPassHash, err = hasher.HashPassword(DefaultPassword)
 	if err != nil {
 		return err

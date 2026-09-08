@@ -12,7 +12,7 @@ import (
 	"github.com/homework/lab/internal/models/entity"
 	bookmark_mocks "github.com/homework/lab/internal/repository/bookmark/mocks"
 	"github.com/homework/lab/internal/repository/shorten/mocks"
-	mocksGenerateHelper "github.com/homework/lab/pkg/helpers/mocks"
+	code_generate_helper "github.com/homework/lab/pkg/helpers/code_gen/mocks"
 )
 
 var testErr = errors.New("test error")
@@ -24,7 +24,7 @@ func TestService_CreateShortenLink(t *testing.T) {
 	testCases := []struct {
 		name        string
 		setupRepo   func(ctx context.Context) *mocks.URLStorage
-		setupKeyGen func() *mocksGenerateHelper.KeyGenerator
+		setupKeyGen func() *code_generate_helper.KeyGenerator
 
 		expectedResult string
 		expectedErr    error
@@ -38,8 +38,8 @@ func TestService_CreateShortenLink(t *testing.T) {
 
 				return mock
 			},
-			setupKeyGen: func() *mocksGenerateHelper.KeyGenerator {
-				mockKeyGen := mocksGenerateHelper.NewKeyGenerator(t)
+			setupKeyGen: func() *code_generate_helper.KeyGenerator {
+				mockKeyGen := code_generate_helper.NewKeyGenerator(t)
 				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("123456")
 
 				return mockKeyGen
@@ -58,8 +58,8 @@ func TestService_CreateShortenLink(t *testing.T) {
 
 				return mock
 			},
-			setupKeyGen: func() *mocksGenerateHelper.KeyGenerator {
-				mockKeyGen := mocksGenerateHelper.NewKeyGenerator(t)
+			setupKeyGen: func() *code_generate_helper.KeyGenerator {
+				mockKeyGen := code_generate_helper.NewKeyGenerator(t)
 				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("123456").Once()
 				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("234567").Once()
 
@@ -77,8 +77,8 @@ func TestService_CreateShortenLink(t *testing.T) {
 
 				return mock
 			},
-			setupKeyGen: func() *mocksGenerateHelper.KeyGenerator {
-				mockKeyGen := mocksGenerateHelper.NewKeyGenerator(t)
+			setupKeyGen: func() *code_generate_helper.KeyGenerator {
+				mockKeyGen := code_generate_helper.NewKeyGenerator(t)
 				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("123456")
 
 				return mockKeyGen
@@ -95,8 +95,8 @@ func TestService_CreateShortenLink(t *testing.T) {
 
 				return mock
 			},
-			setupKeyGen: func() *mocksGenerateHelper.KeyGenerator {
-				mockKeyGen := mocksGenerateHelper.NewKeyGenerator(t)
+			setupKeyGen: func() *code_generate_helper.KeyGenerator {
+				mockKeyGen := code_generate_helper.NewKeyGenerator(t)
 				mockKeyGen.On("GenerateRandomCode", linkKeyLength).Return("123456")
 
 				return mockKeyGen

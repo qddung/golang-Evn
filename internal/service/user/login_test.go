@@ -8,14 +8,14 @@ import (
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	"github.com/homework/lab/internal/models/entity"
 	"github.com/homework/lab/internal/repository/user/mocks"
-	helper_mocks "github.com/homework/lab/pkg/helpers/mocks"
+	hasher_mocks "github.com/homework/lab/pkg/helpers/hasher/mocks"
 	jwt_pkg "github.com/homework/lab/pkg/jwt"
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupRepoForLogin(t *testing.T) (*mocks.UserRepository, jwt_pkg.JwtGenerator, *helper_mocks.HashHelper) {
+func SetupRepoForLogin(t *testing.T) (*mocks.UserRepository, jwt_pkg.JwtGenerator, *hasher_mocks.HashHelper) {
 	jwtMock := jwt_pkg.NewMockJwt()
-	hasher := helper_mocks.NewHashHelper(t)
+	hasher := hasher_mocks.NewHashHelper(t)
 	repo := mocks.NewUserRepository(t)
 	return repo, jwtMock.JwtGenarate, hasher
 }
@@ -26,12 +26,12 @@ func TestService_Login(t *testing.T) {
 	loginInput := &userModel.UserLogin{UserName: "testuser", Password: "123131242"}
 	testCases := []struct {
 		name         string
-		setupRepo    func(ctx context.Context, info *userModel.UserLogin) (*mocks.UserRepository, jwt_pkg.JwtGenerator, *helper_mocks.HashHelper)
+		setupRepo    func(ctx context.Context, info *userModel.UserLogin) (*mocks.UserRepository, jwt_pkg.JwtGenerator, *hasher_mocks.HashHelper)
 		expectedFunc func(t *testing.T, token string, err error)
 	}{
 		{
 			name: "Not found username",
-			setupRepo: func(ctx context.Context, info *userModel.UserLogin) (*mocks.UserRepository, jwt_pkg.JwtGenerator, *helper_mocks.HashHelper) {
+			setupRepo: func(ctx context.Context, info *userModel.UserLogin) (*mocks.UserRepository, jwt_pkg.JwtGenerator, *hasher_mocks.HashHelper) {
 				repo, jwtGen, hasher := SetupRepoForLogin(t)
 				repo.On("GetUserByUserName", ctx, info.UserName).Return(nil, nil)
 				return repo, jwtGen, hasher
@@ -43,7 +43,7 @@ func TestService_Login(t *testing.T) {
 		},
 		{
 			name: "Password not match",
-			setupRepo: func(ctx context.Context, info *userModel.UserLogin) (*mocks.UserRepository, jwt_pkg.JwtGenerator, *helper_mocks.HashHelper) {
+			setupRepo: func(ctx context.Context, info *userModel.UserLogin) (*mocks.UserRepository, jwt_pkg.JwtGenerator, *hasher_mocks.HashHelper) {
 				repo, jwtGen, hasher := SetupRepoForLogin(t)
 				repo.On("GetUserByUserName", ctx, info.UserName).Return(&entity.User{}, nil)
 				hasher.On("CheckPasswordHash", loginInput.Password, "").Return(false)
@@ -57,7 +57,7 @@ func TestService_Login(t *testing.T) {
 
 		{
 			name: "Get user error",
-			setupRepo: func(ctx context.Context, info *userModel.UserLogin) (*mocks.UserRepository, jwt_pkg.JwtGenerator, *helper_mocks.HashHelper) {
+			setupRepo: func(ctx context.Context, info *userModel.UserLogin) (*mocks.UserRepository, jwt_pkg.JwtGenerator, *hasher_mocks.HashHelper) {
 				repo, jwtGen, hasher := SetupRepoForLogin(t)
 				repo.On("GetUserByUserName", ctx, info.UserName).Return(nil, internalErr)
 				return repo, jwtGen, hasher
@@ -69,7 +69,7 @@ func TestService_Login(t *testing.T) {
 		},
 		{
 			name: "Success",
-			setupRepo: func(ctx context.Context, info *userModel.UserLogin) (*mocks.UserRepository, jwt_pkg.JwtGenerator, *helper_mocks.HashHelper) {
+			setupRepo: func(ctx context.Context, info *userModel.UserLogin) (*mocks.UserRepository, jwt_pkg.JwtGenerator, *hasher_mocks.HashHelper) {
 				repo, jwtGen, hasher := SetupRepoForLogin(t)
 				repo.On("GetUserByUserName", ctx, info.UserName).Return(&entity.User{}, nil)
 				hasher.On("CheckPasswordHash", loginInput.Password, "").Return(true)

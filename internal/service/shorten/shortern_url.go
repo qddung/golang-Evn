@@ -11,7 +11,7 @@ import (
 	"github.com/homework/lab/constant"
 	bookmark_repository "github.com/homework/lab/internal/repository/bookmark"
 	url_repository "github.com/homework/lab/internal/repository/shorten"
-	"github.com/homework/lab/pkg/helpers"
+	code_generate_helper "github.com/homework/lab/pkg/helpers/code_gen"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -25,13 +25,13 @@ type ShorternUrl interface {
 }
 
 type shorternUrl struct {
-	generatorRandom    helpers.KeyGenerator
+	generatorRandom    code_generate_helper.KeyGenerator
 	repository         url_repository.URLStorage
 	bookmarkRepository bookmark_repository.BookmarkRepository
 }
 
 // NewShorternUrl new shortern url
-func NewShorternUrl(repository url_repository.URLStorage, generator helpers.KeyGenerator, bookmarkRepository bookmark_repository.BookmarkRepository) ShorternUrl {
+func NewShorternUrl(repository url_repository.URLStorage, generator code_generate_helper.KeyGenerator, bookmarkRepository bookmark_repository.BookmarkRepository) ShorternUrl {
 	return &shorternUrl{generator, repository, bookmarkRepository}
 }
 
