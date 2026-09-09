@@ -25,6 +25,7 @@ import (
 	health_check_service "github.com/homework/lab/internal/service/health_check"
 	shorten_service "github.com/homework/lab/internal/service/shorten"
 	user_service "github.com/homework/lab/internal/service/user"
+	base62_helper "github.com/homework/lab/pkg/helpers/base62"
 	"github.com/homework/lab/pkg/helpers/code_gen"
 	"github.com/homework/lab/pkg/helpers/hasher"
 	jwt_pkg "github.com/homework/lab/pkg/jwt"
@@ -96,6 +97,8 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 
 	// create helper
 	hasher := hasher.NewHasher()
+	code_gen := code_gen.NewKeyGenerator()
+	base62_helper := base62_helper.New()
 	// create repository
 	healthCheckRepository := health_check_repository.NewPing(redisClient)
 	urlStorage := url_repository.NewURLStorage(redisClient)
@@ -103,9 +106,9 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	bookmarkRepo := bookmark_repository.NewBookmarkRepository(sqlDB)
 	// create service
 	healthCheckService := health_check_service.NewHealthCheck(serviceName, instanceID, healthCheckRepository)
-	shortenService := shorten_service.NewShorternUrl(urlStorage, code_gen.NewKeyGenerator(), bookmarkRepo)
+	shortenService := shorten_service.NewShorternUrl(urlStorage, base62_helper, bookmarkRepo)
 	userService := user_service.NewUserService(userRepository, hasher, e.jwtGenerator)
-	bookmarkSvc := bookmark_service.NewBookmarkService(bookmarkRepo, code_gen.NewKeyGenerator())
+	bookmarkSvc := bookmark_service.NewBookmarkService(bookmarkRepo, code_gen)
 
 	// create cache
 	bookmarkCache := bookmark_cache.NewBookmarkCacheInstance(bookmarkSvc, cacheRedis)

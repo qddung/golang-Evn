@@ -11,7 +11,7 @@ import (
 	"github.com/homework/lab/constant"
 	bookmark_repository "github.com/homework/lab/internal/repository/bookmark"
 	url_repository "github.com/homework/lab/internal/repository/shorten"
-	code_generate_helper "github.com/homework/lab/pkg/helpers/code_gen"
+	base62_helper "github.com/homework/lab/pkg/helpers/base62"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -25,19 +25,22 @@ type ShorternUrl interface {
 }
 
 type shorternUrl struct {
-	generatorRandom    code_generate_helper.KeyGenerator
 	repository         url_repository.URLStorage
 	bookmarkRepository bookmark_repository.BookmarkRepository
+	generateCode       base62_helper.Base62Helper
 }
 
+var prefix = "shorten_url_"
+
 // NewShorternUrl new shortern url
-func NewShorternUrl(repository url_repository.URLStorage, generator code_generate_helper.KeyGenerator, bookmarkRepository bookmark_repository.BookmarkRepository) ShorternUrl {
-	return &shorternUrl{generator, repository, bookmarkRepository}
+func NewShorternUrl(repository url_repository.URLStorage, generateCode base62_helper.Base62Helper,
+	bookmarkRepository bookmark_repository.BookmarkRepository) ShorternUrl {
+	return &shorternUrl{repository, bookmarkRepository, generateCode}
 }
 
 // ShortenUrl shortern url
 func (s *shorternUrl) ShortenUrlShortenUrl(ctx context.Context, url string, exp int64) (string, error) {
-	randomCode := s.generatorRandom.GenerateRandomCode(constant.ShortenCodeLength)
+	randomCode := s.generateCode.Encode(prefix + url)
 	res, err := s.repository.GetURL(ctx, randomCode)
 	// redis exeption
 	if err != nil && !errors.Is(err, redis.Nil) {
