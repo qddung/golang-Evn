@@ -10,7 +10,7 @@ import (
 	"github.com/homework/lab/internal/models/entity"
 	repo_mocks "github.com/homework/lab/internal/repository/user/mocks"
 	"github.com/homework/lab/internal/test/data/fixture"
-	helper_mocks "github.com/homework/lab/pkg/helpers/mocks"
+	hasher_mocks "github.com/homework/lab/pkg/helpers/hasher/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
@@ -20,13 +20,13 @@ func TestToUpdateUser(t *testing.T) {
 	testCases := []struct {
 		name        string
 		input       *userModel.UpdateUserInput
-		setupHasher func() *helper_mocks.HashHelper
+		setupHasher func() *hasher_mocks.HashHelper
 		expects     func(t *testing.T, out *domain_model.UpdateUser, err error)
 	}{
 		{
 			name:        "no password",
 			input:       &userModel.UpdateUserInput{UserName: "bob", Password: ""},
-			setupHasher: func() *helper_mocks.HashHelper { return nil },
+			setupHasher: func() *hasher_mocks.HashHelper { return nil },
 			expects: func(t *testing.T, out *domain_model.UpdateUser, err error) {
 				assert.NoError(t, err)
 				assert.Equal(t, "bob", out.UserName)
@@ -36,8 +36,8 @@ func TestToUpdateUser(t *testing.T) {
 		{
 			name:  "hash success",
 			input: &userModel.UpdateUserInput{UserName: "alice", Password: "secret"},
-			setupHasher: func() *helper_mocks.HashHelper {
-				h := helper_mocks.NewHashHelper(t)
+			setupHasher: func() *hasher_mocks.HashHelper {
+				h := hasher_mocks.NewHashHelper(t)
 				h.On("HashPassword", "secret").Return("hashed-secret", nil)
 				return h
 			},
@@ -50,8 +50,8 @@ func TestToUpdateUser(t *testing.T) {
 		{
 			name:  "hash fail",
 			input: &userModel.UpdateUserInput{UserName: "joe", Password: "bad"},
-			setupHasher: func() *helper_mocks.HashHelper {
-				h := helper_mocks.NewHashHelper(t)
+			setupHasher: func() *hasher_mocks.HashHelper {
+				h := hasher_mocks.NewHashHelper(t)
 				h.On("HashPassword", "bad").Return("", errors.New("hash fail"))
 				return h
 			},

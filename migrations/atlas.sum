@@ -1,4 +1,4 @@
-h1:8CsJfLccuBsWls4GxACaYUzMeRh4nEfD9e1O+cC9nVY=
+h1:TcRYL5ugHfrYEfbJuFIjzvLvvle1wPHQOy7D5dRBl9U=
 20260831151233_create_user.up.sql h1:3Us6TC3q0Ez+N9NZc6Nwcyn248QnYvq+HSSW32+7SN4=
 20260831151326_create_bookmark.up.sql h1:GT19lpSnazJkSM+9V+sl1UKQsWXRSXmfMOjj0PugM6c=
-20260907162214_add_unique_constraint_bookmark_code.up.sql h1:wSjfyIBQMxlHpEQuYFWfWaclQSTFDT4tjQ8ApAZutFw=
+20260910101343_change_bookmark_code_data_type.up.sql h1:ab8ldJZoh7X7SgKkKCblAm0wqps3i7VA4sC0iJ1/0Ds=

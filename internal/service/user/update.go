@@ -9,14 +9,14 @@ import (
 
 	domain_model "github.com/homework/lab/internal/models/domain"
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
-	"github.com/homework/lab/pkg/helpers"
+	"github.com/homework/lab/pkg/helpers/hasher"
 )
 
 var ErrorParse = errors.New("error parse")
 var UpdateUserFailed = errors.New("update user failed")
 var ErrorGetUser = errors.New("error get user")
 
-func ToUpdateUser(input *userModel.UpdateUserInput, hasher helpers.HashHelper) (*domain_model.UpdateUser, error) {
+func ToUpdateUser(input *userModel.UpdateUserInput, hasher hasher.HashHelper) (*domain_model.UpdateUser, error) {
 	pass := ""
 	if input.Password != "" {
 		hash, err := hasher.HashPassword(input.Password)

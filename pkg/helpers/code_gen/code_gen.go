@@ -1,4 +1,4 @@
-package helpers
+package code_gen
 
 import (
 	"bytes"

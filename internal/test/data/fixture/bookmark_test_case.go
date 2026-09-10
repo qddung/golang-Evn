@@ -34,7 +34,7 @@ func (u *bookmark_test_case) GenerateData() error {
 			Base:        GetBaseEntity("28d51812-2c60-4896-853b-cfccd06d5244"),
 			Url:         "https://github.com/bradfitz/gomemfs",
 			UserId:      "4e90220a-51f6-49e4-bc0e-44e2f321476a",
-			Code:        "1234567890",
+			Code:        "1234567891",
 			Description: "Test 1",
 		},
 
@@ -42,7 +42,7 @@ func (u *bookmark_test_case) GenerateData() error {
 			Base:        GetBaseEntity("28d51812-2c60-4896-853b-cfccd06d5246"),
 			Url:         "https://github.com/bradfitz/gomemfs",
 			UserId:      "4e90220a-51f6-49e4-bc0e-44e2f321477a",
-			Code:        "1234567890",
+			Code:        "1234567892",
 			Description: "Test 1",
 		},
 	}

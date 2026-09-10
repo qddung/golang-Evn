@@ -10,7 +10,7 @@ import (
 	"github.com/homework/lab/internal/models/dto/api/user"
 	"github.com/homework/lab/internal/models/entity"
 	"github.com/homework/lab/internal/repository/user/mocks"
-	helper_mocks "github.com/homework/lab/pkg/helpers/mocks"
+	hasher_mocks "github.com/homework/lab/pkg/helpers/hasher/mocks"
 	jwt_pkg "github.com/homework/lab/pkg/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -18,13 +18,13 @@ import (
 
 var testErr = errors.New("test error")
 
-func SetupRepo(t *testing.T) (*mocks.UserRepository, *helper_mocks.HashHelper) {
+func SetupRepo(t *testing.T) (*mocks.UserRepository, *hasher_mocks.HashHelper) {
 	repo := mocks.NewUserRepository(t)
-	hasher := helper_mocks.NewHashHelper(t)
+	hasher := hasher_mocks.NewHashHelper(t)
 	return repo, hasher
 }
 
-func setupCreateUser(repo *mocks.UserRepository, hasher *helper_mocks.HashHelper, info *user.UserRegister, ctx context.Context) *entity.User {
+func setupCreateUser(repo *mocks.UserRepository, hasher *hasher_mocks.HashHelper, info *user.UserRegister, ctx context.Context) *entity.User {
 	expectedHashPass := "hash"
 	hasher.On("HashPassword", info.Password).Return(expectedHashPass, nil)
 	repo.On("GetUserByUserName", ctx, info.UserName).Return(nil, nil)
@@ -41,12 +41,12 @@ func TestService_Register(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		setupRepo    func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper)
+		setupRepo    func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *hasher_mocks.HashHelper)
 		expectedFunc func(t *testing.T, info *user.UserInfo, registerInput *user.UserRegister, err error)
 	}{
 		{
 			name: "Failed to GetUserByUserName in userService.Register",
-			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper) {
+			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *hasher_mocks.HashHelper) {
 				repo, hasher := SetupRepo(t)
 				repo.On("GetUserByUserName", ctx, info.UserName).Return(nil, testErr)
 				return repo, hasher
@@ -58,7 +58,7 @@ func TestService_Register(t *testing.T) {
 		{
 			// Duplicate email
 			name: "Duplicate email",
-			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper) {
+			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *hasher_mocks.HashHelper) {
 				repo, hasher := SetupRepo(t)
 				repo.On("GetUserByUserName", ctx, info.UserName).Return(nil, nil)
 				repo.On("GetUserByEmail", ctx, info.Email).Return(&entity.User{}, nil)
@@ -71,7 +71,7 @@ func TestService_Register(t *testing.T) {
 		{
 			// Duplicate username
 			name: "Duplicate username",
-			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper) {
+			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *hasher_mocks.HashHelper) {
 				repo, hasher := SetupRepo(t)
 				repo.On("GetUserByUserName", ctx, info.UserName).Return(&entity.User{}, nil)
 				return repo, hasher
@@ -82,7 +82,7 @@ func TestService_Register(t *testing.T) {
 		},
 		{
 			name: "Create user error",
-			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper) {
+			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *hasher_mocks.HashHelper) {
 				repo, hasher := SetupRepo(t)
 				u := setupCreateUser(repo, hasher, info, ctx)
 				repo.On("CreateUser", ctx, u).Return(testErr)
@@ -94,7 +94,7 @@ func TestService_Register(t *testing.T) {
 		},
 		{
 			name: "Create user successfully",
-			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper) {
+			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *hasher_mocks.HashHelper) {
 				repo, hasher := SetupRepo(t)
 				user := setupCreateUser(repo, hasher, info, ctx)
 				repo.On("CreateUser", ctx, user).Run(func(args mock.Arguments) {
@@ -115,7 +115,7 @@ func TestService_Register(t *testing.T) {
 
 		{
 			name: "Failed to HashPassword in userService.Register",
-			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper) {
+			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *hasher_mocks.HashHelper) {
 				repo, hasher := SetupRepo(t)
 				// existence checks succeed
 				repo.On("GetUserByUserName", ctx, info.UserName).Return(nil, nil)
@@ -131,7 +131,7 @@ func TestService_Register(t *testing.T) {
 
 		{
 			name: "Failed to GetUserByEmail in userService.Register",
-			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *helper_mocks.HashHelper) {
+			setupRepo: func(ctx context.Context, info *user.UserRegister) (*mocks.UserRepository, *hasher_mocks.HashHelper) {
 				repo, hasher := SetupRepo(t)
 				// username check passes
 				repo.On("GetUserByUserName", ctx, info.UserName).Return(nil, nil)

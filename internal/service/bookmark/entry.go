@@ -6,7 +6,6 @@ import (
 	"github.com/homework/lab/internal/models/dto/api"
 	bookmark_model "github.com/homework/lab/internal/models/dto/api/bookmark"
 	bookmark_repository "github.com/homework/lab/internal/repository/bookmark"
-	"github.com/homework/lab/pkg/helpers"
 )
 
 //go:generate mockery --name BookmarkService --output mocks
@@ -20,10 +19,9 @@ type BookmarkService interface {
 // BookmarkService struct
 type bookmarkService struct {
 	bookmarkRepository bookmark_repository.BookmarkRepository
-	keyGenerator       helpers.KeyGenerator
 }
 
 // Initialize BookmarkService instance
-func NewBookmarkService(bookmarkRepository bookmark_repository.BookmarkRepository, keyGenerator helpers.KeyGenerator) BookmarkService {
-	return &bookmarkService{bookmarkRepository, keyGenerator}
+func NewBookmarkService(bookmarkRepository bookmark_repository.BookmarkRepository) BookmarkService {
+	return &bookmarkService{bookmarkRepository}
 }

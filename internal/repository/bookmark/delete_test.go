@@ -52,8 +52,7 @@ func TestDeleteBookmark(t *testing.T) {
 			t.Parallel()
 			ctx := context.Background()
 			db := SetUpDB(t)
-			repo := NewBookmarkRepository(db)
-
+			repo := NewBookmarkRepository(db, nil)
 			err := repo.DeleteBookmark(ctx, tc.userID, tc.bookmarkID)
 			tc.expectError(t, err)
 			if tc.assertFunc != nil {
