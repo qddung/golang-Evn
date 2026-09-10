@@ -39,7 +39,7 @@ func NewShorternUrl(repository url_repository.URLStorage, generateCode base62_he
 
 // ShortenUrl shortern url
 func (s *shorternUrl) ShortenUrlShortenUrl(ctx context.Context, url string, exp int64) (string, error) {
-	randomCode := s.generateCode.Encode(prefix + url)
+	randomCode := prefix + s.generateCode.Encode(url)
 	res, err := s.repository.GetURL(ctx, randomCode)
 	// redis exeption
 	if err != nil && !errors.Is(err, redis.Nil) {
