@@ -14,26 +14,29 @@ type testCache struct {
 	expectedError error
 }
 
-func assertConnectionClose(tc *testCache, ctx context.Context, t *testing.T, client *redis.Client, groupKey, field, value string) {
+func setupInputRunDelete(t *testing.T, tc *testCache, ctx context.Context, groupKey, field, value string) (cacheInstance *CacheInstance, client *redis.Client) {
+	t.Parallel()
+	cache, client := setupCache(t)
 	if !tc.closeClient {
 		assert.NoError(t, client.HSet(ctx, groupKey, field, value).Err())
 	} else {
 		assert.NoError(t, client.Close())
 	}
+	return cache, client
+}
+
+var testCases = []testCache{
+	{name: "success", closeClient: false, expectedError: nil},
+	{name: "connection error", closeClient: true, expectedError: redis.ErrClosed},
 }
 
 func TestCacheInstance_Delete(t *testing.T) {
-	testCases := []testCache{
-		{name: "success", closeClient: false, expectedError: nil},
-		{name: "connection error", closeClient: true, expectedError: redis.ErrClosed},
-	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			groupKey, field, value := "group", "field", "value"
-			cache, client := setupCache(t)
 			ctx := context.Background()
-			assertConnectionClose(&tc, ctx, t, client, groupKey, field, value)
+			groupKey, field, value := "group", "field", "value"
+			cache, client := setupInputRunDelete(t, &tc, ctx, groupKey, field, value)
 
 			err := cache.Delete(ctx, groupKey, field)
 			assert.ErrorIs(t, err, tc.expectedError)
@@ -45,17 +48,11 @@ func TestCacheInstance_Delete(t *testing.T) {
 }
 
 func TestCacheInstance_DeleteGroup(t *testing.T) {
-	testCases := []testCache{
-		{name: "success", closeClient: false, expectedError: nil},
-		{name: "connection error", closeClient: true, expectedError: redis.ErrClosed},
-	}
-
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			groupKey, field, value := "group", "field", "value"
-			cache, client := setupCache(t)
 			ctx := context.Background()
-			assertConnectionClose(&tc, ctx, t, client, groupKey, field, value)
+			groupKey, field, value := "group", "field", "value"
+			cache, client := setupInputRunDelete(t, &tc, ctx, groupKey, field, value)
 
 			err := cache.DeleteGroup(ctx, groupKey)
 			assert.ErrorIs(t, err, tc.expectedError)
