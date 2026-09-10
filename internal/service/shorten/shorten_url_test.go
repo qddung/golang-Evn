@@ -41,25 +41,25 @@ func TestService_CreateShortenLink(t *testing.T) {
 				return mockKeyGen
 			},
 
-			expectedResult: "123456",
+			expectedResult: prefix + "123456",
 			expectedErr:    nil,
 		},
+
 		{
-			name: "normal case - random the same key",
+			name: "err case - can't get key in repository",
 			setupRepo: func(ctx context.Context, url string) *mocks.URLStorage {
 				mock := mocks.NewURLStorage(t)
-				mock.On("GetURL", ctx, prefix+"234567").Return("", redis.Nil)
-				mock.On("StoreURL", ctx, prefix+"234567", url, testExpTime).Return(nil)
-
+				mock.On("GetURL", ctx, prefix+"123456").Return("", testErr)
 				return mock
 			},
 			setupKeyGen: func(url string) *base62_helper_mocks.Base62Helper {
 				mockKeyGen := base62_helper_mocks.NewBase62Helper(t)
-				mockKeyGen.On("Encode", url).Return("234567")
+				mockKeyGen.On("Encode", url).Return("123456")
 				return mockKeyGen
 			},
-			expectedResult: "234567",
-			expectedErr:    nil,
+
+			expectedResult: "",
+			expectedErr:    testErr,
 		},
 		{
 			name: "err case - can't put new key",
@@ -80,22 +80,6 @@ func TestService_CreateShortenLink(t *testing.T) {
 			expectedResult: "",
 			expectedErr:    testErr,
 		},
-		{
-			name: "err case - can't get key",
-			setupRepo: func(ctx context.Context, url string) *mocks.URLStorage {
-				mock := mocks.NewURLStorage(t)
-				mock.On("GetURL", ctx, prefix+"123456").Return("", testErr)
-				return mock
-			},
-			setupKeyGen: func(url string) *base62_helper_mocks.Base62Helper {
-				mockKeyGen := base62_helper_mocks.NewBase62Helper(t)
-				mockKeyGen.On("Encode", url).Return("123456")
-				return mockKeyGen
-			},
-
-			expectedResult: "",
-			expectedErr:    testErr,
-		},
 	}
 
 	for _, tc := range testCases {
@@ -110,9 +94,7 @@ func TestService_CreateShortenLink(t *testing.T) {
 			testService := NewShorternUrl(mockRepo, keygenMockHelper, nil)
 
 			result, err := testService.ShortenUrlShortenUrl(ctx, url, 60)
-			if tc.expectedResult != "" {
-				assert.Equal(t, result, prefix+tc.expectedResult)
-			}
+			assert.Equal(t, result, tc.expectedResult)
 			assert.ErrorIs(t, err, tc.expectedErr)
 		})
 	}

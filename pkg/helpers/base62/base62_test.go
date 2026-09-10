@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/ivanrad/base62"
-	_ "github.com/ivanrad/base62"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -17,20 +17,26 @@ func TestBookmarkCacheInstance_Update(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		setup         func(*mocks.Cache, *bookmark_service_mocks.BookmarkService)
+		setup         func() (*mocks.Cache, *bookmark_service_mocks.BookmarkService)
 		expectedError error
 	}{
 		{
 			name: "success",
-			setup: func(cacheMock *mocks.Cache, serviceMock *bookmark_service_mocks.BookmarkService) {
+			setup: func() (*mocks.Cache, *bookmark_service_mocks.BookmarkService) {
+				cacheMock := mocks.NewCache(t)
+				serviceMock := bookmark_service_mocks.NewBookmarkService(t)
 				cacheMock.On("DeleteGroup", ctx, GetGroupKey("user-1")).Return(nil)
 				serviceMock.On("UpdateBookmark", ctx, request, "user-1", "bookmark-1").Return(nil)
+				return cacheMock, serviceMock
 			},
 		},
 		{
 			name: "connection error",
-			setup: func(cacheMock *mocks.Cache, serviceMock *bookmark_service_mocks.BookmarkService) {
+			setup: func() (*mocks.Cache, *bookmark_service_mocks.BookmarkService) {
+				cacheMock := mocks.NewCache(t)
+				serviceMock := bookmark_service_mocks.NewBookmarkService(t)
 				cacheMock.On("DeleteGroup", ctx, GetGroupKey("user-1")).Return(redis.ErrClosed)
+				return cacheMock, serviceMock
 			},
 			expectedError: redis.ErrClosed,
 		},
@@ -38,9 +44,7 @@ func TestBookmarkCacheInstance_Update(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			cacheMock := mocks.NewCache(t)
-			serviceMock := bookmark_service_mocks.NewBookmarkService(t)
-			tc.setup(cacheMock, serviceMock)
+			cacheMock, serviceMock := tc.setup()
 			instance := &BookmarkCacheInstance{service: serviceMock, cache: cacheMock}
 
 			err := instance.UpdateBookmark(ctx, request, "user-1", "bookmark-1")

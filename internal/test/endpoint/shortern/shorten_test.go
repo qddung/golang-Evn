@@ -135,15 +135,7 @@ func TestShorten_Integration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, nil)
-			if errConnector != nil {
-				testItem.Fatal(errConnector)
-			}
-			apiEngine := api.NewEngine(&api.EnginOpt{
-				App:       gin.New(),
-				Cfg:       tc.configTest,
-				Connector: connectorMock,
-			})
+			apiEngine := SetApiEngine(testItem, tc.configTest)
 			rec := tc.setupTestHTTP(apiEngine)
 			// Check the status code of the response
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
@@ -216,24 +208,29 @@ func TestRedirect_Integration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, nil)
-			if errConnector != nil {
-				testItem.Fatal(errConnector)
-			}
-			apiEngine := api.NewEngine(&api.EnginOpt{
-				App:       gin.New(),
-				Cfg:       tc.configTest,
-				Connector: connectorMock,
-			})
+			apiEngine := SetApiEngine(testItem, tc.configTest)
 			rec := tc.setupTestHTTP(apiEngine)
 			// Check status code
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
 			// Check response content or location header
 			if tc.expectedStatusCode == http.StatusFound {
-				// assert.Equal(testItem, tc.getExpectedResponseContain(), rec.Header().Get("Location"), "Expected redirect location header does not match")
+				assert.Equal(testItem, tc.getExpectedResponseContain(), rec.Header().Get("Location"), "Expected redirect location header does not match")
 			} else {
-				// assert.Contains(testItem, rec.Body.String(), tc.getExpectedResponseContain(), "Expected response body does not match actual response body")
+				assert.Contains(testItem, rec.Body.String(), tc.getExpectedResponseContain(), "Expected response body does not match actual response body")
 			}
 		})
 	}
+}
+
+func SetApiEngine(t *testing.T, config *config.Config) api.Engine {
+	connectorMock, errConnector := connection.InitDBConnectorMock(t, nil)
+	if errConnector != nil {
+		t.Fatal(errConnector)
+	}
+	apiEngine := api.NewEngine(&api.EnginOpt{
+		App:       gin.New(),
+		Cfg:       config,
+		Connector: connectorMock,
+	})
+	return apiEngine
 }
