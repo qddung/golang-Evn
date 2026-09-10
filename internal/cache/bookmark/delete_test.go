@@ -15,35 +15,32 @@ func TestBookmarkCacheInstance_DeleteBookmark(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		setup         func() (*mocks.Cache, *bookmark_service_mocks.BookmarkService)
+		setup         func(cacheMock *mocks.Cache, serviceMock *bookmark_service_mocks.BookmarkService, userId, bookmarkId string)
 		expectedError error
 	}{
 		{
 			name: "success",
-			setup: func() (*mocks.Cache, *bookmark_service_mocks.BookmarkService) {
-				cacheMock := mocks.NewCache(t)
-				serviceMock := bookmark_service_mocks.NewBookmarkService(t)
-				cacheMock.On("DeleteGroup", ctx, GetGroupKey("user-1")).Return(nil)
-				serviceMock.On("DeleteBookmark", ctx, "user-1", "bookmark-1").Return(nil)
-				return cacheMock, serviceMock
+			setup: func(cacheMock *mocks.Cache, serviceMock *bookmark_service_mocks.BookmarkService, userId, bookmarkId string) {
+				cacheMock.On("DeleteGroup", ctx, GetGroupKey(userId)).Return(nil)
+				serviceMock.On("DeleteBookmark", ctx, userId, bookmarkId).Return(nil)
 			},
 		},
 		{
 			name: "connection error",
-			setup: func() (*mocks.Cache, *bookmark_service_mocks.BookmarkService) {
-				cacheMock := mocks.NewCache(t)
-				serviceMock := bookmark_service_mocks.NewBookmarkService(t)
-				cacheMock.On("DeleteGroup", ctx, GetGroupKey("user-1")).Return(redis.ErrClosed)
-				return cacheMock, serviceMock
+			setup: func(cacheMock *mocks.Cache, serviceMock *bookmark_service_mocks.BookmarkService, userId, bookmarkId string) {
+				cacheMock.On("DeleteGroup", ctx, GetGroupKey(userId)).Return(redis.ErrClosed)
 			},
 			expectedError: redis.ErrClosed,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			cacheMock, serviceMock := tc.setup()
+			userId, bookmarkId := "user-1", "bookmark-1"
+			cacheMock := mocks.NewCache(t)
+			serviceMock := bookmark_service_mocks.NewBookmarkService(t)
+			tc.setup(cacheMock, serviceMock, userId, bookmarkId)
 			instance := NewBookmarkCacheInstance(serviceMock, cacheMock)
-			err := instance.DeleteBookmark(ctx, "user-1", "bookmark-1")
+			err := instance.DeleteBookmark(ctx, userId, bookmarkId)
 			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}

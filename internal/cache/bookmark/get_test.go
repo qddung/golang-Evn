@@ -43,11 +43,9 @@ func TestBookmarkCacheInstance_Get(t *testing.T) {
 		{
 			name: "connection error",
 			setup: func() (*mocks.Cache, *bookmark_service_mocks.BookmarkService) {
-				var key = GetGroupKey("user-1")
-
 				cacheMock := mocks.NewCache(t)
-				cacheMock.On("Read", ctx, key, "1_10").Return("", redis.ErrClosed)
-				cacheMock.On("Write", ctx, key, "1_10", mock.AnythingOfType("[]uint8"), ttl).Return(redis.ErrClosed)
+				cacheMock.On("Read", ctx, GetGroupKey("user-1"), "1_10").Return("", redis.ErrClosed)
+				cacheMock.On("Write", ctx, GetGroupKey("user-1"), "1_10", mock.AnythingOfType("[]uint8"), ttl).Return(redis.ErrClosed)
 
 				serviceMock := bookmark_service_mocks.NewBookmarkService(t)
 				serviceMock.On("GetBookmarks", ctx, "user-1", query).Return(expected, nil)
