@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/homework/lab/constant"
 	bookmark_repository "github.com/homework/lab/internal/repository/bookmark"
 	url_repository "github.com/homework/lab/internal/repository/shorten"
 	base62_helper "github.com/homework/lab/pkg/helpers/base62"
@@ -61,31 +60,4 @@ func (s *shorternUrl) ShortenUrlShortenUrl(ctx context.Context, url string, exp 
 	}
 
 	return randomCode, nil
-}
-
-var ErrCodeDoesntExist = errors.New("code does not exist")
-
-// GetLinkFromCode return the original from shorten code
-func (s *shorternUrl) GetLinkFromCode(ctx context.Context, code string) (string, error) {
-	if len(code) == constant.BookmarkCodeLength {
-		return getLinkFromBookmarkCode(s, ctx, code)
-	}
-	return getLinkFromShortenCode(s, ctx, code)
-}
-
-func getLinkFromShortenCode(s *shorternUrl, ctx context.Context, code string) (string, error) {
-	link, err := s.repository.GetURL(ctx, code)
-	if errors.Is(err, redis.Nil) {
-		return "", ErrCodeDoesntExist
-	}
-
-	return link, err
-}
-
-func getLinkFromBookmarkCode(s *shorternUrl, ctx context.Context, code string) (string, error) {
-	bookmark, err := s.bookmarkRepository.FindBookmarkByCode(ctx, code)
-	if errors.Is(err, redis.Nil) {
-		return "", ErrCodeDoesntExist
-	}
-	return bookmark.Url, err
 }

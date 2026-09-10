@@ -2,10 +2,12 @@ package bookmark_repository
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/homework/lab/internal/models/entity"
 	"github.com/homework/lab/internal/test/data/fixture"
+	base62_helper "github.com/homework/lab/pkg/helpers/base62"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -14,14 +16,14 @@ type inputCreateBookmark struct {
 	userId      string
 	url         string
 	description string
-	code        string
 }
+
+var prefix = "bookmark_url_"
 
 func (input *inputCreateBookmark) AssertCompareBookmark(t *testing.T, bookmark *entity.Bookmark, expected bool) {
 	result := input.userId == bookmark.UserId &&
 		input.url == bookmark.Url &&
-		input.description == bookmark.Description &&
-		input.code == bookmark.Code
+		input.description == bookmark.Description && strings.Contains(bookmark.Code, prefix)
 	assert.Equal(t, expected, result)
 }
 
@@ -41,7 +43,6 @@ func TestCreateBookmark(t *testing.T) {
 				userId:      "test",
 				url:         "test",
 				description: "test",
-				code:        "test",
 			},
 			expectError: func(t *testing.T, err error) {
 				assert.NoError(t, err)
@@ -53,8 +54,9 @@ func TestCreateBookmark(t *testing.T) {
 			t.Parallel()
 			ctx := context.Background()
 			db := SetUpDB(t)
-			repo := NewBookmarkRepository(db)
-			bookmark, err := repo.CreateBookmark(ctx, tc.input.userId, tc.input.url, tc.input.description, tc.input.code)
+			code_gen := base62_helper.New()
+			repo := NewBookmarkRepository(db, code_gen)
+			bookmark, err := repo.CreateBookmark(ctx, tc.input.userId, tc.input.url, tc.input.description, prefix)
 			tc.expectError(t, err)
 			if bookmark != nil {
 				tc.input.AssertCompareBookmark(t, bookmark, true)

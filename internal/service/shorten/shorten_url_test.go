@@ -9,8 +9,6 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/homework/lab/internal/models/entity"
-	bookmark_mocks "github.com/homework/lab/internal/repository/bookmark/mocks"
 	"github.com/homework/lab/internal/repository/shorten/mocks"
 	base62_helper_mocks "github.com/homework/lab/pkg/helpers/base62/mocks"
 )
@@ -112,107 +110,6 @@ func TestService_CreateShortenLink(t *testing.T) {
 			testService := NewShorternUrl(mockRepo, keygenMockHelper, nil)
 
 			result, err := testService.ShortenUrlShortenUrl(ctx, url, 60)
-			assert.Equal(t, result, tc.expectedResult)
-			assert.ErrorIs(t, err, tc.expectedErr)
-		})
-	}
-
-}
-
-func TestService_GetLinkFromCode_CallShortenCode(t *testing.T) {
-	testCases := []struct {
-		name           string
-		setupRepo      func(ctx context.Context) *mocks.URLStorage
-		expectedResult string
-		expectedErr    error
-	}{
-		{
-			name: "normal case",
-
-			setupRepo: func(ctx context.Context) *mocks.URLStorage {
-				mock := mocks.NewURLStorage(t)
-				mock.On("GetURL", ctx, "123456").Return("https://google.com", nil)
-
-				return mock
-			},
-			expectedResult: "https://google.com",
-			expectedErr:    nil,
-		},
-		{
-			name: "err case - can't get key",
-
-			setupRepo: func(ctx context.Context) *mocks.URLStorage {
-				mock := mocks.NewURLStorage(t)
-				mock.On("GetURL", ctx, "123456").Return("", testErr)
-				return mock
-			},
-			expectedResult: "",
-			expectedErr:    testErr,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-			ctx := context.Background()
-
-			mockRepo := tc.setupRepo(ctx)
-
-			testService := NewShorternUrl(mockRepo, nil, nil)
-
-			result, err := testService.GetLinkFromCode(ctx, "123456")
-			assert.Equal(t, result, tc.expectedResult)
-			assert.ErrorIs(t, err, tc.expectedErr)
-		})
-	}
-
-}
-
-func TestService_GetLinkFromCode_CallBookmarkCode(t *testing.T) {
-	testCases := []struct {
-		name           string
-		code           string
-		setupRepo      func(ctx context.Context) *bookmark_mocks.BookmarkRepository
-		expectedResult string
-		expectedErr    error
-	}{
-		{
-			name: "normal case",
-			code: "1234567890",
-			setupRepo: func(ctx context.Context) *bookmark_mocks.BookmarkRepository {
-				mock := bookmark_mocks.NewBookmarkRepository(t)
-				bookmark_return := &entity.Bookmark{
-					Code: "1234567890",
-					Url:  "https://google.com",
-				}
-				mock.On("FindBookmarkByCode", ctx, "1234567890").Return(bookmark_return, nil)
-				return mock
-			},
-			expectedResult: "https://google.com",
-			expectedErr:    nil,
-		},
-		{
-			name: "err case - can't get key",
-			code: "1234567890",
-			setupRepo: func(ctx context.Context) *bookmark_mocks.BookmarkRepository {
-				mock := bookmark_mocks.NewBookmarkRepository(t)
-				mock.On("FindBookmarkByCode", ctx, "1234567890").Return(nil, redis.Nil)
-				return mock
-			},
-			expectedResult: "",
-			expectedErr:    ErrCodeDoesntExist,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-			ctx := context.Background()
-
-			bookmarkMockRepo := tc.setupRepo(ctx)
-			testService := NewShorternUrl(nil, nil, bookmarkMockRepo)
-
-			result, err := testService.GetLinkFromCode(ctx, tc.code)
 			assert.Equal(t, result, tc.expectedResult)
 			assert.ErrorIs(t, err, tc.expectedErr)
 		})

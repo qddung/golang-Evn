@@ -14,9 +14,9 @@ type BookmarkRepository struct {
 	mock.Mock
 }
 
-// CreateBookmark provides a mock function with given fields: ctx, userId, url, description, code
-func (_m *BookmarkRepository) CreateBookmark(ctx context.Context, userId string, url string, description string, code string) (*entity.Bookmark, error) {
-	ret := _m.Called(ctx, userId, url, description, code)
+// CreateBookmark provides a mock function with given fields: ctx, userId, url, description, prefix
+func (_m *BookmarkRepository) CreateBookmark(ctx context.Context, userId string, url string, description string, prefix string) (*entity.Bookmark, error) {
+	ret := _m.Called(ctx, userId, url, description, prefix)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateBookmark")
@@ -25,10 +25,10 @@ func (_m *BookmarkRepository) CreateBookmark(ctx context.Context, userId string,
 	var r0 *entity.Bookmark
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string) (*entity.Bookmark, error)); ok {
-		return rf(ctx, userId, url, description, code)
+		return rf(ctx, userId, url, description, prefix)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string) *entity.Bookmark); ok {
-		r0 = rf(ctx, userId, url, description, code)
+		r0 = rf(ctx, userId, url, description, prefix)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*entity.Bookmark)
@@ -36,7 +36,7 @@ func (_m *BookmarkRepository) CreateBookmark(ctx context.Context, userId string,
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, string) error); ok {
-		r1 = rf(ctx, userId, url, description, code)
+		r1 = rf(ctx, userId, url, description, prefix)
 	} else {
 		r1 = ret.Error(1)
 	}
