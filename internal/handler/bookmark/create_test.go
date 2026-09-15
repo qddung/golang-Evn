@@ -9,8 +9,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v5"
+	bookmark_cache_mocks "github.com/homework/lab/internal/cache/bookmark/mocks"
 	bookmark_model "github.com/homework/lab/internal/models/dto/api/bookmark"
-	bookmark_service_mocks "github.com/homework/lab/internal/service/bookmark/mocks"
 	"github.com/homework/lab/pkg/response"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -38,7 +38,7 @@ import (
 func TestBookmarkHandler_CreateBookmark(t *testing.T) {
 	testCases := []struct {
 		name         string
-		setupMock    func(ctx *gin.Context, input *bookmark_model.NewBookmarkRequest) *bookmark_service_mocks.BookmarkService
+		setupMock    func(ctx *gin.Context, input *bookmark_model.NewBookmarkRequest) *bookmark_cache_mocks.BookmarkCache
 		body         string
 		withClaims   bool
 		expectedCode int
@@ -46,8 +46,8 @@ func TestBookmarkHandler_CreateBookmark(t *testing.T) {
 	}{
 		{
 			name: "success",
-			setupMock: func(ctx *gin.Context, input *bookmark_model.NewBookmarkRequest) *bookmark_service_mocks.BookmarkService {
-				mockSvc := bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context, input *bookmark_model.NewBookmarkRequest) *bookmark_cache_mocks.BookmarkCache {
+				mockSvc := bookmark_cache_mocks.NewBookmarkCache(t)
 				mockSvc.On("NewBookmark", ctx, "user-1", mock.MatchedBy(func(req *bookmark_model.NewBookmarkRequest) bool {
 					return req != nil && req.Url == "https://example.com" && req.Description == "demo"
 				})).Return(&bookmark_model.BookmarkInfo{
@@ -65,8 +65,8 @@ func TestBookmarkHandler_CreateBookmark(t *testing.T) {
 		},
 		{
 			name: "missing claims",
-			setupMock: func(ctx *gin.Context, input *bookmark_model.NewBookmarkRequest) *bookmark_service_mocks.BookmarkService {
-				return bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context, input *bookmark_model.NewBookmarkRequest) *bookmark_cache_mocks.BookmarkCache {
+				return bookmark_cache_mocks.NewBookmarkCache(t)
 			},
 			body:         `{"url":"https://example.com","description":"demo"}`,
 			withClaims:   false,
@@ -75,8 +75,8 @@ func TestBookmarkHandler_CreateBookmark(t *testing.T) {
 		},
 		{
 			name: "invalid request",
-			setupMock: func(ctx *gin.Context, input *bookmark_model.NewBookmarkRequest) *bookmark_service_mocks.BookmarkService {
-				return bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context, input *bookmark_model.NewBookmarkRequest) *bookmark_cache_mocks.BookmarkCache {
+				return bookmark_cache_mocks.NewBookmarkCache(t)
 			},
 			body:         `{"url":"not a url"}`,
 			withClaims:   true,
@@ -85,8 +85,8 @@ func TestBookmarkHandler_CreateBookmark(t *testing.T) {
 		},
 		{
 			name: "service error",
-			setupMock: func(ctx *gin.Context, input *bookmark_model.NewBookmarkRequest) *bookmark_service_mocks.BookmarkService {
-				mockSvc := bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context, input *bookmark_model.NewBookmarkRequest) *bookmark_cache_mocks.BookmarkCache {
+				mockSvc := bookmark_cache_mocks.NewBookmarkCache(t)
 				mockSvc.On("NewBookmark", ctx, "user-1", mock.MatchedBy(func(req *bookmark_model.NewBookmarkRequest) bool {
 					return req != nil && req.Url == "https://example.com" && req.Description == "demo"
 				})).Return((*bookmark_model.BookmarkInfo)(nil), response.InternalError)

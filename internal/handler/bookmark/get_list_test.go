@@ -7,9 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v5"
-	bookmark_model "github.com/homework/lab/internal/models/dto/api/bookmark"
+	bookmark_cache_mocks "github.com/homework/lab/internal/cache/bookmark/mocks"
 	api "github.com/homework/lab/internal/models/dto/api"
-	bookmark_service_mocks "github.com/homework/lab/internal/service/bookmark/mocks"
+	bookmark_model "github.com/homework/lab/internal/models/dto/api/bookmark"
 	"github.com/homework/lab/pkg/response"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -18,7 +18,7 @@ import (
 func TestBookmarkHandler_GetBookmarks(t *testing.T) {
 	testCases := []struct {
 		name         string
-		setupMock    func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService
+		setupMock    func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache
 		query        string
 		withClaims   bool
 		expectedCode int
@@ -26,12 +26,12 @@ func TestBookmarkHandler_GetBookmarks(t *testing.T) {
 	}{
 		{
 			name: "success",
-			setupMock: func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService {
-				mockSvc := bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache {
+				mockSvc := bookmark_cache_mocks.NewBookmarkCache(t)
 				mockSvc.On("GetBookmarks", ctx, "user-1", mock.MatchedBy(func(query *bookmark_model.GetBookmarksQuery) bool {
 					return query != nil && query.Page == 1 && query.Limit == 10 && query.Sort == "created_at desc"
 				})).Return(&api.PaginatedResponse[bookmark_model.BookmarkInfo]{
-					Data: []bookmark_model.BookmarkInfo{{Id: "b-1", Url: "https://example.com", Description: "demo", Code: "ABC123"}},
+					Data:       []bookmark_model.BookmarkInfo{{Id: "b-1", Url: "https://example.com", Description: "demo", Code: "ABC123"}},
 					Pagination: api.Pagination{Page: 1, Limit: 10, Total: 1},
 				}, nil)
 				return mockSvc
@@ -43,8 +43,8 @@ func TestBookmarkHandler_GetBookmarks(t *testing.T) {
 		},
 		{
 			name: "missing claims",
-			setupMock: func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService {
-				return bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache {
+				return bookmark_cache_mocks.NewBookmarkCache(t)
 			},
 			query:        "?page=1&limit=10",
 			withClaims:   false,
@@ -53,8 +53,8 @@ func TestBookmarkHandler_GetBookmarks(t *testing.T) {
 		},
 		{
 			name: "service error",
-			setupMock: func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService {
-				mockSvc := bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache {
+				mockSvc := bookmark_cache_mocks.NewBookmarkCache(t)
 				mockSvc.On("GetBookmarks", ctx, "user-1", mock.MatchedBy(func(query *bookmark_model.GetBookmarksQuery) bool {
 					return query != nil && query.Page == 1 && query.Limit == 10 && query.Sort == "created_at desc"
 				})).Return((*api.PaginatedResponse[bookmark_model.BookmarkInfo])(nil), response.InternalError)

@@ -55,7 +55,7 @@ func TestGetBookmarksByUserId(t *testing.T) {
 			t.Parallel()
 			ctx := context.Background()
 			db := SetUpDB(t)
-			repo := NewBookmarkRepository(db)
+			repo := NewBookmarkRepository(db, nil)
 
 			bookmarks, total, err := repo.GetBookmarksByUserId(ctx, tc.userID, tc.limit, tc.offset, tc.sort)
 			tc.expectError(t, err)
@@ -68,4 +68,3 @@ func TestGetBookmarksByUserId(t *testing.T) {
 		})
 	}
 }
-

@@ -7,7 +7,7 @@ import (
 
 	userModel "github.com/homework/lab/internal/models/dto/api/user"
 	"github.com/homework/lab/internal/repository/user"
-	"github.com/homework/lab/pkg/helpers"
+	"github.com/homework/lab/pkg/helpers/hasher"
 	jwt_pkg "github.com/homework/lab/pkg/jwt"
 )
 
@@ -23,11 +23,11 @@ type UserService interface {
 
 type userService struct {
 	userRepository user.UserRepository
-	hasher         helpers.HashHelper
+	hasher         hasher.HashHelper
 	jwt            jwt_pkg.JwtGenerator
 }
 
-func NewUserService(userRepository user.UserRepository, hasher helpers.HashHelper, jwt jwt_pkg.JwtGenerator) UserService {
+func NewUserService(userRepository user.UserRepository, hasher hasher.HashHelper, jwt jwt_pkg.JwtGenerator) UserService {
 	return &userService{userRepository: userRepository, hasher: hasher, jwt: jwt}
 }
 

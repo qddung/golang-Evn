@@ -2,7 +2,7 @@ package bookmark_handler
 
 import (
 	"github.com/gin-gonic/gin"
-	bookmark_service "github.com/homework/lab/internal/service/bookmark"
+	bookmark_cache "github.com/homework/lab/internal/cache/bookmark"
 )
 
 type BookmarkHandler interface {
@@ -13,9 +13,9 @@ type BookmarkHandler interface {
 }
 
 type bookmarkHandler struct {
-	svc bookmark_service.BookmarkService
+	svc bookmark_cache.BookmarkCache
 }
 
-func NewBookmarkHandler(svc bookmark_service.BookmarkService) BookmarkHandler {
+func NewBookmarkHandler(svc bookmark_cache.BookmarkCache) BookmarkHandler {
 	return &bookmarkHandler{svc}
 }

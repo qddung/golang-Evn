@@ -49,11 +49,13 @@ const docTemplate = `{
                 "summary": "Get bookmarks",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "name": "limit",
                         "in": "query"
                     },
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "name": "page",
                         "in": "query"
@@ -86,7 +88,7 @@ const docTemplate = `{
                 },
                 "security": [
                     {
-                        "JWT": []
+                        "BearerAuth": []
                     }
                 ]
             },
@@ -134,7 +136,7 @@ const docTemplate = `{
                 },
                 "security": [
                     {
-                        "JWT": []
+                        "BearerAuth": []
                     }
                 ]
             }
@@ -191,7 +193,7 @@ const docTemplate = `{
                 },
                 "security": [
                     {
-                        "JWT": []
+                        "BearerAuth": []
                     }
                 ]
             },
@@ -237,7 +239,7 @@ const docTemplate = `{
                 },
                 "security": [
                     {
-                        "JWT": []
+                        "BearerAuth": []
                     }
                 ]
             }
@@ -338,7 +340,7 @@ const docTemplate = `{
                 },
                 "security": [
                     {
-                        "JWT": []
+                        "BearerAuth": []
                     }
                 ]
             },
@@ -387,7 +389,7 @@ const docTemplate = `{
                 },
                 "security": [
                     {
-                        "JWT": []
+                        "BearerAuth": []
                     }
                 ]
             }
@@ -559,7 +561,7 @@ const docTemplate = `{
                 "code": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
                 "description": {
@@ -568,7 +570,7 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 },
                 "url": {
@@ -737,9 +739,9 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
-        "JWT": {
+        "BearerAuth": {
             "type": "apiKey",
-            "name": "JWT",
+            "name": "Authorization",
             "in": "header"
         }
     }

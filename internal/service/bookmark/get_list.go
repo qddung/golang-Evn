@@ -6,6 +6,7 @@ import (
 	domain_model "github.com/homework/lab/internal/models/domain"
 	"github.com/homework/lab/internal/models/dto/api"
 	bookmark_model "github.com/homework/lab/internal/models/dto/api/bookmark"
+	"github.com/rs/zerolog/log"
 )
 
 var SuccessGetBookmarks = "success get bookmarks"
@@ -25,6 +26,7 @@ func (s *bookmarkService) GetBookmarks(ctx context.Context, userId string, query
 
 	bookmarks, total, err := s.bookmarkRepository.GetBookmarksByUserId(ctx, userId, limit, offset, sort)
 	if err != nil {
+		log.Error().Err(err).Msg("Failed to GetBookmarksByUserId in bookmarkService.GetBookmarks")
 		return nil, err
 	}
 

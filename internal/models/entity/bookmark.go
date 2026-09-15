@@ -8,10 +8,11 @@ import (
 // Fields follow the project's JSON and GORM tag conventions.
 type Bookmark struct {
 	base.Base
-	Code        string `json:"code" gorm:"not null;type:text"`
+	Code        string `json:"code" gorm:"type:text;"`
 	Description string `json:"description" gorm:"type:text"`
 	Url         string `json:"url" gorm:"not null;type:text;index:idx_id,unique"`
 	UserId      string `json:"user_id" gorm:"not null;type:uuid;index:idx_id,unique"`
+	CodeInt     int    `json:"-" gorm:"not null;autoincrement;index:idx_code,unique"`
 	// Navigation Attribute
 	User User `gorm:foreignKey:UserId`
 }

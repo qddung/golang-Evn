@@ -135,15 +135,7 @@ func TestShorten_Integration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, nil)
-			if errConnector != nil {
-				testItem.Fatal(errConnector)
-			}
-			apiEngine := api.NewEngine(&api.EnginOpt{
-				App:       gin.New(),
-				Cfg:       tc.configTest,
-				Connector: connectorMock,
-			})
+			apiEngine := SetApiEngine(testItem, tc.configTest)
 			rec := tc.setupTestHTTP(apiEngine)
 			// Check the status code of the response
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
@@ -176,6 +168,8 @@ func TestRedirect_Integration(t *testing.T) {
 					Code string `json:"code"`
 				}
 				_ = json.Unmarshal(respPost.Body.Bytes(), &shortenResp)
+
+				fmt.Println("code for redirect is empty", shortenResp.Code)
 				// Bước 2: Gọi GET /v1/links/redirect/{code}
 				reqGet := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/v1/links/redirect/%s", shortenResp.Code), nil)
 				respGet := httptest.NewRecorder()
@@ -214,15 +208,7 @@ func TestRedirect_Integration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(testItem *testing.T) {
 			testItem.Parallel()
-			connectorMock, errConnector := connection.InitDBConnectorMock(testItem, nil)
-			if errConnector != nil {
-				testItem.Fatal(errConnector)
-			}
-			apiEngine := api.NewEngine(&api.EnginOpt{
-				App:       gin.New(),
-				Cfg:       tc.configTest,
-				Connector: connectorMock,
-			})
+			apiEngine := SetApiEngine(testItem, tc.configTest)
 			rec := tc.setupTestHTTP(apiEngine)
 			// Check status code
 			assert.Equal(testItem, tc.expectedStatusCode, rec.Code, "Expected status code does not match actual status code")
@@ -234,4 +220,17 @@ func TestRedirect_Integration(t *testing.T) {
 			}
 		})
 	}
+}
+
+func SetApiEngine(t *testing.T, config *config.Config) api.Engine {
+	connectorMock, errConnector := connection.InitDBConnectorMock(t, nil)
+	if errConnector != nil {
+		t.Fatal(errConnector)
+	}
+	apiEngine := api.NewEngine(&api.EnginOpt{
+		App:       gin.New(),
+		Cfg:       config,
+		Connector: connectorMock,
+	})
+	return apiEngine
 }

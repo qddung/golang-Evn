@@ -9,6 +9,7 @@ import (
 	"github.com/homework/lab/docs"
 	_ "github.com/homework/lab/docs"
 	"github.com/homework/lab/internal/api/middleware"
+	bookmark_cache "github.com/homework/lab/internal/cache/bookmark"
 	"github.com/homework/lab/internal/config"
 	"github.com/homework/lab/internal/connection"
 	bookmark_handler "github.com/homework/lab/internal/handler/bookmark"
@@ -16,6 +17,7 @@ import (
 	"github.com/homework/lab/internal/handler/shorten"
 	user_handler "github.com/homework/lab/internal/handler/user"
 	bookmark_repository "github.com/homework/lab/internal/repository/bookmark"
+	"github.com/homework/lab/internal/repository/cache"
 	health_check_repository "github.com/homework/lab/internal/repository/health_check"
 	url_repository "github.com/homework/lab/internal/repository/shorten"
 	userRepository "github.com/homework/lab/internal/repository/user"
@@ -23,7 +25,8 @@ import (
 	health_check_service "github.com/homework/lab/internal/service/health_check"
 	shorten_service "github.com/homework/lab/internal/service/shorten"
 	user_service "github.com/homework/lab/internal/service/user"
-	"github.com/homework/lab/pkg/helpers"
+	base62_helper "github.com/homework/lab/pkg/helpers/base62"
+	"github.com/homework/lab/pkg/helpers/hasher"
 	jwt_pkg "github.com/homework/lab/pkg/jwt"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -89,29 +92,32 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	instanceID := cfg.InstanceID
 	redisClient := e.connector.GetRedisClient()
 	sqlDB := e.connector.GetSqlDB()
+	cacheRedis := cache.NewCache(redisClient)
 
-	// create handler
+	// create helper
+	hasher := hasher.NewHasher()
+	// code_gen := code_gen.NewKeyGenerator()
+	base62_helper := base62_helper.New()
+	// create repository
 	healthCheckRepository := health_check_repository.NewPing(redisClient)
-	healthCheckService := health_check_service.NewHealthCheck(serviceName, instanceID, healthCheckRepository)
-	healthCheckHandler := health_check_handler.NewHealthCheck(healthCheckService)
-
-	// create shorten url handler
 	urlStorage := url_repository.NewURLStorage(redisClient)
-	shortenService := shorten_service.NewShorternUrl(urlStorage, helpers.NewKeyGenerator())
-	shortenURLHandler := shorten.NewShortenURL(shortenService)
-
-	// create user handler
 	userRepository := userRepository.NewUserRepository(sqlDB)
-	hasher := helpers.NewHasher()
+	bookmarkRepo := bookmark_repository.NewBookmarkRepository(sqlDB, base62_helper)
+	// create service
+	healthCheckService := health_check_service.NewHealthCheck(serviceName, instanceID, healthCheckRepository)
+	shortenService := shorten_service.NewShorternUrl(urlStorage, base62_helper, bookmarkRepo)
 	userService := user_service.NewUserService(userRepository, hasher, e.jwtGenerator)
+	bookmarkSvc := bookmark_service.NewBookmarkService(bookmarkRepo)
+
+	// create cache
+	bookmarkCache := bookmark_cache.NewBookmarkCacheInstance(bookmarkSvc, cacheRedis)
+	// create handler
+	healthCheckHandler := health_check_handler.NewHealthCheck(healthCheckService)
+	shortenURLHandler := shorten.NewShortenURL(shortenService)
 	userHandler := user_handler.NewUserHandler(userService)
+	bookmarkHandler := bookmark_handler.NewBookmarkHandler(bookmarkCache)
 
-	// create bookmark handler
-	bookmarkRepo := bookmark_repository.NewBookmarkRepository(sqlDB)
-	bookmarkSvc := bookmark_service.NewBookmarkService(bookmarkRepo, helpers.NewKeyGenerator())
-	bookmarkHdl := bookmark_handler.NewBookmarkHandler(bookmarkSvc)
-
-	return handlers{healthCheckHandler, shortenURLHandler, userHandler, bookmarkHdl, cfg}
+	return handlers{healthCheckHandler, shortenURLHandler, userHandler, bookmarkHandler, cfg}
 }
 
 func (e *engine) initRoutes(cfg *config.Config) {

@@ -59,7 +59,7 @@ func TestUpdateBookmark(t *testing.T) {
 			t.Parallel()
 			ctx := context.Background()
 			db := SetUpDB(t)
-			repo := NewBookmarkRepository(db)
+			repo := NewBookmarkRepository(db, nil)
 
 			err := repo.UpdateBookmark(ctx, tc.userID, tc.bookmarkID, tc.url, tc.description)
 			tc.expectError(t, err)

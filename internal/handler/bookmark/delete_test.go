@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	jwt "github.com/golang-jwt/jwt/v5"
-	bookmark_service_mocks "github.com/homework/lab/internal/service/bookmark/mocks"
+	bookmark_cache_mocks "github.com/homework/lab/internal/cache/bookmark/mocks"
 	"github.com/homework/lab/pkg/response"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,15 +15,15 @@ import (
 func TestBookmarkHandler_DeleteBookmark(t *testing.T) {
 	testCases := []struct {
 		name         string
-		setupMock    func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService
+		setupMock    func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache
 		withClaims   bool
 		expectedCode int
 		expectedText string
 	}{
 		{
 			name: "success",
-			setupMock: func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService {
-				mockSvc := bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache {
+				mockSvc := bookmark_cache_mocks.NewBookmarkCache(t)
 				mockSvc.On("DeleteBookmark", ctx, "user-1", "bookmark-1").Return(nil)
 				return mockSvc
 			},
@@ -33,8 +33,8 @@ func TestBookmarkHandler_DeleteBookmark(t *testing.T) {
 		},
 		{
 			name: "missing claims",
-			setupMock: func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService {
-				return bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache {
+				return bookmark_cache_mocks.NewBookmarkCache(t)
 			},
 			withClaims:   false,
 			expectedCode: http.StatusUnauthorized,
@@ -42,8 +42,8 @@ func TestBookmarkHandler_DeleteBookmark(t *testing.T) {
 		},
 		{
 			name: "service error",
-			setupMock: func(ctx *gin.Context) *bookmark_service_mocks.BookmarkService {
-				mockSvc := bookmark_service_mocks.NewBookmarkService(t)
+			setupMock: func(ctx *gin.Context) *bookmark_cache_mocks.BookmarkCache {
+				mockSvc := bookmark_cache_mocks.NewBookmarkCache(t)
 				mockSvc.On("DeleteBookmark", ctx, "user-1", "bookmark-1").Return(response.NotFoundError)
 				return mockSvc
 			},

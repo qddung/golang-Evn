@@ -8,10 +8,11 @@ import (
 	"github.com/homework/lab/pkg/response"
 )
 
+const PrefixCreate = "bookmark_url_"
+
 // NewBookmark
 func (s *bookmarkService) NewBookmark(ctx context.Context, userId string, bookmark *bookmark_model.NewBookmarkRequest) (*bookmark_model.BookmarkInfo, error) {
-	code := s.keyGenerator.GenerateRandomCode(10)
-	bookmarkCreate, err := s.bookmarkRepository.CreateBookmark(ctx, userId, bookmark.Url, bookmark.Description, code)
+	bookmarkCreate, err := s.bookmarkRepository.CreateBookmark(ctx, userId, bookmark.Url, bookmark.Description, PrefixCreate)
 
 	if err != nil {
 		return nil, response.ErrorHandling(err)

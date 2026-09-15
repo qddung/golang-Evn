@@ -10,16 +10,17 @@ dev-run: swagger
 run-app:
 	go run cmd/api/main.go
 
-# 1. Định nghĩa giá trị mặc định (người dùng có thể đè bằng: make test OPTION=cache)
-OPTION ?= cache
+# Coverage exclude files and directories out of report
 COVERAGE_EXCLUDE=mocks|main.go|test|config.go|infrastructure/**
 COVERAGE_THRESHOLD ?= 80
 
-# 2. Xử lý logic điều kiện (Sử dụng cú pháp ifeq/ifneq chuẩn của Make)
+# Process check run make test whether cache or no-cache
 CACHECMD := 
+OPTION ?= cache
 ifeq ($(OPTION),nocache)
     CACHECMD := go clean -testcache    
 endif
+
 
 test: 
 	@mkdir -p ./test
@@ -56,9 +57,6 @@ docker-build:
 	docker build -f deployment/Dockerfile -t $(IMG_NAME):$(IMG_TAG) .
 
 docker-release: docker-build
-	docker push $(IMG_NAME):$(IMG_TAG)
-
-docker-release:	
 	docker push $(IMG_NAME):$(IMG_TAG)
 
 generated-key:

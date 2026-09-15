@@ -6,5 +6,7 @@
 privatekey.pem
 publickey.pem
 /cmd/test
+/cmd/dev_run
 /deployment/postgres-data
 atlas.*
+/cmd/seed
