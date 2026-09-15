@@ -19,6 +19,7 @@ func GetGroupKey(userId string) string {
 var ErrorMarshal = errors.New("parse result failed")
 var ErrorWriteCache = errors.New("write cache failed")
 
+// deleteGroupKey
 func (b *BookmarkCacheInstance) deleteGroupKey(ctx context.Context, userId string) error {
 	err := b.cache.DeleteGroup(ctx, GetGroupKey(userId))
 	if err != nil {

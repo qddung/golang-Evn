@@ -11,7 +11,6 @@ import (
 	bookmark_service_mocks "github.com/homework/lab/internal/service/bookmark/mocks"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestBookmarkCacheInstance_Get(t *testing.T) {
@@ -45,13 +44,14 @@ func TestBookmarkCacheInstance_Get(t *testing.T) {
 			setup: func() (*mocks.Cache, *bookmark_service_mocks.BookmarkService) {
 				cacheMock := mocks.NewCache(t)
 				cacheMock.On("Read", ctx, GetGroupKey("user-1"), "1_10").Return("", redis.ErrClosed)
-				cacheMock.On("Write", ctx, GetGroupKey("user-1"), "1_10", mock.AnythingOfType("[]uint8"), ttl).Return(redis.ErrClosed)
+				cacheMock.On("Write", ctx, GetGroupKey("user-1"), "1_10", expectedBytes, ttl).Return(redis.ErrClosed)
 
 				serviceMock := bookmark_service_mocks.NewBookmarkService(t)
 				serviceMock.On("GetBookmarks", ctx, "user-1", query).Return(expected, nil)
 				return cacheMock, serviceMock
 			},
-			expectedError: ErrorWriteCache,
+			expected:      expected,
+			expectedError: nil,
 		},
 	}
 

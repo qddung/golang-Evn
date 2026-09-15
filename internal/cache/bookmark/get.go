@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Get Bookmarks from cache
 func (b *BookmarkCacheInstance) GetBookmarks(ctx context.Context, userId string, query *bookmark_model.GetBookmarksQuery) (*api.PaginatedResponse[bookmark_model.BookmarkInfo], error) {
 	// Read Cache
 	var groupKey = GetGroupKey(userId)
@@ -23,29 +24,27 @@ func (b *BookmarkCacheInstance) GetBookmarks(ctx context.Context, userId string,
 			if delErr != nil {
 				log.Error().Err(delErr).Msg("Failed to delete cache after unmarshal failure")
 			}
+		} else {
+			return &returnValue, nil
 		}
 	}
+
 	// Return value
 
-	// Not exit
+	res, err := b.service.GetBookmarks(ctx, userId, query)
 	if err != nil {
-		res, err := b.service.GetBookmarks(ctx, userId, query)
-		if err != nil {
-			return nil, err
-		}
-		byteResult, err := json.Marshal(res)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to Marshal result in bookmarkCache.Get")
-			return nil, ErrorMarshal
-		}
-		err = b.cache.Write(ctx, groupKey, fields, byteResult, ttl)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to Write to cache in bookmarkCache.Get")
-			return nil, ErrorWriteCache
-		}
-
+		return nil, err
+	}
+	byteResult, err := json.Marshal(res)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to Marshal result in bookmarkCache.Get")
+		return res, nil
+	}
+	err = b.cache.Write(ctx, groupKey, fields, byteResult, ttl)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to Write to cache in bookmarkCache.Get")
 		return res, nil
 	}
 
-	return &returnValue, nil
+	return res, nil
 }

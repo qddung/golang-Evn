@@ -9,3 +9,4 @@ publickey.pem
 /cmd/dev_run
 /deployment/postgres-data
 atlas.*
+/cmd/seed

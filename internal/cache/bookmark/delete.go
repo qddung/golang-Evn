@@ -4,6 +4,7 @@ import (
 	"context"
 )
 
+// DeleteBookmark
 func (b *BookmarkCacheInstance) DeleteBookmark(ctx context.Context, userId string, bookmarkId string) error {
 	err := b.deleteGroupKey(ctx, userId)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	bookmark_model "github.com/homework/lab/internal/models/dto/api/bookmark"
 )
 
+// UpdateBookmark
 func (b *BookmarkCacheInstance) UpdateBookmark(ctx context.Context, request *bookmark_model.UpdateBookmarkRequest, userId, bookmarkId string) error {
 	err := b.deleteGroupKey(ctx, userId)
 	if err != nil {
