@@ -1,7 +1,8 @@
 package base62_helper
 
 import (
-	"github.com/ivanrad/base62"
+	base62_lib "github.com/homework/lab/pkg/lib/base62"
+	_ "github.com/ivanrad/base62"
 )
 
 //go:generate mockery --name=Base62Helper --filename=base62.go --outpkg=mocks
@@ -10,13 +11,14 @@ type Base62Helper interface {
 }
 
 type base62Helper struct {
+	base62Encoding base62_lib.Base62Encoding
 }
 
 func (b *base62Helper) Encode(data string) string {
-	res := base62.EncodeToString([]byte(data))
+	res := b.base62Encoding.EncodeToString([]byte(data))
 	return res
 }
 
-func New() Base62Helper {
-	return &base62Helper{}
+func New(base62Encoding base62_lib.Base62Encoding) Base62Helper {
+	return &base62Helper{base62Encoding}
 }
