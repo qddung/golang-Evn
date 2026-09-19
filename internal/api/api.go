@@ -96,11 +96,11 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	cacheRedis := cache.NewCache(redisClient)
 
 	// lib
-	base62_lib := base62_lib.NewStdEncoding()
+	base62_encoding := base62_lib.NewStdEncoding()
 	// create helper
 	hasher := hasher.NewHasher()
 	// code_gen := code_gen.NewKeyGenerator()
-	base62_helper := base62_helper.New(base62_lib)
+	base62_helper := base62_helper.New(base62_encoding)
 	// create repository
 	healthCheckRepository := health_check_repository.NewPing(redisClient)
 	urlStorage := url_repository.NewURLStorage(redisClient)
