@@ -3,7 +3,7 @@ package base62_helper
 import (
 	"testing"
 
-	"github.com/ivanrad/base62"
+	base62_lib "github.com/homework/lab/pkg/lib/base62"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,9 +21,10 @@ func TestBase62(t *testing.T) {
 	for _, tc := range testCase {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			base62Helper := New()
+			enc := base62_lib.NewStdEncoding()
+			base62Helper := New(enc)
 			res := base62Helper.Encode(tc.data)
-			assert.Equal(t, base62.EncodeToString([]byte(tc.data)), res)
+			assert.Equal(t, enc.EncodeToString([]byte(tc.data)), res)
 
 		})
 

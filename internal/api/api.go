@@ -28,6 +28,7 @@ import (
 	base62_helper "github.com/homework/lab/pkg/helpers/base62"
 	"github.com/homework/lab/pkg/helpers/hasher"
 	jwt_pkg "github.com/homework/lab/pkg/jwt"
+	base62_lib "github.com/homework/lab/pkg/lib/base62"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -94,10 +95,12 @@ func (e *engine) InitHandlers(cfg *config.Config) handlers {
 	sqlDB := e.connector.GetSqlDB()
 	cacheRedis := cache.NewCache(redisClient)
 
+	// lib
+	base62_encoding := base62_lib.NewStdEncoding()
 	// create helper
 	hasher := hasher.NewHasher()
 	// code_gen := code_gen.NewKeyGenerator()
-	base62_helper := base62_helper.New()
+	base62_helper := base62_helper.New(base62_encoding)
 	// create repository
 	healthCheckRepository := health_check_repository.NewPing(redisClient)
 	urlStorage := url_repository.NewURLStorage(redisClient)

@@ -8,6 +8,7 @@ import (
 	"github.com/homework/lab/internal/models/entity"
 	"github.com/homework/lab/internal/test/data/fixture"
 	base62_helper "github.com/homework/lab/pkg/helpers/base62"
+	base62_lib "github.com/homework/lab/pkg/lib/base62"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -54,7 +55,8 @@ func TestCreateBookmark(t *testing.T) {
 			t.Parallel()
 			ctx := context.Background()
 			db := SetUpDB(t)
-			code_gen := base62_helper.New()
+			enc := base62_lib.NewStdEncoding()
+			code_gen := base62_helper.New(enc)
 			repo := NewBookmarkRepository(db, code_gen)
 			bookmark, err := repo.CreateBookmark(ctx, tc.input.userId, tc.input.url, tc.input.description, prefix)
 			tc.expectError(t, err)
